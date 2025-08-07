@@ -30,12 +30,18 @@ router.get('/', requireAuth, (req, res) => {
         const customers = dataManager.findBy('customers', { isActive: true });
         
         // Get all bills to calculate accurate totals
-        const billsData = dataManager.getBillsData();
+        const billsData = dataManager.readData('bills');
         const bills = billsData.bills || [];
         
         // Calculate actual total purchases for each customer from bills
         const customersWithTotals = customers.map(customer => {
-            const customerBills = bills.filter(bill => bill.customerId === customer.id);
+            // Match bills by customerId, customerName, or customerPhone
+            const customerBills = bills.filter(bill => {
+                return bill.customerId === customer.id ||
+                       bill.customerName === customer.name ||
+                       bill.customerPhone === customer.contact?.phone;
+            });
+            
             const actualTotal = customerBills.reduce((sum, bill) => {
                 return sum + (bill.finalTotal || bill.grandTotal || 0);
             }, 0);

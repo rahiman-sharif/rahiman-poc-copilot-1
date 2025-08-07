@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotation #<%= quotation.quotationNumber %> - <%= quotation.customerInfo.name %></title>
+    <style>
+        /* Print-specific styling */
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none !important; }
+            .print-break { page-break-after: always; }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: white;
+            color: #333;
+        }
+        
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+        }
+        
+        .invoice-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 3px solid #8b5cf6;
+            text-align: center;
+        }
+        
+        .company-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #8b5cf6;
+            margin-bottom: 5px;
+        }
+        
+        .company-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .invoice-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: #8b5cf6;
+            color: white;
+            padding: 10px;
+        }
+        
+        .quotation-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .quotation-info, .customer-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            color: #8b5cf6;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 2px 0;
+        }
+        
+        .info-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .items-section {
+            padding: 20px;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .items-table th {
+            background: #8b5cf6;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #8b5cf6;
+        }
+        
+        .items-table td {
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        
+        .items-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .item-details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .amount-column {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .charges-section {
+            margin-top: 20px;
+        }
+        
+        .charges-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .charges-table th {
+            background: #6b7280;
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #6b7280;
+        }
+        
+        .charges-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .totals-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-top: 2px solid #8b5cf6;
+        }
+        
+        .totals-table {
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+        }
+        
+        .totals-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .total-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .total-amount {
+            font-weight: bold;
+            text-align: right;
+            color: #333;
+        }
+        
+        .final-total {
+            background: #8b5cf6;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .final-total td {
+            padding: 12px;
+            border: none;
+        }
+        
+        .terms-section {
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .terms-title {
+            font-weight: bold;
+            color: #8b5cf6;
+            margin-bottom: 10px;
+        }
+        
+        .terms-content {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .footer-section {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .signature-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-top: 40px;
+        }
+        
+        .signature-box {
+            text-align: center;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+        
+        .print-controls {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .print-btn {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+        
+        .print-btn:hover {
+            background: #7c3aed;
+        }
+        
+        .back-btn {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: #4b5563;
+        }
+        
+        .validity-notice {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #92400e;
+        }
+        
+        .expired-notice {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Controls -->
+    <div class="print-controls no-print">
+        <button onclick="window.print()" class="print-btn">🖨️ Print Quotation</button>
+        <a href="/quotations/<%= quotation.id %>" class="back-btn">← Back to Quotation</a>
+    </div>
+
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="company-name"><%= company.name %></div>
+            <div class="company-details">
+                <%= company.address.line1 %>, <%= company.address.line2 %><br>
+                <%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %><br>
+                Phone: <%= company.contact.phone1 %> | Email: <%= company.contact.email %><br>
+                GSTIN: <%= company.gst.gstin %> | PAN: <%= company.gst.panNo %>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="invoice-title">💜 QUOTATION</div>
+
+        <!-- Validity Notice -->
+        <% 
+            const validUntil = new Date(quotation.validUntil);
+            const isExpired = validUntil < new Date();
+            const daysLeft = Math.ceil((validUntil - new Date()) / (1000 * 60 * 60 * 24));
+        %>
+        <% if (isExpired) { %>
+            <div class="validity-notice expired-notice">
+                ⚠️ This quotation expired on <%= validUntil.toLocaleDateString('en-IN') %>
+            </div>
+        <% } else if (daysLeft <= 7) { %>
+            <div class="validity-notice">
+                ⏰ This quotation expires on <%= validUntil.toLocaleDateString('en-IN') %> 
+                (<%= daysLeft %> day<%= daysLeft !== 1 ? 's' : '' %> remaining)
+            </div>
+        <% } %>
+
+        <!-- Quotation Details -->
+        <div class="quotation-details">
+            <div class="quotation-info">
+                <div class="section-title">💜 Quotation Information</div>
+                <div class="info-row">
+                    <span class="info-label">Quotation Number:</span>
+                    <span class="info-value"><%= quotation.quotationNumber %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Quotation Date:</span>
+                    <span class="info-value"><%= new Date(quotation.quotationDate).toLocaleDateString('en-IN') %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Valid Until:</span>
+                    <span class="info-value"><%= validUntil.toLocaleDateString('en-IN') %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Validity Days:</span>
+                    <span class="info-value"><%= quotation.validityDays %> days</span>
+                </div>
+            </div>
+
+            <div class="customer-info">
+                <div class="section-title">👤 Customer Information</div>
+                <div class="info-row">
+                    <span class="info-label">Name:</span>
+                    <span class="info-value"><%= quotation.customerInfo.name %></span>
+                </div>
+                <% if (quotation.customerInfo.phone) { %>
+                <div class="info-row">
+                    <span class="info-label">Phone:</span>
+                    <span class="info-value"><%= quotation.customerInfo.phone %></span>
+                </div>
+                <% } %>
+                <% if (quotation.customerInfo.email) { %>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value"><%= quotation.customerInfo.email %></span>
+                </div>
+                <% } %>
+                <% if (quotation.customerInfo.gstin) { %>
+                <div class="info-row">
+                    <span class="info-label">GSTIN:</span>
+                    <span class="info-value"><%= quotation.customerInfo.gstin %></span>
+                </div>
+                <% } %>
+                <% if (quotation.customerInfo.address) { %>
+                <div class="info-row">
+                    <span class="info-label">Address:</span>
+                    <span class="info-value"><%= quotation.customerInfo.address %></span>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="items-section">
+            <h3 style="color: #8b5cf6; margin-bottom: 15px;">📦 Items</h3>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 35%;">Item Details</th>
+                        <th style="width: 10%;">HSN Code</th>
+                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 10%;">Unit</th>
+                        <th style="width: 15%;">Rate (₹)</th>
+                        <th style="width: 15%;">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% quotation.items.forEach((item, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td>
+                                <div class="item-name"><%= item.itemName %></div>
+                                <% if (item.description) { %>
+                                    <div class="item-details">Description: <%= item.description %></div>
+                                <% } %>
+                            </td>
+                            <td><%= item.hsnCode || 'N/A' %></td>
+                            <td class="amount-column"><%= item.quantity %></td>
+                            <td><%= item.unit || 'Pcs' %></td>
+                            <td class="amount-column">₹<%= (item.rate || 0).toLocaleString('en-IN') %></td>
+                            <td class="amount-column">₹<%= (item.total || 0).toLocaleString('en-IN') %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+
+            <!-- Extra Charges -->
+            <% if (quotation.extraCharges && quotation.extraCharges.length > 0) { %>
+                <div class="charges-section">
+                    <h4 style="color: #8b5cf6; margin-bottom: 10px;">💰 Additional Charges</h4>
+                    <table class="charges-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 70%;">Charge Description</th>
+                                <th style="width: 25%;">Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% quotation.extraCharges.forEach((charge, index) => { %>
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td><%= charge.description %></td>
+                                    <td class="amount-column">₹<%= (charge.amount || 0).toLocaleString('en-IN') %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <table class="totals-table">
+                <tr>
+                    <td class="total-label">Subtotal:</td>
+                    <td class="total-amount">₹<%= (quotation.subtotal || 0).toLocaleString('en-IN') %></td>
+                </tr>
+                <% if (quotation.cgstAmount > 0) { %>
+                <tr>
+                    <td class="total-label">CGST (9%):</td>
+                    <td class="total-amount">₹<%= (quotation.cgstAmount || 0).toLocaleString('en-IN') %></td>
+                </tr>
+                <tr>
+                    <td class="total-label">SGST (9%):</td>
+                    <td class="total-amount">₹<%= (quotation.sgstAmount || 0).toLocaleString('en-IN') %></td>
+                </tr>
+                <% } %>
+                <tr class="final-total">
+                    <td>Total Amount:</td>
+                    <td>₹<%= (quotation.finalTotal || 0).toLocaleString('en-IN') %></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="terms-section">
+            <div class="terms-title">📋 Terms & Conditions:</div>
+            <div class="terms-content">
+                1. This quotation is valid for <%= quotation.validityDays %> days from the date of issue.<br>
+                2. Prices are subject to change without prior notice after the validity period.<br>
+                3. This is a quotation only and not an invoice. No payment is due until order confirmation.<br>
+                4. Goods once sold will not be taken back or exchanged.<br>
+                5. All disputes are subject to Chandigarh jurisdiction only.<br>
+                6. Payment terms will be as per agreed terms during order placement.<br>
+                7. Delivery terms and charges will be discussed during order confirmation.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-section">
+            <p style="margin: 0; color: #666; font-size: 12px;">
+                This is a computer-generated quotation and does not require a physical signature.
+            </p>
+            
+            <div class="signature-area">
+                <div class="signature-box">
+                    <strong>Customer Acknowledgment</strong><br>
+                    <small>Date & Signature</small>
+                </div>
+                <div class="signature-box">
+                    <strong>For <%= company.name %></strong><br>
+                    <small>Authorized Signatory</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-print functionality
+        window.addEventListener('load', function() {
+            // Check if print parameter is in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('print') === 'true') {
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>

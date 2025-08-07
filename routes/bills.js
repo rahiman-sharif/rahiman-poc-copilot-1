@@ -57,8 +57,8 @@ router.get('/api/fresh-stock', requireAuth, (req, res) => {
         
         items.forEach(item => {
             stockData[item.id] = {
-                quantity: item.stock.quantity,
-                minLevel: item.stock.minLevel
+                quantity: item.stock?.quantity || 0,
+                minLevel: item.stock?.minLevel || 0
             };
         });
         
@@ -86,10 +86,10 @@ router.get('/new', requireAuth, (req, res) => {
             return {
                 ...item,
                 categoryName: category ? category.name : 'Unknown',
-                // Ensure stock is fresh from database
+                // Ensure stock is fresh from database with null checking
                 stock: {
-                    quantity: item.stock.quantity,
-                    minLevel: item.stock.minLevel
+                    quantity: item.stock?.quantity || 0,
+                    minLevel: item.stock?.minLevel || 0
                 }
             };
         });
@@ -157,41 +157,60 @@ router.post('/', requireAuth, (req, res) => {
                 return res.redirect('/bills/new?error=Customer phone number is required for new customer');
             }
 
-            // Create new customer instantly
+            // Validate phone number format (basic validation)
+            const phoneRegex = /^[\+]?[0-9\-\s]{10,15}$/;
+            if (!phoneRegex.test(customerPhone.trim())) {
+                return res.redirect('/bills/new?error=Please enter a valid phone number (10-15 digits)');
+            }
+
+            // Check if customer already exists by phone number (primary unique identifier)
             const customers = dataManager.getAll('customers');
-            const nextId = customers.length + 1;
-            const newCustomerId = `cust_${String(nextId).padStart(3, '0')}`;
+            const existingCustomer = customers.find(c => 
+                c.contact?.phone === customerPhone.trim()
+            );
 
-            customer = {
-                id: newCustomerId,
-                name: customerName.trim(),
-                type: 'Individual',
-                contact: {
-                    phone: customerPhone.trim(),
-                    email: '',
-                    address: {
-                        line1: '',
-                        line2: '',
-                        city: '',
-                        state: '',
-                        pincode: ''
-                    }
-                },
-                gst: {
-                    gstin: customerGstin ? customerGstin.trim().toUpperCase() : '',
-                    isRegistered: customerGstin ? true : false
-                },
-                paymentTerms: 'Cash',
-                creditLimit: 0,
-                totalPurchases: 0,
-                outstandingAmount: 0,
-                isActive: true,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
+            if (existingCustomer) {
+                // Customer already exists, use existing customer
+                customer = existingCustomer;
+                console.log(`📋 Using existing customer for bill: ${customerName} (${existingCustomer.id}) - matched by phone`);
+            } else {
+                // Create new customer only if doesn't exist
+                const nextId = customers.length + 1;
+                const newCustomerId = `cust_${String(nextId).padStart(3, '0')}`;
 
-            // Add to database immediately
-            dataManager.add('customers', customer);
+                customer = {
+                    id: newCustomerId,
+                    name: customerName.trim(),
+                    type: 'Individual',
+                    contact: {
+                        phone: customerPhone.trim(),
+                        email: '',
+                        address: {
+                            line1: '',
+                            line2: '',
+                            city: '',
+                            state: '',
+                            pincode: ''
+                        }
+                    },
+                    gst: {
+                        gstin: customerGstin ? customerGstin.trim().toUpperCase() : '',
+                        isRegistered: customerGstin ? true : false
+                    },
+                    paymentTerms: 'Cash',
+                    creditLimit: 0,
+                    totalPurchases: 0,
+                    outstandingAmount: 0,
+                    isActive: true,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    createdFrom: 'bill' // Track that this customer came from bill
+                };
+
+                // Add to database
+                dataManager.add('customers', customer);
+                console.log(`✅ New customer created from bill: ${customerName} (${newCustomerId})`);
+            }
         } else {
             return res.redirect('/bills/new?error=Invalid customer type. Please select Existing or New Customer.');
         }
@@ -218,8 +237,9 @@ router.post('/', requireAuth, (req, res) => {
                     return res.redirect(`/bills/new?error=Item not found: ${item.itemName}`);
                 }
                 
-                if (currentItem.stock.quantity < item.quantity) {
-                    return res.redirect(`/bills/new?error=Insufficient stock for ${item.itemName}. Available: ${currentItem.stock.quantity} ${currentItem.unit}, Required: ${item.quantity} ${currentItem.unit}`);
+                const availableStock = currentItem.stock?.quantity || 0;
+                if (availableStock < item.quantity) {
+                    return res.redirect(`/bills/new?error=Insufficient stock for ${item.itemName}. Available: ${availableStock} ${currentItem.unit}, Required: ${item.quantity} ${currentItem.unit}`);
                 }
             }
         }
@@ -285,7 +305,8 @@ router.post('/', requireAuth, (req, res) => {
             if (!item.isServiceItem) {
                 const currentItem = dataManager.findBy('items', { id: item.itemId })[0];
                 if (currentItem) {
-                    const newQuantity = Math.max(0, currentItem.stock.quantity - item.quantity);
+                    const currentStock = currentItem.stock?.quantity || 0;
+                    const newQuantity = Math.max(0, currentStock - item.quantity);
                     
                     // Update stock using dataManager
                     dataManager.updateNestedProperty('items', item.itemId, 'stock.quantity', newQuantity);
@@ -299,7 +320,7 @@ router.post('/', requireAuth, (req, res) => {
                         }
                     });
                         
-                    console.log(`Stock deducted: ${currentItem.name} - ${item.quantity} (${currentItem.stock.quantity} → ${newQuantity})`);
+                    console.log(`Stock deducted: ${currentItem.name} - ${item.quantity} (${currentStock} → ${newQuantity})`);
                 }
             }
         });

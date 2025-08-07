@@ -299,6 +299,18 @@ function initializeFreshSystem() {
         });
         console.log('✅ Empty bills file initialized');
     }
+
+    // 7. Initialize empty quotations file
+    const quotations = dataManager.getQuotationsData();
+    
+    if (!quotations.quotations || quotations.quotations.length === 0) {
+        dataManager.writeData('quotations', { 
+            quotations: [],
+            nextQuotationNumber: 1,
+            lastUpdated: new Date().toISOString()
+        });
+        console.log('✅ Empty quotations file initialized');
+    }
     
     console.log('🎉 Fresh system initialization completed!');
 }
@@ -366,6 +378,7 @@ app.set('views', path.join(__dirname, 'views'));
 const itemsRouter = require('./routes/items');
 const customersRouter = require('./routes/customers');
 const billsRouter = require('./routes/bills');
+const quotationsRouter = require('./routes/quotations');
 const stockRouter = require('./routes/stock');
 const reportsRouter = require('./routes/reports');
 const usersRouter = require('./routes/users');
@@ -377,6 +390,7 @@ app.use('/items', (req, res, next) => {
 }, itemsRouter);
 app.use('/customers', customersRouter);
 app.use('/bills', billsRouter);
+app.use('/quotations', quotationsRouter);
 app.use('/stock', stockRouter);
 app.use('/reports', reportsRouter);
 app.use('/users', usersRouter);

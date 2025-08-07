@@ -115,9 +115,9 @@
                             <option value="Individual">Individual</option>
                         </select>
                         <select id="paymentFilter" class="filter-select">
-                            <option value="">All Customers</option>
-                            <option value="Business">Business</option>
-                            <option value="Individual">Individual</option>
+                            <option value="">All Payment Terms</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Credit">Credit</option>
                         </select>
                     </div>
                 </div>
@@ -153,7 +153,7 @@
                             <% customers.forEach(customer => { %>
                                 <tr class="item-row" 
                                     data-type="<%= customer.type %>" 
-                                    data-payment="<%= customer.paymentTerms && customer.paymentTerms.includes('Cash') ? 'Cash' : 'Credit' %>">
+                                    data-payment="<%= customer.paymentTerms %>">
                                     <td>
                                         <div class="item-info">
                                             <strong><%= customer.name %></strong>

@@ -4,6 +4,41 @@ const dataManager = require('../utils/dataManager');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
+const multer = require('multer');
+const extractZip = require('extract-zip');
+
+console.log('💾 Data Management router loaded');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadsDir = path.join(__dirname, '..', 'uploads');
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        cb(null, uploadsDir);
+    },
+    filename: function (req, file, cb) {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        cb(null, `backup-upload-${timestamp}.zip`);
+    }
+});
+
+const upload = multer({ 
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype === 'application/zip' || 
+            file.mimetype === 'application/x-zip-compressed' ||
+            file.originalname.toLowerCase().endsWith('.zip')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only ZIP files are allowed'), false);
+        }
+    },
+    limits: {
+        fileSize: 50 * 1024 * 1024 // 50MB limit
+    }
+});
 
 console.log('💾 Data Management router loaded');
 
@@ -330,6 +365,115 @@ router.get('/download/:backupName', requireAdmin, async (req, res) => {
     } catch (error) {
         console.error('Error downloading backup:', error);
         res.status(500).json({ error: 'Failed to download backup' });
+    }
+});
+
+// POST /data/upload-restore - Upload and restore backup from ZIP
+router.post('/upload-restore', requireAdmin, upload.single('backupFile'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.redirect('/data?error=No file uploaded');
+        }
+
+        const uploadedFile = req.file.path;
+        const extractDir = path.join(__dirname, '..', 'temp-restore');
+        
+        // Clean up any existing temp directory
+        if (fs.existsSync(extractDir)) {
+            fs.rmSync(extractDir, { recursive: true });
+        }
+        fs.mkdirSync(extractDir, { recursive: true });
+
+        try {
+            // Extract the ZIP file
+            await extractZip(uploadedFile, { dir: extractDir });
+            
+            // Validate the backup structure
+            const requiredFiles = ['bills.json', 'customers.json', 'items.json', 'users.json', 'settings.json'];
+            const extractedFiles = fs.readdirSync(extractDir);
+            
+            // Check if it's a valid backup
+            const hasRequiredFiles = requiredFiles.some(file => extractedFiles.includes(file));
+            if (!hasRequiredFiles) {
+                throw new Error('Invalid backup file - missing required data files');
+            }
+            
+            // Create backup of current data before restore
+            const backupTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const preRestoreBackupName = `pre-restore-${backupTimestamp}`;
+            const backupDir = path.join(__dirname, '..', 'backups');
+            const preRestoreBackupPath = path.join(backupDir, preRestoreBackupName);
+            
+            if (!fs.existsSync(backupDir)) {
+                fs.mkdirSync(backupDir, { recursive: true });
+            }
+            fs.mkdirSync(preRestoreBackupPath, { recursive: true });
+            
+            // Backup current data
+            const dataDir = path.join(__dirname, '..', 'data');
+            const currentFiles = fs.readdirSync(dataDir);
+            
+            for (const file of currentFiles) {
+                fs.copyFileSync(
+                    path.join(dataDir, file), 
+                    path.join(preRestoreBackupPath, file)
+                );
+            }
+            
+            // Create backup info
+            const backupInfo = {
+                created: new Date().toISOString(),
+                createdBy: req.session.user.username,
+                files: currentFiles,
+                version: '1.0.0',
+                type: 'pre-restore-backup'
+            };
+            
+            fs.writeFileSync(
+                path.join(preRestoreBackupPath, 'backup-info.json'), 
+                JSON.stringify(backupInfo, null, 2)
+            );
+            
+            // Restore data from uploaded backup
+            for (const file of extractedFiles) {
+                if (file.endsWith('.json') && file !== 'backup-info.json') {
+                    const srcPath = path.join(extractDir, file);
+                    const destPath = path.join(dataDir, file);
+                    
+                    // Validate JSON structure before copying
+                    try {
+                        const data = JSON.parse(fs.readFileSync(srcPath, 'utf8'));
+                        fs.writeFileSync(destPath, JSON.stringify(data, null, 2));
+                    } catch (jsonError) {
+                        console.error(`Invalid JSON in ${file}:`, jsonError);
+                        // Skip invalid files but continue with others
+                    }
+                }
+            }
+            
+            // Clean up
+            fs.rmSync(extractDir, { recursive: true });
+            fs.unlinkSync(uploadedFile);
+            
+            res.redirect('/data?success=Backup restored successfully! Previous data backed up as: ' + preRestoreBackupName);
+            
+        } catch (extractError) {
+            console.error('Error extracting or restoring backup:', extractError);
+            
+            // Clean up on error
+            if (fs.existsSync(extractDir)) {
+                fs.rmSync(extractDir, { recursive: true });
+            }
+            if (fs.existsSync(uploadedFile)) {
+                fs.unlinkSync(uploadedFile);
+            }
+            
+            res.redirect('/data?error=Failed to restore backup: ' + extractError.message);
+        }
+        
+    } catch (error) {
+        console.error('Error in upload-restore:', error);
+        res.redirect('/data?error=Failed to process uploaded file: ' + error.message);
     }
 });
 

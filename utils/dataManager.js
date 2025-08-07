@@ -8,6 +8,7 @@ class DataManager {
             items: path.join(this.dataDir, 'items.json'),
             customers: path.join(this.dataDir, 'customers.json'),
             bills: path.join(this.dataDir, 'bills.json'),
+            quotations: path.join(this.dataDir, 'quotations.json'),
             categories: path.join(this.dataDir, 'categories.json'),
             users: path.join(this.dataDir, 'users.json'),
             company: path.join(this.dataDir, 'company.json'),
@@ -360,6 +361,47 @@ class DataManager {
             return this.writeData('users', data);
         } catch (error) {
             console.error('Error saving users:', error);
+            return false;
+        }
+    }
+
+    // ===== QUOTATIONS METHODS =====
+    
+    // Get quotations data (similar to getBillsData)
+    getQuotationsData() {
+        try {
+            const data = this.readData('quotations');
+            return data || { quotations: [], nextQuotationNumber: 1 };
+        } catch (error) {
+            console.error('Error reading quotations data:', error);
+            return { quotations: [], nextQuotationNumber: 1 };
+        }
+    }
+
+    // Update next quotation number
+    updateNextQuotationNumber(newNumber) {
+        try {
+            const data = this.getQuotationsData();
+            data.nextQuotationNumber = newNumber;
+            data.lastUpdated = new Date().toISOString();
+            this.writeData('quotations', data);
+            return true;
+        } catch (error) {
+            console.error('Error updating next quotation number:', error);
+            return false;
+        }
+    }
+
+    // Add quotation (similar to bills but for quotations)
+    addQuotation(quotationData) {
+        try {
+            const data = this.getQuotationsData();
+            data.quotations.push(quotationData);
+            data.lastUpdated = new Date().toISOString();
+            this.writeData('quotations', data);
+            return true;
+        } catch (error) {
+            console.error('Error adding quotation:', error);
             return false;
         }
     }

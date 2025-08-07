@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Purple theme for quotations */
+        .quotations-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .header-left h2 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header-left p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #8b5cf6;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+            border: 2px solid #8b5cf6;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #8b5cf6;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .search-and-filter {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .search-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: end;
+        }
+        
+        .search-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .search-row input,
+        .search-row select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-row input:focus,
+        .search-row select:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+        
+        .btn-search {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+        
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .quotations-table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 2px solid #e5e7eb;
+        }
+        
+        .quotations-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .quotations-table th {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        
+        .quotations-table th:first-child {
+            border-top-left-radius: 12px;
+        }
+        
+        .quotations-table th:last-child {
+            border-top-right-radius: 12px;
+        }
+        
+        .quotations-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+        
+        .quotations-table tbody tr:hover {
+            background: #faf5ff;
+        }
+        
+        .quotations-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px;
+        }
+        
+        .quotations-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px;
+        }
+        
+        .quotation-number {
+            font-weight: 600;
+            color: #8b5cf6;
+        }
+        
+        .customer-name {
+            font-weight: 500;
+            color: #1f2937;
+        }
+        
+        .amount {
+            font-weight: 600;
+            color: #059669;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-converted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-view {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn-convert {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-convert:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn-print {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-print:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state h3 {
+            margin: 0 0 8px 0;
+            color: #374151;
+        }
+        
+        .empty-state p {
+            margin: 0 0 24px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Quotation Management</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <span class="current">💜 Quotations</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="quotations-main">
+        <div class="quotations-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>💜 Quotations</h2>
+                    <p>Manage all quotations</p>
+                </div>
+                <div class="header-right">
+                    <a href="/quotations/new" class="btn-primary">
+                        <span>➕</span>
+                        New Quotation
+                    </a>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value"><%= quotations.length %></div>
+                    <div class="stat-label">Total Quotations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">
+                        <%= quotations.filter(q => {
+                            const validUntil = new Date(q.validUntil);
+                            return validUntil >= new Date() && q.status === 'active';
+                        }).length %>
+                    </div>
+                    <div class="stat-label">Valid Quotations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">
+                        ₹<%= quotations.reduce((sum, q) => sum + (q.finalTotal || 0), 0).toLocaleString('en-IN') %>
+                    </div>
+                    <div class="stat-label">Total Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">
+                        <%= quotations.filter(q => q.status === 'converted').length %>
+                    </div>
+                    <div class="stat-label">Converted to Bills</div>
+                </div>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="search-and-filter">
+                <form method="GET" action="/quotations">
+                    <div class="search-row">
+                        <div>
+                            <label for="search">Search Quotations</label>
+                            <input type="text" id="search" name="search" placeholder="Quotation number, customer name..." value="<%= query.search || '' %>">
+                        </div>
+                        <div>
+                            <label for="status">Status</label>
+                            <select id="status" name="status">
+                                <option value="">All Status</option>
+                                <option value="active" <%= query.status === 'active' ? 'selected' : '' %>>Valid</option>
+                                <option value="expired" <%= query.status === 'expired' ? 'selected' : '' %>>Expired</option>
+                                <option value="converted" <%= query.status === 'converted' ? 'selected' : '' %>>Converted</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="dateFrom">Date From</label>
+                            <input type="date" id="dateFrom" name="dateFrom" value="<%= query.dateFrom || '' %>">
+                        </div>
+                        <div>
+                            <label for="dateTo">Date To</label>
+                            <input type="date" id="dateTo" name="dateTo" value="<%= query.dateTo || '' %>">
+                        </div>
+                        <div>
+                            <button type="submit" class="btn-search">🔍 Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Quotations Table -->
+            <div class="quotations-table-container">
+                <% if (quotations.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💜</div>
+                        <h3>No Quotations Found</h3>
+                        <p>Start creating quotations for your customers to track price inquiries.</p>
+                        <a href="/quotations/new" class="btn-primary">
+                            <span>➕</span>
+                            Create First Quotation
+                        </a>
+                    </div>
+                <% } else { %>
+                    <table class="quotations-table">
+                        <thead>
+                            <tr>
+                                <th>Quotation #</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Valid Until</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% quotations.forEach(quotation => { 
+                                const customerInfo = quotation.customerInfo || { name: 'Unknown Customer', phone: '' };
+                                const validUntil = new Date(quotation.validUntil);
+                                const isExpired = validUntil < new Date();
+                                let status = quotation.status || 'active';
+                                if (status === 'active' && isExpired) status = 'expired';
+                            %>
+                                <tr>
+                                    <td>
+                                        <span class="quotation-number"><%= quotation.quotationNumber %></span>
+                                    </td>
+                                    <td>
+                                        <%= new Date(quotation.quotationDate).toLocaleDateString('en-IN') %>
+                                    </td>
+                                    <td>
+                                        <span class="customer-name">
+                                            <%= customerInfo.name %>
+                                        </span>
+                                        <% if (customerInfo.phone) { %>
+                                            <br><small><%= customerInfo.phone %></small>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="amount">₹<%= (quotation.finalTotal || 0).toLocaleString('en-IN') %></span>
+                                    </td>
+                                    <td>
+                                        <%= validUntil.toLocaleDateString('en-IN') %>
+                                        <% if (isExpired && quotation.status === 'active') { %>
+                                            <br><small style="color: #ef4444;">Expired</small>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-<%= status %>">
+                                            <% if (status === 'active') { %>Valid
+                                            <% } else if (status === 'expired') { %>Expired
+                                            <% } else if (status === 'converted') { %>Converted
+                                            <% } %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/quotations/<%= quotation.id %>" class="btn-sm btn-view">
+                                                👁️ View
+                                            </a>
+                                            <% if (status === 'active' && !isExpired) { %>
+                                                <button onclick="convertToBill('<%= quotation.id %>')" class="btn-sm btn-convert">
+                                                    🔄 Convert
+                                                </button>
+                                            <% } %>
+                                            <a href="/quotations/<%= quotation.id %>/print" class="btn-sm btn-print" target="_blank">
+                                                🖨️ Print
+                                            </a>
+                                            <% if (user.role === 'admin' || user.role === 'manager') { %>
+                                                <button onclick="deleteQuotation('<%= quotation.id %>')" class="btn-sm btn-delete">
+                                                    🗑️ Delete
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        function deleteQuotation(quotationId) {
+            if (confirm('🚨 Are you sure you want to delete this quotation? This action cannot be undone.')) {
+                fetch(`/quotations/${quotationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('❌ Error deleting quotation: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Error deleting quotation. Please try again.');
+                });
+            }
+        }
+
+        function convertToBill(quotationId) {
+            if (confirm('🔄 Are you sure you want to convert this quotation to a bill?\\n\\n' +
+                       '✅ This will create a new bill\\n' +
+                       '📦 Stock levels will be updated\\n' +
+                       '👤 Customer data will be saved\\n' +
+                       '💜 Quotation will be marked as converted\\n\\n' +
+                       'This action cannot be undone!')) {
+                
+                // Show loading state
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ Converting...';
+                btn.disabled = true;
+                
+                fetch(`/quotations/${quotationId}/convert`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(data => {
+                    if (data) {
+                        // If we get here, there was an error
+                        console.error('Error response:', data);
+                        alert('❌ Error converting quotation to bill. Please try again.');
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Error converting quotation to bill. Please try again.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+            }
+        }
+
+        // Auto-submit search form on filter changes
+        document.querySelectorAll('#status, #dateFrom, #dateTo').forEach(element => {
+            element.addEventListener('change', function() {
+                this.form.submit();
+            });
+        });
+    </script>
+</body>
+</html>

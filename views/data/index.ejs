@@ -351,6 +351,20 @@
                 </div>
             </div>
 
+            <!-- Backup Restore -->
+            <div class="data-card">
+                <span class="card-icon">🔄</span>
+                <div class="card-title">Restore from Backup</div>
+                <div class="card-description">
+                    Upload and restore data from a previously downloaded backup ZIP file. Current data will be backed up automatically.
+                </div>
+                <div class="card-actions">
+                    <button onclick="showRestoreModal()" class="btn btn-warning">
+                        📁 Upload & Restore
+                    </button>
+                </div>
+            </div>
+
             <!-- Data Export -->
             <div class="data-card">
                 <span class="card-icon">📤</span>
@@ -447,6 +461,184 @@
                 window.location.href = '/data/export?format=json';
             }
         });
+
+        // Restore modal functions
+        function showRestoreModal() {
+            document.getElementById('restoreModal').style.display = 'block';
+        }
+
+        function hideRestoreModal() {
+            document.getElementById('restoreModal').style.display = 'none';
+            document.getElementById('restoreForm').reset();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const fileInfo = document.getElementById('fileInfo');
+            const submitBtn = document.getElementById('submitRestore');
+            
+            if (file) {
+                if (file.name.toLowerCase().endsWith('.zip')) {
+                    fileInfo.innerHTML = `
+                        <div style="color: #28a745;">
+                            ✅ Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+                        </div>
+                    `;
+                    submitBtn.disabled = false;
+                } else {
+                    fileInfo.innerHTML = `
+                        <div style="color: #dc3545;">
+                            ❌ Error: Please select a ZIP file
+                        </div>
+                    `;
+                    submitBtn.disabled = true;
+                }
+            } else {
+                fileInfo.innerHTML = '';
+                submitBtn.disabled = true;
+            }
+        }
+
+        function confirmRestore() {
+            return confirm('⚠️ WARNING: This will replace ALL current data with the backup data.\n\nYour current data will be automatically backed up before restore.\n\nDo you want to continue?');
+        }
     </script>
+
+    <!-- Restore Modal -->
+    <div id="restoreModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔄 Restore from Backup</h3>
+                <span class="close" onclick="hideRestoreModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="restore-warning">
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <strong>⚠️ Important:</strong>
+                        <ul style="margin: 10px 0 0 20px;">
+                            <li>This will replace ALL current data</li>
+                            <li>Current data will be automatically backed up first</li>
+                            <li>Only upload ZIP files downloaded from this system</li>
+                            <li>Maximum file size: 50MB</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <form id="restoreForm" action="/data/upload-restore" method="post" enctype="multipart/form-data" onsubmit="return confirmRestore()">
+                    <div class="form-group">
+                        <label for="backupFile">Select Backup ZIP File:</label>
+                        <input type="file" 
+                               id="backupFile" 
+                               name="backupFile" 
+                               accept=".zip" 
+                               required 
+                               onchange="handleFileSelect(event)"
+                               style="width: 100%; padding: 10px; border: 2px dashed #ddd; border-radius: 8px; margin-top: 10px;">
+                    </div>
+                    
+                    <div id="fileInfo" style="margin: 10px 0;"></div>
+                    
+                    <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="hideRestoreModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" id="submitRestore" class="btn btn-warning" disabled>
+                            🔄 Restore Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        
+        .close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-warning:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+    </style>
 </body>
 </html>

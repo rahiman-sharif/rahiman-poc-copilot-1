@@ -214,15 +214,15 @@ body {
 
 /* Dashboard Main */
 .dashboard-main {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 30px 20px;
+    padding: 20px 15px;
 }
 
 .dashboard-container {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 25px;
 }
 
 .welcome-section {
@@ -2014,5 +2014,337 @@ input[type="checkbox"] {
     
     .settings-grid {
         grid-template-columns: 1fr !important;
+    }
+}
+
+/* ========== NEW CLEAN DASHBOARD STYLES ========== */
+
+/* Welcome Banner */
+.welcome-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.welcome-banner h2 {
+    font-size: 24px;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.welcome-banner p {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+/* Section Headers */
+.section-title {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+    font-weight: 600;
+}
+
+/* Overview Section */
+.overview-section {
+    margin-bottom: 30px;
+}
+
+.overview-section .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.overview-section .stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.overview-section .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.stat-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.stat-header .stat-icon {
+    font-size: 28px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.stat-header h4 {
+    color: #6c757d;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-alert {
+    margin-top: 6px;
+    color: #dc3545;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Primary Actions */
+.actions-section {
+    margin-bottom: 40px;
+}
+
+.primary-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.primary-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: white;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    min-height: 80px;
+}
+
+.primary-btn:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+.primary-btn .btn-icon {
+    font-size: 28px;
+    width: 50px;
+    height: 50px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.primary-btn:hover .btn-icon {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.create-quote {
+    border-color: #9b59b6;
+    color: #9b59b6;
+}
+
+.create-quote:hover {
+    background: #9b59b6;
+    box-shadow: 0 6px 20px rgba(155, 89, 182, 0.3);
+}
+
+.create-quote .btn-icon {
+    background: rgba(155, 89, 182, 0.1);
+}
+
+/* Management Section */
+.management-section {
+    margin-bottom: 40px;
+}
+
+.management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.management-group {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+}
+
+.group-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.management-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mgmt-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.mgmt-card:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+    transform: translateX(4px);
+}
+
+.mgmt-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.mgmt-info h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 4px 0;
+}
+
+.mgmt-info p {
+    font-size: 12px;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Admin Section Styling */
+.admin-only {
+    border-left: 4px solid #dc3545;
+}
+
+.admin-only .group-title {
+    color: #dc3545;
+}
+
+.admin-only .mgmt-card:hover {
+    border-color: #dc3545;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        gap: 20px;
+    }
+    
+    .welcome-banner {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .welcome-banner h2 {
+        font-size: 24px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+    }
+    
+    .overview-section .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        max-width: none;
+    }
+    
+    .primary-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .management-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .primary-btn {
+        min-height: 70px;
+        padding: 20px;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-main {
+        padding: 20px 15px;
+    }
+    
+    .welcome-banner h2 {
+        font-size: 20px;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+    }
+    
+    .primary-btn .btn-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+    }
+    
+    .overview-section .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-value {
+        font-size: 22px;
     }
 }
