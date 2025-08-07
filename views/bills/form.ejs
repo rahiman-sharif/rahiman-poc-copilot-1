@@ -6,6 +6,21 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        /* Body and container width expansion */
+        body {
+            min-width: 1400px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .form-container {
+            max-width: none;
+            width: 100%;
+            min-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
         /* Modern Billing Form Styles */
         .billing-form {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -133,12 +148,14 @@
         
         .items-table {
             width: 100%;
+            min-width: 1200px;
             border-collapse: separate;
             border-spacing: 0;
             margin: 20px 0;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            table-layout: fixed;
         }
         
         .items-table th {
@@ -153,10 +170,36 @@
         
         .items-table th:first-child {
             border-top-left-radius: 12px;
+            width: 60px;
+        }
+        
+        .items-table th:nth-child(2) {
+            width: 300px;
+        }
+        
+        .items-table th:nth-child(3) {
+            width: 100px;
+        }
+        
+        .items-table th:nth-child(4) {
+            width: 200px;
+        }
+        
+        .items-table th:nth-child(5) {
+            width: 100px;
+        }
+        
+        .items-table th:nth-child(6) {
+            width: 100px;
+        }
+        
+        .items-table th:nth-child(7) {
+            width: 150px;
         }
         
         .items-table th:last-child {
             border-top-right-radius: 12px;
+            width: 80px;
         }
         
         .items-table td {
@@ -176,11 +219,26 @@
             border-radius: 6px;
             font-size: 13px;
             transition: border-color 0.3s ease;
+            box-sizing: border-box;
         }
         
         .item-row input:focus, .item-row select:focus {
             outline: none;
             border-color: #667eea;
+        }
+        
+        /* Material column specific styling */
+        .item-row select {
+            min-height: 38px;
+            cursor: pointer;
+        }
+        
+        .item-row select option {
+            white-space: normal;
+            word-wrap: break-word;
+            padding: 8px;
+            line-height: 1.4;
+            font-size: 12px;
         }
         
         .add-item-btn {
@@ -206,16 +264,28 @@
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 36px;
         }
         
         .remove-item-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Table cell alignment for action buttons */
+        .items-table td:last-child {
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px;
         }
         
         .totals-section {
@@ -280,7 +350,7 @@
         
         .charge-row {
             display: grid;
-            grid-template-columns: 2fr 2fr 1fr 1fr auto;
+            grid-template-columns: 2fr 2fr 1fr 1fr 50px;
             gap: 12px;
             align-items: center;
             margin-bottom: 12px;
@@ -309,6 +379,15 @@
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Charge row delete button alignment */
+        .charge-row .remove-item-btn {
+            justify-self: center;
+            align-self: center;
+            margin: 0;
+            width: 40px;
+            height: 36px;
         }
         
         /* Payment Details Styling */

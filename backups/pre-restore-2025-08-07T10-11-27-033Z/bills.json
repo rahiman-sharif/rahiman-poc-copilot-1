@@ -139,30 +139,20 @@
     {
       "id": "bill_005",
       "billNumber": 5,
-      "customerId": "cust_005",
-      "customerName": "Ramakrishnan",
-      "customerPhone": "1234567891",
+      "customerId": "cust_002",
+      "customerName": "Rajesh Kumar",
+      "customerPhone": "+91-98765-67890",
       "customerGstin": "",
-      "billDate": "2025-08-07T10:12:30.340Z",
+      "billDate": "2025-08-07T10:08:29.880Z",
       "items": [
         {
-          "itemId": "item_001",
-          "itemName": "Steel Rod 8mm",
-          "hsnCode": "7213",
-          "quantity": 2,
-          "rate": 75.5,
-          "amount": 151,
-          "gstRate": 18,
-          "isServiceItem": false
-        },
-        {
-          "itemId": "item_002",
-          "itemName": "Steel Rod 12mm",
-          "hsnCode": "7213",
+          "itemId": "item_010",
+          "itemName": "Steel rod 9mm",
+          "hsnCode": "7777",
           "quantity": 1,
-          "rate": 76.2,
-          "amount": 76.2,
-          "gstRate": 18,
+          "rate": 500,
+          "amount": 500,
+          "gstRate": 5,
           "isServiceItem": false
         }
       ],
@@ -171,24 +161,19 @@
           "description": "Loading Charges",
           "amount": 500,
           "gstRate": 0
-        },
-        {
-          "description": "Transport Charges",
-          "amount": 1200,
-          "gstRate": 0
         }
       ],
-      "subtotal": 1927.2,
-      "cgstAmount": 20.45,
-      "sgstAmount": 20.45,
-      "totalGst": 40.9,
-      "finalTotal": 1968.1,
+      "subtotal": 1000,
+      "cgstAmount": 12.5,
+      "sgstAmount": 12.5,
+      "totalGst": 25,
+      "finalTotal": 1025,
       "paymentMethod": "Cash",
       "paymentDetails": {
         "method": "Cash"
       },
       "createdBy": "user_001",
-      "createdAt": "2025-08-07T10:12:30.340Z"
+      "createdAt": "2025-08-07T10:08:29.881Z"
     }
   ],
   "nextBillNumber": 6
