@@ -1,0 +1,44 @@
+{
+  "settings": {
+    "application": {
+      "name": "Vikram Steels Billing System",
+      "version": "1.0.0",
+      "timezone": "Asia/Kolkata"
+    },
+    "keyboard": {
+      "shortcuts": {
+        "F1": "New Bill",
+        "F2": "Items Management", 
+        "F3": "Customers Management",
+        "F4": "Reports Dashboard",
+        "Ctrl+N": "New Item/Customer/Invoice",
+        "Ctrl+S": "Save forms",
+        "Ctrl+F": "Search functionality"
+      },
+      "enabled": true
+    },
+    "gst": {
+      "rates": [0, 5, 12, 18, 28],
+      "defaultRate": 18,
+      "cgstSgstSplit": true,
+      "igstForInterState": true
+    },
+    "invoice": {
+      "template": "traditional",
+      "showBundleInfo": true,
+      "showHsnCodes": true,
+      "showWeights": true,
+      "autoSave": true
+    },
+    "backup": {
+      "autoBackup": true,
+      "backupInterval": "daily",
+      "retentionDays": 30,
+      "lastBackup": null
+    },
+    "offline": {
+      "enabled": true,
+      "syncRequired": false
+    }
+  }
+}

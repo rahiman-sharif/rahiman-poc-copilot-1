@@ -1,0 +1,32 @@
+{
+  "categories": [
+    {
+      "id": "cat_001",
+      "name": "Steel",
+      "description": "Steel rods, bars, and structural items",
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_002",
+      "name": "Cement",
+      "description": "Cement bags and concrete materials",
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_003",
+      "name": "Charges",
+      "description": "Service charges like loading, transport, etc.",
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat_004",
+      "name": "Hardware",
+      "description": "Construction hardware and tools",
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ]
+}

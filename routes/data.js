@@ -3,6 +3,7 @@ const router = express.Router();
 const dataManager = require('../utils/dataManager');
 const fs = require('fs');
 const path = require('path');
+const archiver = require('archiver');
 
 console.log('💾 Data Management router loaded');
 
@@ -297,5 +298,39 @@ function jsonToCSV(data) {
     
     return [csvHeaders, ...csvRows].join('\n');
 }
+
+// GET /data/download/:backupName - Download backup as ZIP
+router.get('/download/:backupName', requireAdmin, async (req, res) => {
+    try {
+        const backupName = req.params.backupName;
+        const backupDir = path.join(__dirname, '..', 'backups');
+        const backupPath = path.join(backupDir, backupName);
+        
+        if (!fs.existsSync(backupPath)) {
+            return res.status(404).json({ error: 'Backup not found' });
+        }
+        
+        // Create ZIP archive
+        const archive = archiver('zip', {
+            zlib: { level: 9 } // Best compression
+        });
+        
+        const zipFilename = `${backupName}.zip`;
+        
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename="${zipFilename}"`);
+        
+        archive.pipe(res);
+        
+        // Add all files from backup folder to ZIP
+        archive.directory(backupPath, false);
+        
+        archive.finalize();
+        
+    } catch (error) {
+        console.error('Error downloading backup:', error);
+        res.status(500).json({ error: 'Failed to download backup' });
+    }
+});
 
 module.exports = router;

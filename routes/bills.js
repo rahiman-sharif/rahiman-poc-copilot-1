@@ -181,9 +181,13 @@ router.post('/', requireAuth, (req, res) => {
                     gstin: customerGstin ? customerGstin.trim().toUpperCase() : '',
                     isRegistered: customerGstin ? true : false
                 },
+                paymentTerms: 'Cash',
+                creditLimit: 0,
                 totalPurchases: 0,
+                outstandingAmount: 0,
                 isActive: true,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
             };
 
             // Add to database immediately

@@ -9,7 +9,7 @@
       "email": "",
       "status": "active",
       "createdAt": "2025-08-06T14:44:48.505Z",
-      "lastLogin": "2025-08-07T09:28:37.331Z"
+      "lastLogin": "2025-08-07T09:42:19.937Z"
     },
     {
       "id": "user_002",
@@ -21,19 +21,6 @@
       "status": "active",
       "createdAt": "2025-08-06T14:51:23.417Z",
       "lastLogin": "2025-08-07T09:12:11.010Z"
-    },
-    {
-      "id": "user_003",
-      "username": "rahiman",
-      "password": "$2b$10$PA3MUV4YzlKD3nOvRTgp2eMgAvioAfvv2bMkBinUK3M2AJdBFzmtm",
-      "role": "admin",
-      "fullName": "Rahiman",
-      "email": "",
-      "status": "active",
-      "createdAt": "2025-08-07T09:21:27.473Z",
-      "lastLogin": "2025-08-07T09:28:55.709Z",
-      "isActive": true,
-      "updatedAt": "2025-08-07T09:28:55.710Z"
     }
   ]
 }

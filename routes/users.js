@@ -44,30 +44,78 @@ router.get('/add', requireAdmin, (req, res) => {
         title: 'Add New User',
         user: req.session.user,
         success: req.query.success,
-        error: req.query.error
+        error: req.query.error,
+        formData: null
     });
 });
 
 // POST /users/add - Create new user
 router.post('/add', requireAdmin, async (req, res) => {
     try {
-        const { username, email, role, password, fullName } = req.body;
+        console.log('Received form data:', req.body);
+        const { username, email, role, password, fullName, status } = req.body;
         
-        // Validation
-        if (!username || !email || !role || !password || !fullName) {
-            return res.redirect('/users/add?error=All fields are required');
+        console.log('Extracted fields:', {
+            username: `"${username}"`,
+            email: `"${email}"`,
+            role: `"${role}"`,
+            password: password ? '[PROVIDED]' : '[EMPTY]',
+            fullName: `"${fullName}"`,
+            status: `"${status}"`
+        });
+        
+        // Validation - trim whitespace and check for empty values (email is optional)
+        const trimmedUsername = username ? username.trim() : '';
+        const trimmedRole = role ? role.trim() : '';
+        const trimmedPassword = password ? password.trim() : '';
+        const trimmedFullName = fullName ? fullName.trim() : '';
+        
+        console.log('Trimmed fields:', {
+            username: `"${trimmedUsername}"`,
+            role: `"${trimmedRole}"`,
+            password: trimmedPassword ? '[PROVIDED]' : '[EMPTY]',
+            fullName: `"${trimmedFullName}"`
+        });
+        
+        if (!trimmedUsername || !trimmedRole || !trimmedPassword || !trimmedFullName) {
+            console.log('Validation failed - missing required fields');
+            const missingFields = [];
+            if (!trimmedUsername) missingFields.push('Username');
+            if (!trimmedRole) missingFields.push('Role');
+            if (!trimmedPassword) missingFields.push('Password');
+            if (!trimmedFullName) missingFields.push('Full Name');
+            
+            return res.render('users/add', {
+                title: 'Add New User',
+                user: req.session.user,
+                error: `Required fields missing: ${missingFields.join(', ')}. Email is optional.`,
+                formData: req.body
+            });
         }
         
+        // Get all users for validation and user ID generation
         const users = await dataManager.getUsers();
         
-        // Check if username/email already exists
-        const existingUser = users.find(u => u.username === username || u.email === email);
+        // Check if username already exists or email exists (if email is provided)
+        const trimmedEmail = email ? email.trim() : '';
+        const existingUser = users.find(u => 
+            u.username === trimmedUsername || 
+            (trimmedEmail && u.email === trimmedEmail)
+        );
         if (existingUser) {
-            return res.redirect('/users/add?error=Username or email already exists');
+            const errorMessage = existingUser.username === trimmedUsername ? 
+                'Username already exists' : 
+                'Email already exists';
+            return res.render('users/add', {
+                title: 'Add New User',
+                user: req.session.user,
+                error: errorMessage,
+                formData: req.body
+            });
         }
         
         // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
         
         // Generate new user ID
         const maxId = users.length > 0 ? Math.max(...users.map(u => parseInt(u.id.split('_')[1]))) : 0;
@@ -76,15 +124,16 @@ router.post('/add', requireAdmin, async (req, res) => {
         // Create new user
         const newUser = {
             id: newId,
-            username: username,
-            email: email,
-            fullName: fullName,
-            role: role,
+            username: trimmedUsername,
+            email: trimmedEmail,
+            fullName: trimmedFullName,
+            role: trimmedRole,
             password: hashedPassword,
+            status: status || 'active',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             lastLogin: null,
-            isActive: true
+            isActive: status !== 'inactive'
         };
         
         users.push(newUser);
@@ -94,7 +143,12 @@ router.post('/add', requireAdmin, async (req, res) => {
         
     } catch (error) {
         console.error('Error creating user:', error);
-        res.redirect('/users/add?error=Failed to create user');
+        res.render('users/add', {
+            title: 'Add New User',
+            user: req.session.user,
+            error: 'Failed to create user',
+            formData: req.body
+        });
     }
 });
 
@@ -126,11 +180,40 @@ router.get('/:id/edit', requireAdmin, async (req, res) => {
 router.post('/:id/edit', requireAdmin, async (req, res) => {
     try {
         const userId = req.params.id;
-        const { username, email, role, password, fullName, isActive } = req.body;
+        const { username, email, role, password, fullName, status } = req.body;
         
-        // Validation
-        if (!username || !email || !role || !fullName) {
-            return res.redirect(`/users/${userId}/edit?error=All fields except password are required`);
+        console.log('Edit user data received:', {
+            username: `"${username}"`,
+            email: `"${email}"`,
+            role: `"${role}"`,
+            password: password ? '[PROVIDED]' : '[EMPTY]',
+            fullName: `"${fullName}"`,
+            status: `"${status}"`
+        });
+        
+        // Validation - email is optional
+        const trimmedUsername = username ? username.trim() : '';
+        const trimmedRole = role ? role.trim() : '';
+        const trimmedFullName = fullName ? fullName.trim() : '';
+        const trimmedEmail = email ? email.trim() : '';
+        
+        console.log('Edit trimmed fields:', {
+            username: `"${trimmedUsername}"`,
+            role: `"${trimmedRole}"`,
+            fullName: `"${trimmedFullName}"`,
+            email: `"${trimmedEmail}"`
+        });
+        
+        if (!trimmedUsername || !trimmedRole || !trimmedFullName) {
+            // Get the user data to re-render the form
+            const users = await dataManager.getUsers();
+            const editUser = users.find(u => u.id === userId);
+            return res.render('users/edit', {
+                title: 'Edit User',
+                user: req.session.user,
+                editUser: editUser,
+                error: 'Username, role, and full name are required'
+            });
         }
         
         const users = await dataManager.getUsers();
@@ -141,17 +224,32 @@ router.post('/:id/edit', requireAdmin, async (req, res) => {
         }
         
         // Check if username/email already exists (excluding current user)
-        const existingUser = users.find(u => u.id !== userId && (u.username === username || u.email === email));
+        const existingUser = users.find(u => 
+            u.id !== userId && (
+                u.username === trimmedUsername || 
+                (trimmedEmail && u.email === trimmedEmail)
+            )
+        );
         if (existingUser) {
-            return res.redirect(`/users/${userId}/edit?error=Username or email already exists`);
+            const errorMessage = existingUser.username === trimmedUsername ? 
+                'Username already exists' : 
+                'Email already exists';
+            const editUser = users.find(u => u.id === userId);
+            return res.render('users/edit', {
+                title: 'Edit User',
+                user: req.session.user,
+                editUser: editUser,
+                error: errorMessage
+            });
         }
         
         // Update user data
-        users[userIndex].username = username;
-        users[userIndex].email = email;
-        users[userIndex].fullName = fullName;
-        users[userIndex].role = role;
-        users[userIndex].isActive = isActive === 'on';
+        users[userIndex].username = trimmedUsername;
+        users[userIndex].email = trimmedEmail;
+        users[userIndex].fullName = trimmedFullName;
+        users[userIndex].role = trimmedRole;
+        users[userIndex].status = status || 'active';
+        users[userIndex].isActive = status !== 'inactive';
         users[userIndex].updatedAt = new Date().toISOString();
         
         // Update password if provided

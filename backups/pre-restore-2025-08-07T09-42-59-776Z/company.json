@@ -1,0 +1,39 @@
+{
+  "company": {
+    "id": "company_001",
+    "name": "Vikram Steels",
+    "address": {
+      "line1": "Shop No. 45, Steel Market",
+      "line2": "Industrial Area, Phase-2",
+      "city": "Chandigarh",
+      "state": "Punjab",
+      "pincode": "160002",
+      "country": "India"
+    },
+    "contact": {
+      "phone1": "+91-98765-43210",
+      "phone2": "+91-98765-43211",
+      "email": "info@vikramsteels.com",
+      "website": "www.vikramsteels.com"
+    },
+    "gst": {
+      "gstin": "03ABCDE1234F1Z5",
+      "panNo": "ABCDE1234F",
+      "registrationDate": "2022-04-01"
+    },
+    "invoice": {
+      "prefix": "VS-",
+      "nextNumber": 1,
+      "footerNote": "Goods once sold will not be taken back",
+      "authorizedSignatory": "For Vikram Steels - Authorized Signatory"
+    },
+    "settings": {
+      "currency": "INR",
+      "currencySymbol": "₹",
+      "decimalPlaces": 2,
+      "dateFormat": "DD/MM/YYYY"
+    },
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-08-06T00:00:00.000Z"
+  }
+}

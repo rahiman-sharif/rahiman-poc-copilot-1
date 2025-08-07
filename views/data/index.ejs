@@ -6,6 +6,26 @@
     <title><%= title %> - Vikram Steels</title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .page-header h2 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+        
         .data-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -205,18 +225,45 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <h1>💾 Data Management</h1>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Billing Management System</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.username %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
         </div>
-        <div class="nav-links">
-            <a href="/dashboard">Dashboard</a>
-            <span>Welcome, <%= user.username %></span>
-            <a href="/logout">Logout</a>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <span class="current">💾 Data Management</span>
         </div>
     </nav>
 
-    <div class="container">
+    <!-- Main Data Management Content -->
+    <main class="main-content">
+        <div class="container">
+        
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2>💾 Data Management</h2>
+            <p>Manage system data, backups, exports, and database integrity</p>
+        </div>
+        
         <% if (success) { %>
             <div class="alert alert-success">
                 <%= success %>
@@ -319,21 +366,7 @@
                         📊 Export CSV
                     </a>
                 </div>
-            </div>
-
-            <!-- Data Import -->
-            <div class="data-card">
-                <span class="card-icon">📥</span>
-                <div class="card-title">Data Import</div>
-                <div class="card-description">
-                    Import data from external sources. Supports JSON and CSV formats with validation.
-                </div>
-                <div class="card-actions">
-                    <button class="btn btn-info" onclick="alert('Import functionality coming soon!')">
-                        📥 Import Data
-                    </button>
-                </div>
-            </div>
+            </div>            
 
             <!-- System Health -->
             <div class="data-card">
@@ -345,10 +378,7 @@
                 <div class="card-actions">
                     <button class="btn btn-primary" onclick="checkSystemHealth()">
                         🔍 Health Check
-                    </button>
-                    <button class="btn btn-warning" onclick="alert('Maintenance tools coming soon!')">
-                        🔧 Maintenance
-                    </button>
+                    </button>                   
                 </div>
             </div>
 
@@ -362,31 +392,16 @@
                 <div class="card-actions">
                     <button class="btn btn-info" onclick="showDataStats()">
                         📊 View Stats
-                    </button>
-                    <button class="btn btn-success" onclick="alert('Advanced analytics coming soon!')">
-                        📈 Analytics
-                    </button>
-                </div>
-            </div>
-
-            <!-- Security & Audit -->
-            <div class="data-card">
-                <span class="card-icon">🔒</span>
-                <div class="card-title">Security & Audit</div>
-                <div class="card-description">
-                    Security logs, audit trails, and data access monitoring for compliance and security.
-                </div>
-                <div class="card-actions">
-                    <button class="btn btn-warning" onclick="alert('Audit logs coming soon!')">
-                        📋 Audit Logs
-                    </button>
-                    <button class="btn btn-primary" onclick="alert('Security scan coming soon!')">
-                        🔒 Security Scan
-                    </button>
+                    </button>                   
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 Vikram Steels Billing System. Built for offline use.</p>
+    </footer>
 
     <script>
         function checkSystemHealth() {
