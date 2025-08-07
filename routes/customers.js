@@ -29,16 +29,36 @@ router.get('/', requireAuth, (req, res) => {
     try {
         const customers = dataManager.findBy('customers', { isActive: true });
         
+        // Get all bills to calculate accurate totals
+        const billsData = dataManager.getBillsData();
+        const bills = billsData.bills || [];
+        
+        // Calculate actual total purchases for each customer from bills
+        const customersWithTotals = customers.map(customer => {
+            const customerBills = bills.filter(bill => bill.customerId === customer.id);
+            const actualTotal = customerBills.reduce((sum, bill) => {
+                return sum + (bill.finalTotal || bill.grandTotal || 0);
+            }, 0);
+            
+            // Update the customer's totalPurchases if it doesn't match
+            if (customer.totalPurchases !== actualTotal) {
+                customer.totalPurchases = actualTotal;
+                dataManager.updateById('customers', customer.id, { totalPurchases: actualTotal });
+            }
+            
+            return customer;
+        });
+        
         // Calculate stats
-        const businessCustomers = customers.filter(customer => customer.type === 'Business');
-        const individualCustomers = customers.filter(customer => customer.type === 'Individual');
-        const totalPurchases = customers.reduce((sum, customer) => sum + customer.totalPurchases, 0);
+        const businessCustomers = customersWithTotals.filter(customer => customer.type === 'Business');
+        const individualCustomers = customersWithTotals.filter(customer => customer.type === 'Individual');
+        const totalPurchases = customersWithTotals.reduce((sum, customer) => sum + (customer.totalPurchases || 0), 0);
 
         res.render('customers/index', {
             title: 'Customer Management - Vikram Steels',
             user: req.session.user,
-            customers: customers,
-            totalCustomers: customers.length,
+            customers: customersWithTotals,
+            totalCustomers: customersWithTotals.length,
             businessCustomers: businessCustomers.length,
             individualCustomers: individualCustomers.length,
             totalPurchases: totalPurchases,

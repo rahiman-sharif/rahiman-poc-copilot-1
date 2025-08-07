@@ -94,7 +94,7 @@
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon">�</div>
+                    <div class="stat-icon">💰</div>
                     <div class="stat-info">
                         <h3>Total Bills</h3>
                         <p class="stat-number"><%= totalPurchases.toLocaleString() %></p>
@@ -190,7 +190,7 @@
                                         <% } %>
                                     </td>
                                     <td>
-                                        <span class="total-bills">₹<%= customer.totalPurchases.toLocaleString() %></span>
+                                        <span class="total-bills">₹<%= (customer.totalPurchases || 0).toLocaleString() %></span>
                                     </td>
                                     <% if (user.role === 'admin') { %>
                                         <td>

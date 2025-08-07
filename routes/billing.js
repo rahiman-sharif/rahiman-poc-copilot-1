@@ -212,14 +212,14 @@ router.post('/', requireAuth, (req, res) => {
                 .find({ id: customer.id })
                 .assign({
                     outstandingAmount: customer.outstandingAmount + grandTotal,
-                    totalPurchases: customer.totalPurchases + grandTotal
+                    totalPurchases: (customer.totalPurchases || 0) + grandTotal
                 })
                 .write();
         } else {
             customersDb.get('customers')
                 .find({ id: customer.id })
                 .assign({
-                    totalPurchases: customer.totalPurchases + grandTotal
+                    totalPurchases: (customer.totalPurchases || 0) + grandTotal
                 })
                 .write();
         }

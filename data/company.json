@@ -28,12 +28,19 @@
       "authorizedSignatory": "For Vikram Steels - Authorized Signatory"
     },
     "settings": {
-      "currency": "INR",
-      "currencySymbol": "₹",
-      "decimalPlaces": 2,
-      "dateFormat": "DD/MM/YYYY"
+      "showLogos": true,
+      "showTermsConditions": true,
+      "showBankDetails": true
     },
-    "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-08-06T00:00:00.000Z"
+    "bank": {
+      "accountName": "Vikram Steels",
+      "accountNumber": "1234567890123456",
+      "ifscCode": "SBIN0001234",
+      "bankName": "State Bank of India",
+      "branch": "Chandigarh Main"
+    },
+    "isActive": true,
+    "createdAt": "2025-08-07T12:08:36.984Z",
+    "updatedAt": "2025-08-07T12:08:36.984Z"
   }
 }

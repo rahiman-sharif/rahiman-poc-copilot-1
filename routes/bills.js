@@ -277,7 +277,7 @@ router.post('/', requireAuth, (req, res) => {
 
         // Update customer total purchases
         dataManager.updateById('customers', customer.id, {
-            totalPurchases: customer.totalPurchases + parseFloat(finalTotal)
+            totalPurchases: (customer.totalPurchases || 0) + parseFloat(finalTotal)
         });
 
         // Update item stock quantities (only for physical items, not services)

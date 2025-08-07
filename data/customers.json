@@ -2,138 +2,115 @@
   "customers": [
     {
       "id": "cust_001",
-      "name": "Sharma Constructions",
-      "type": "Business",
-      "contact": {
-        "phone": "+91-98765-12345",
-        "email": "contact@sharmaconstruction.com",
-        "address": {
-          "line1": "Plot No. 123, Sector 22",
-          "line2": "Industrial Area",
-          "city": "Chandigarh",
-          "state": "Punjab",
-          "pincode": "160022"
-        }
-      },
-      "gst": {
-        "gstin": "03ABCDE5678G1Z9",
-        "isRegistered": true
-      },
-      "paymentTerms": "Credit - 30 days",
-      "creditLimit": 500000,
-      "totalPurchases": 504.4,
-      "outstandingAmount": 0,
-      "isActive": true,
-      "createdAt": "2025-01-15T00:00:00.000Z",
-      "updatedAt": "2025-08-06T16:39:40.669Z"
-    },
-    {
-      "id": "cust_002",
-      "name": "Rajesh Kumar",
-      "type": "Individual",
-      "contact": {
-        "phone": "+91-98765-67890",
-        "email": "",
-        "address": {
-          "line1": "House No. 456",
-          "line2": "Phase 3B2, Mohali",
-          "city": "Mohali",
-          "state": "Punjab",
-          "pincode": "160059"
-        }
-      },
-      "gst": {
-        "gstin": "",
-        "isRegistered": false
-      },
-      "paymentTerms": "Cash",
-      "creditLimit": 0,
-      "totalPurchases": 589.09,
-      "outstandingAmount": 0,
-      "isActive": true,
-      "createdAt": "2025-02-01T00:00:00.000Z",
-      "updatedAt": "2025-08-07T05:43:43.815Z"
-    },
-    {
-      "id": "cust_003",
-      "name": "Metro Builders Pvt Ltd",
+      "name": "ABC Construction Ltd",
       "type": "Business",
       "contact": {
         "phone": "+91-98765-11111",
-        "email": "purchase@metrobuilders.in",
+        "email": "contact@abcconstruction.com",
         "address": {
-          "line1": "Commercial Complex, SCO 789",
-          "line2": "Sector 35, Chandigarh",
+          "line1": "Plot No. 123, Industrial Area",
+          "line2": "Phase-1, Sector 25",
           "city": "Chandigarh",
           "state": "Punjab",
-          "pincode": "160035"
+          "pincode": "160019",
+          "country": "India"
         }
       },
       "gst": {
-        "gstin": "03XYZTE9876H2A1",
+        "gstin": "03ABCDE1234F1Z1",
+        "panNo": "ABCDE1234F",
+        "registrationType": "Regular",
         "isRegistered": true
       },
-      "paymentTerms": "Credit - 15 days",
-      "creditLimit": 1000000,
-      "totalPurchases": 53000,
+      "paymentTerms": "Credit",
+      "creditLimit": 500000,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-01-20T00:00:00.000Z",
-      "updatedAt": "2025-08-07T05:15:11.584Z"
+      "createdAt": "2025-08-07T12:08:36.988Z"
+    },
+    {
+      "id": "cust_002",
+      "name": "Rajesh Building Materials",
+      "type": "Business",
+      "contact": {
+        "phone": "+91-98765-22222",
+        "email": "rajesh@buildingmaterials.com",
+        "address": {
+          "line1": "Shop No. 45, Building Market",
+          "line2": "Main Road, Sector 22",
+          "city": "Chandigarh",
+          "state": "Punjab",
+          "pincode": "160022",
+          "country": "India"
+        }
+      },
+      "gst": {
+        "gstin": "03BCDEF2345G2Z2",
+        "panNo": "BCDEF2345G",
+        "registrationType": "Regular",
+        "isRegistered": true
+      },
+      "paymentTerms": "Cash",
+      "creditLimit": 0,
+      "outstandingAmount": 0,
+      "isActive": true,
+      "createdAt": "2025-08-07T12:08:36.988Z"
+    },
+    {
+      "id": "cust_003",
+      "name": "Sharma Steel Works",
+      "type": "Business",
+      "contact": {
+        "phone": "+91-98765-33333",
+        "email": "info@sharmasteelworks.com",
+        "address": {
+          "line1": "Workshop No. 12, Steel Complex",
+          "line2": "Industrial Area, Phase-2",
+          "city": "Chandigarh",
+          "state": "Punjab",
+          "pincode": "160002",
+          "country": "India"
+        }
+      },
+      "gst": {
+        "gstin": "03CDEFG3456H3Z3",
+        "panNo": "CDEFG3456H",
+        "registrationType": "Regular",
+        "isRegistered": true
+      },
+      "paymentTerms": "Credit",
+      "creditLimit": 200000,
+      "outstandingAmount": 0,
+      "isActive": true,
+      "createdAt": "2025-08-07T12:08:36.988Z"
     },
     {
       "id": "cust_004",
-      "name": "Rahiman",
+      "name": "Rahiman Sharif",
       "type": "Individual",
       "contact": {
-        "phone": "+91-87544-37191",
-        "email": "",
+        "phone": "+91-98765-44444",
+        "email": "rahiman.sharif@gmail.com",
         "address": {
-          "line1": "Test",
-          "line2": "",
-          "city": "test",
-          "state": "test",
-          "pincode": "604303"
+          "line1": "House No. 256, Green Valley",
+          "line2": "Sector 12, Modern City",
+          "city": "Chandigarh",
+          "state": "Punjab",
+          "pincode": "160012",
+          "country": "India"
         }
       },
       "gst": {
         "gstin": "",
+        "panNo": "",
+        "registrationType": "Unregistered",
         "isRegistered": false
       },
       "paymentTerms": "Cash",
       "creditLimit": 0,
-      "totalPurchases": 194.09,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-06T15:16:09.109Z",
-      "updatedAt": "2025-08-06T16:04:17.659Z"
-    },
-    {
-      "id": "cust_005",
-      "name": "Ramakrishnan",
-      "type": "Individual",
-      "contact": {
-        "phone": "1234567891",
-        "email": "",
-        "address": {
-          "line1": "",
-          "line2": "",
-          "city": "",
-          "state": "",
-          "pincode": ""
-        }
-      },
-      "gst": {
-        "gstin": "",
-        "isRegistered": false
-      },
-      "paymentTerms": "Cash",
-      "creditLimit": 0,
-      "totalPurchases": 1968.1,
-      "outstandingAmount": 0,
-      "isActive": true,
-      "createdAt": "2025-08-07T10:12:30.324Z",
-      "updatedAt": "2025-08-07T10:12:30.351Z"
+      "createdAt": "2025-08-07T12:08:36.988Z"
     }
   ]
 }

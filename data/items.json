@@ -2,6 +2,26 @@
   "items": [
     {
       "id": "item_001",
+      "name": "Steel Rod 6mm",
+      "categoryId": "cat_001",
+      "price": 74.5,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "SAIL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 8.7 kg per rod",
+      "stock": {
+        "quantity": 400,
+        "minLevel": 20
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_002",
       "name": "Steel Rod 8mm",
       "categoryId": "cat_001",
       "price": 75.5,
@@ -12,35 +32,36 @@
       "brand": "SAIL",
       "isServiceItem": false,
       "priceEditableAtBilling": false,
-      "bundleInfo": "Each bundle = 533 kg",
+      "bundleInfo": "Each bundle ≈ 12.4 kg per rod",
       "stock": {
-        "quantity": 298,
+        "quantity": 300,
+        "minLevel": 15
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_003",
+      "name": "Steel Rod 10mm",
+      "categoryId": "cat_001",
+      "price": 76,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "TATA Steel",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 19.3 kg per rod",
+      "stock": {
+        "quantity": 250,
         "minLevel": 10
       },
       "isActive": true,
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-08-07T10:12:30.365Z",
-      "stockDataMigrated": true,
-      "stockMigratedAt": "2025-08-06T16:22:54.598Z",
-      "lastStockUpdate": "2025-08-07T10:12:30.363Z",
-      "lastStockAdjustment": {
-        "type": "add",
-        "quantity": 300,
-        "reason": "New stock received",
-        "oldStock": 1,
-        "newStock": 301,
-        "adjustedBy": "user_001",
-        "adjustedAt": "2025-08-07T04:58:46.349Z"
-      },
-      "lastStockMovement": {
-        "type": "sale",
-        "quantity": 2,
-        "billId": "bill_005",
-        "soldAt": "2025-08-07T10:12:30.363Z"
-      }
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_002",
+      "id": "item_004",
       "name": "Steel Rod 12mm",
       "categoryId": "cat_001",
       "price": 76.2,
@@ -51,24 +72,16 @@
       "brand": "TATA Steel",
       "isServiceItem": false,
       "priceEditableAtBilling": false,
-      "bundleInfo": "Each bundle = 540 kg",
+      "bundleInfo": "Each bundle ≈ 27.8 kg per rod",
       "stock": {
-        "quantity": 74,
+        "quantity": 200,
         "minLevel": 15
       },
       "isActive": true,
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-08-07T10:12:30.377Z",
-      "lastStockUpdate": "2025-08-07T10:12:30.376Z",
-      "lastStockMovement": {
-        "type": "sale",
-        "quantity": 1,
-        "billId": "bill_005",
-        "soldAt": "2025-08-07T10:12:30.376Z"
-      }
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_003",
+      "id": "item_005",
       "name": "Steel Rod 16mm",
       "categoryId": "cat_001",
       "price": 77.8,
@@ -79,17 +92,117 @@
       "brand": "JSW Steel",
       "isServiceItem": false,
       "priceEditableAtBilling": false,
-      "bundleInfo": "Each bundle = 560 kg",
+      "bundleInfo": "Each bundle ≈ 49.5 kg per rod",
       "stock": {
-        "quantity": 40,
+        "quantity": 150,
         "minLevel": 10
       },
       "isActive": true,
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_004",
-      "name": "Cement OPC 53 Grade",
+      "id": "item_006",
+      "name": "Steel Rod 20mm",
+      "categoryId": "cat_001",
+      "price": 78.5,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "JSW Steel",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 77.4 kg per rod",
+      "stock": {
+        "quantity": 100,
+        "minLevel": 8
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_007",
+      "name": "Steel Rod 25mm",
+      "categoryId": "cat_001",
+      "price": 79.2,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "JINDAL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 121 kg per rod",
+      "stock": {
+        "quantity": 80,
+        "minLevel": 5
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_008",
+      "name": "Steel Rod 32mm",
+      "categoryId": "cat_001",
+      "price": 80,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "JINDAL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 198 kg per rod",
+      "stock": {
+        "quantity": 50,
+        "minLevel": 3
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_009",
+      "name": "Ramco Cement OPC 53",
+      "categoryId": "cat_002",
+      "price": 385,
+      "unit": "bag",
+      "isTaxable": true,
+      "gstRate": 28,
+      "hsnCode": "2523",
+      "brand": "Ramco",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "50 kg per bag",
+      "stock": {
+        "quantity": 300,
+        "minLevel": 50
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_010",
+      "name": "Ramco Cement PPC",
+      "categoryId": "cat_002",
+      "price": 375,
+      "unit": "bag",
+      "isTaxable": true,
+      "gstRate": 28,
+      "hsnCode": "2523",
+      "brand": "Ramco",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "50 kg per bag",
+      "stock": {
+        "quantity": 250,
+        "minLevel": 40
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_011",
+      "name": "UltraTech Cement OPC 53",
       "categoryId": "cat_002",
       "price": 420,
       "unit": "bag",
@@ -101,57 +214,40 @@
       "priceEditableAtBilling": false,
       "bundleInfo": "50 kg per bag",
       "stock": {
-        "quantity": 200,
+        "quantity": 350,
+        "minLevel": 60
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_012",
+      "name": "UltraTech Cement PPC",
+      "categoryId": "cat_002",
+      "price": 410,
+      "unit": "bag",
+      "isTaxable": true,
+      "gstRate": 28,
+      "hsnCode": "2523",
+      "brand": "UltraTech",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "50 kg per bag",
+      "stock": {
+        "quantity": 280,
         "minLevel": 50
       },
       "isActive": true,
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_005",
-      "name": "Cement PPC",
-      "categoryId": "cat_002",
-      "price": 380,
-      "unit": "bag",
-      "isTaxable": true,
-      "gstRate": 28,
-      "hsnCode": "2523",
-      "brand": "ACC",
-      "isServiceItem": false,
-      "priceEditableAtBilling": false,
-      "bundleInfo": "50 kg per bag",
-      "stock": {
-        "quantity": 110,
-        "minLevel": 30
-      },
-      "isActive": true,
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "lastStockUpdate": "2025-08-06T17:08:26.004Z",
-      "updatedAt": "2025-08-06T17:08:26.004Z",
-      "lastStockAdjustment": {
-        "type": "add",
-        "quantity": 100,
-        "reason": "New stock received",
-        "oldStock": 110,
-        "newStock": 110,
-        "adjustedBy": "user_001",
-        "adjustedAt": "2025-08-06T17:08:26.004Z"
-      },
-      "lastStockMovement": {
-        "type": "sale",
-        "quantity": 1,
-        "billId": "bill_002",
-        "soldAt": "2025-08-06T16:39:40.673Z"
-      }
-    },
-    {
-      "id": "item_006",
+      "id": "item_013",
       "name": "Loading Charges",
       "categoryId": "cat_003",
       "price": 500,
       "unit": "service",
-      "isTaxable": false,
-      "gstRate": 0,
+      "isTaxable": true,
+      "gstRate": 18,
       "hsnCode": "9967",
       "brand": "",
       "isServiceItem": true,
@@ -165,13 +261,13 @@
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_007",
+      "id": "item_014",
       "name": "Transport Charges",
       "categoryId": "cat_003",
       "price": 1200,
       "unit": "service",
-      "isTaxable": false,
-      "gstRate": 0,
+      "isTaxable": true,
+      "gstRate": 18,
       "hsnCode": "9966",
       "brand": "",
       "isServiceItem": true,
@@ -185,41 +281,47 @@
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_008",
-      "name": "Steel Angle 40x40mm",
-      "categoryId": "cat_001",
-      "price": 68.5,
-      "unit": "kg",
+      "id": "item_015",
+      "name": "Cutting Charges",
+      "categoryId": "cat_003",
+      "price": 50,
+      "unit": "service",
       "isTaxable": true,
       "gstRate": 18,
-      "hsnCode": "7216",
-      "brand": "JINDAL",
-      "isServiceItem": false,
-      "priceEditableAtBilling": false,
-      "bundleInfo": "Each piece = 6 meter, 15 kg",
+      "hsnCode": "9965",
+      "brand": "",
+      "isServiceItem": true,
+      "priceEditableAtBilling": true,
+      "bundleInfo": "Per cut/piece",
       "stock": {
-        "quantity": 501,
-        "minLevel": 8
+        "quantity": 0,
+        "minLevel": 0
       },
       "isActive": true,
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "barcode": "",
-      "updatedAt": "2025-08-06T15:02:04.749Z",
-      "lastStockUpdate": "2025-08-06T16:21:55.066Z",
-      "lastStockAdjustment": {
-        "type": "add",
-        "quantity": 500,
-        "reason": "Physical count adjustment",
-        "oldStock": 1,
-        "newStock": 501,
-        "adjustedBy": "user_001",
-        "adjustedAt": "2025-08-06T16:21:55.066Z"
-      },
-      "stockDataMigrated": true,
-      "stockMigratedAt": "2025-08-06T16:22:54.599Z"
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_009",
+      "id": "item_016",
+      "name": "Welding Charges",
+      "categoryId": "cat_003",
+      "price": 200,
+      "unit": "service",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "9963",
+      "brand": "",
+      "isServiceItem": true,
+      "priceEditableAtBilling": true,
+      "bundleInfo": "Per hour",
+      "stock": {
+        "quantity": 0,
+        "minLevel": 0
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_017",
       "name": "Wire Mesh 8 Gauge",
       "categoryId": "cat_004",
       "price": 85,
@@ -239,74 +341,64 @@
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_010",
-      "name": "Steel rod 9mm",
-      "categoryId": "cat_001",
-      "price": 500,
+      "id": "item_018",
+      "name": "Binding Wire",
+      "categoryId": "cat_004",
+      "price": 95,
       "unit": "kg",
       "isTaxable": true,
-      "gstRate": 5,
-      "hsnCode": "7777",
-      "brand": "Batas",
+      "gstRate": 18,
+      "hsnCode": "7217",
+      "brand": "Local",
       "isServiceItem": false,
       "priceEditableAtBilling": false,
-      "bundleInfo": "",
-      "barcode": "",
+      "bundleInfo": "16 gauge thickness",
       "stock": {
-        "quantity": 1,
-        "minLevel": 0
+        "quantity": 200,
+        "minLevel": 25
       },
       "isActive": true,
-      "createdAt": "2025-08-06T15:00:00.252Z",
-      "updatedAt": "2025-08-07T07:54:18.751Z",
-      "lastStockUpdate": "2025-08-07T04:58:21.318Z",
-      "lastStockAdjustment": {
-        "type": "set",
-        "quantity": 1,
-        "reason": "New stock received",
-        "oldStock": 1,
-        "newStock": 1,
-        "adjustedBy": "user_001",
-        "adjustedAt": "2025-08-07T04:58:21.318Z"
-      }
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
     {
-      "id": "item_011",
-      "name": "Steel rod 20mm",
-      "categoryId": "cat_001",
-      "price": 50000,
-      "unit": "kg",
+      "id": "item_019",
+      "name": "Bundle 6mm - 20 pieces",
+      "categoryId": "cat_005",
+      "price": 2500,
+      "unit": "bundle",
       "isTaxable": true,
-      "gstRate": 5,
-      "hsnCode": "7777",
-      "brand": "Batassssss",
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "SAIL",
       "isServiceItem": false,
       "priceEditableAtBilling": false,
-      "bundleInfo": "",
-      "barcode": "",
+      "bundleInfo": "20 pieces of 6mm steel rods",
       "stock": {
-        "quantity": 500,
-        "minLevel": 11
+        "quantity": 15,
+        "minLevel": 3
       },
       "isActive": true,
-      "createdAt": "2025-08-07T05:11:34.624Z",
-      "updatedAt": "2025-08-07T08:21:28.619Z",
-      "lastStockUpdate": "2025-08-07T08:21:28.611Z",
-      "lastStockAdjustment": {
-        "type": "add",
-        "quantity": 500,
-        "reason": "New stock received",
-        "oldStock": 0,
-        "newStock": 500,
-        "adjustedBy": "user_001",
-        "adjustedAt": "2025-08-07T08:21:28.611Z"
+      "createdAt": "2025-08-07T12:08:36.947Z"
+    },
+    {
+      "id": "item_020",
+      "name": "Bundle 8mm - 10 pieces",
+      "categoryId": "cat_005",
+      "price": 4700,
+      "unit": "bundle",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "SAIL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "10 pieces of 8mm steel rods",
+      "stock": {
+        "quantity": 12,
+        "minLevel": 2
       },
-      "lastStockMovement": {
-        "type": "sale",
-        "quantity": 1,
-        "billId": "bill_003",
-        "soldAt": "2025-08-07T05:15:11.595Z"
-      }
+      "isActive": true,
+      "createdAt": "2025-08-07T12:08:36.947Z"
     }
   ]
 }
