@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1><i class="fas fa-users-cog"></i> User Management</h1>
+                <p>Manage System Users & Permissions</p>
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-name"><%= user.fullName %></div>
+                    <div class="user-role"><%= user.role %></div>
+                </div>
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <span class="separator">/</span>
+            <a href="/settings">Settings</a>
+            <span class="separator">/</span>
+            <span class="current">User Management</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <h2><i class="fas fa-users-cog"></i> User Management</h2>
+                <p>Manage system users, roles, and permissions</p>
+            </div>
+            <div class="header-right">
+                <a href="/settings/users/new" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New User
+                </a>
+                <a href="/settings" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Settings
+                </a>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <% if (typeof message !== 'undefined' && message) { %>
+            <div class="alert alert-<%= message.type %>">
+                <i class="fas fa-<%= message.type === 'success' ? 'check-circle' : 'exclamation-triangle' %>"></i>
+                <%= message.text %>
+            </div>
+        <% } %>
+
+        <!-- User Statistics -->
+        <div class="info-card">
+            <div class="info-header">
+                <h3><i class="fas fa-chart-pie"></i> User Statistics</h3>
+            </div>
+            <div class="info-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users" style="color: #667eea;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Users</h3>
+                            <div class="stat-number"><%= users.length %></div>
+                            <small>Active system users</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-crown" style="color: #dc3545;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Administrators</h3>
+                            <div class="stat-number"><%= users.filter(u => u.role === 'admin').length %></div>
+                            <small>Admin users</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-tie" style="color: #28a745;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Staff Members</h3>
+                            <div class="stat-number"><%= users.filter(u => u.role === 'staff').length %></div>
+                            <small>Staff users</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle" style="color: #ffc107;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Active Users</h3>
+                            <div class="stat-number"><%= users.filter(u => u.isActive !== false).length %></div>
+                            <small>Currently active</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="items-table-container">
+            <div class="table-header">
+                <h3><i class="fas fa-table"></i> System Users</h3>
+                <div class="table-filters">
+                    <input type="text" id="searchUsers" class="search-input" placeholder="Search users...">
+                    <select id="filterRole" class="filter-select">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                    <select id="filterStatus" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <% if (users && users.length > 0) { %>
+                <table class="items-table data-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-user"></i> User Info</th>
+                            <th><i class="fas fa-envelope"></i> Contact</th>
+                            <th><i class="fas fa-shield-alt"></i> Role</th>
+                            <th><i class="fas fa-calendar"></i> Created</th>
+                            <th><i class="fas fa-clock"></i> Last Login</th>
+                            <th><i class="fas fa-toggle-on"></i> Status</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(function(userItem) { %>
+                            <tr data-role="<%= userItem.role %>" data-status="<%= userItem.isActive !== false ? 'active' : 'inactive' %>">
+                                <td>
+                                    <div class="item-info">
+                                        <strong><%= userItem.fullName %></strong>
+                                        <small>ID: <%= userItem.id %></small>
+                                        <small>Username: <%= userItem.username %></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="contact-info">
+                                        <strong><%= userItem.email || 'No email' %></strong>
+                                        <small><%= userItem.phone || 'No phone' %></small>
+                                        <small><%= userItem.department || 'No department' %></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% if (userItem.role === 'admin') { %>
+                                        <span class="status-badge" style="background: #dc3545; color: white;">
+                                            <i class="fas fa-crown"></i> Admin
+                                        </span>
+                                    <% } else { %>
+                                        <span class="status-badge" style="background: #28a745; color: white;">
+                                            <i class="fas fa-user-tie"></i> Staff
+                                        </span>
+                                    <% } %>
+                                    <br>
+                                    <small style="color: #6c757d;">
+                                        <% if (userItem.permissions && userItem.permissions.length > 0) { %>
+                                            <%= userItem.permissions.slice(0, 2).join(', ') %>
+                                            <% if (userItem.permissions.length > 2) { %>
+                                                +<%= userItem.permissions.length - 2 %> more
+                                            <% } %>
+                                        <% } else { %>
+                                            Standard permissions
+                                        <% } %>
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="date-info">
+                                        <strong><%= new Date(userItem.createdAt || Date.now()).toLocaleDateString() %></strong>
+                                        <small><%= new Date(userItem.createdAt || Date.now()).toLocaleTimeString() %></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="date-info">
+                                        <% if (userItem.lastLogin) { %>
+                                            <strong><%= new Date(userItem.lastLogin).toLocaleDateString() %></strong>
+                                            <small><%= new Date(userItem.lastLogin).toLocaleTimeString() %></small>
+                                        <% } else { %>
+                                            <span style="color: #6c757d;">Never logged in</span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% if (userItem.isActive !== false) { %>
+                                        <span class="status-badge status-ok">
+                                            <i class="fas fa-check-circle"></i> Active
+                                        </span>
+                                    <% } else { %>
+                                        <span class="status-badge status-low">
+                                            <i class="fas fa-times-circle"></i> Inactive
+                                        </span>
+                                    <% } %>
+                                    <br>
+                                    <small style="color: #6c757d;">
+                                        <% if (userItem.id === user.id) { %>
+                                            Current User
+                                        <% } else { %>
+                                            User Account
+                                        <% } %>
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/settings/users/<%= userItem.id %>/edit" class="btn btn-sm btn-info">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <% if (userItem.id !== user.id) { %>
+                                            <% if (userItem.isActive !== false) { %>
+                                                <button class="btn btn-sm btn-warning" onclick="toggleUserStatus('<%= userItem.id %>', false)">
+                                                    <i class="fas fa-ban"></i> Disable
+                                                </button>
+                                            <% } else { %>
+                                                <button class="btn btn-sm btn-success" onclick="toggleUserStatus('<%= userItem.id %>', true)">
+                                                    <i class="fas fa-check"></i> Enable
+                                                </button>
+                                            <% } %>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteUser('<%= userItem.id %>', '<%= userItem.fullName %>')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        <% } else { %>
+                                            <span class="btn btn-sm btn-secondary" style="opacity: 0.5;">
+                                                <i class="fas fa-lock"></i> Current User
+                                            </span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>No Users Found</h3>
+                    <p>No users are registered in the system.</p>
+                    <a href="/settings/users/new" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add First User
+                    </a>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- User Permissions Info -->
+        <div class="dev-info">
+            <h4><i class="fas fa-info-circle"></i> Role Permissions</h4>
+            <div class="permissions-grid">
+                <div class="permission-section">
+                    <h5><i class="fas fa-crown" style="color: #dc3545;"></i> Administrator</h5>
+                    <ul>
+                        <li><i class="fas fa-check text-success"></i> Full system access</li>
+                        <li><i class="fas fa-check text-success"></i> User management</li>
+                        <li><i class="fas fa-check text-success"></i> Settings configuration</li>
+                        <li><i class="fas fa-check text-success"></i> Data backup & restore</li>
+                        <li><i class="fas fa-check text-success"></i> Reports & analytics</li>
+                        <li><i class="fas fa-check text-success"></i> All billing operations</li>
+                    </ul>
+                </div>
+                <div class="permission-section">
+                    <h5><i class="fas fa-user-tie" style="color: #28a745;"></i> Staff</h5>
+                    <ul>
+                        <li><i class="fas fa-check text-success"></i> Billing & invoicing</li>
+                        <li><i class="fas fa-check text-success"></i> Customer management</li>
+                        <li><i class="fas fa-check text-success"></i> Item management</li>
+                        <li><i class="fas fa-check text-success"></i> Stock management</li>
+                        <li><i class="fas fa-check text-success"></i> Basic reports</li>
+                        <li><i class="fas fa-times text-danger"></i> System settings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p>&copy; 2024 Vikram Steels. User Management System</p>
+    </footer>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Action</h3>
+            <p id="confirmMessage"></p>
+            <div class="modal-actions">
+                <button id="confirmBtn" class="btn btn-danger">Confirm</button>
+                <button onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-hide alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+
+        // Search functionality
+        document.getElementById('searchUsers').addEventListener('input', function() {
+            filterTable();
+        });
+
+        document.getElementById('filterRole').addEventListener('change', function() {
+            filterTable();
+        });
+
+        document.getElementById('filterStatus').addEventListener('change', function() {
+            filterTable();
+        });
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchUsers').value.toLowerCase();
+            const roleFilter = document.getElementById('filterRole').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            const rows = document.querySelectorAll('#usersTable tbody tr');
+
+            rows.forEach(row => {
+                const userInfo = row.querySelector('.item-info').textContent.toLowerCase();
+                const contactInfo = row.querySelector('.contact-info').textContent.toLowerCase();
+                const role = row.dataset.role;
+                const status = row.dataset.status;
+
+                const matchesSearch = userInfo.includes(searchTerm) || contactInfo.includes(searchTerm);
+                const matchesRole = !roleFilter || role === roleFilter;
+                const matchesStatus = !statusFilter || status === statusFilter;
+
+                if (matchesSearch && matchesRole && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Modal functions
+        function showModal(message, callback) {
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmModal').style.display = 'flex';
+            document.getElementById('confirmBtn').onclick = function() {
+                callback();
+                closeModal();
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+        }
+
+        // User actions
+        function toggleUserStatus(userId, isActive) {
+            const action = isActive ? 'enable' : 'disable';
+            showModal(`Are you sure you want to ${action} this user?`, function() {
+                // In a real implementation, this would make an API call
+                fetch(`/settings/users/${userId}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ isActive })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error updating user status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating user status');
+                });
+            });
+        }
+
+        function deleteUser(userId, userName) {
+            showModal(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`, function() {
+                // In a real implementation, this would make an API call
+                fetch(`/settings/users/${userId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting user');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting user');
+                });
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('confirmModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+
+    <style>
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .permission-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .permission-section h5 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 16px;
+        }
+
+        .permission-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .permission-section li {
+            padding: 5px 0;
+            font-size: 14px;
+        }
+
+        .permission-section li i {
+            margin-right: 8px;
+            width: 16px;
+        }
+
+        .text-success {
+            color: #28a745 !important;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+    </style>
+</body>
+</html>

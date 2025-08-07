@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Settings - Vikram Steels</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Integration Settings</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/settings">⚙️ Settings</a>
+            <span class="separator">></span>
+            <span class="current">🔗 Integration</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>🔗 Integration Settings</h2>
+                    <p>Configure external integrations, APIs and third-party services</p>
+                </div>
+                <div class="header-right">
+                    <a href="/settings" class="btn btn-secondary">← Back to Settings</a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-danger">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Integration Settings Form -->
+            <div class="form-container">
+                <form action="/settings/integration" method="POST" class="settings-form">
+                    <!-- GST Integration -->
+                    <div class="form-section">
+                        <h3>🏛️ GST Portal Integration</h3>
+                        
+                        <div class="integration-status">
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <span class="status-icon">🏛️</span>
+                                    <h4>GST Portal</h4>
+                                    <span class="status-badge inactive">Inactive</span>
+                                </div>
+                                <p>Connect to GST portal for automated filing and compliance</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="gstPortalEnabled">Enable GST Portal Integration</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="gstPortalEnabled" name="gstPortalEnabled" 
+                                           <%= settings.integration?.gstPortal?.enabled ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Connect to GST portal for GSTR filing</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="gstUsername">GST Portal Username</label>
+                                <input type="text" id="gstUsername" name="gstUsername" 
+                                       value="<%= settings.integration?.gstPortal?.username || '' %>" 
+                                       placeholder="Your GST portal username">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="gstApiKey">API Key</label>
+                                <input type="password" id="gstApiKey" name="gstApiKey" 
+                                       value="<%= settings.integration?.gstPortal?.apiKey || '' %>" 
+                                       placeholder="GST portal API key">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="autoGstrFiling">Auto GSTR Filing</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="autoGstrFiling" name="autoGstrFiling" 
+                                           <%= settings.integration?.gstPortal?.autoFiling ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Automatically file GSTR returns</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="gstrFilingDay">Filing Day of Month</label>
+                                <select id="gstrFilingDay" name="gstrFilingDay">
+                                    <option value="">Select Day</option>
+                                    <% for(let i = 1; i <= 31; i++) { %>
+                                        <option value="<%= i %>" <%= settings.integration?.gstPortal?.filingDay === i ? 'selected' : '' %>><%= i %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Integration -->
+                    <div class="form-section">
+                        <h3>📧 Email Integration</h3>
+                        
+                        <div class="integration-status">
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <span class="status-icon">📧</span>
+                                    <h4>Email Service</h4>
+                                    <span class="status-badge active">Active</span>
+                                </div>
+                                <p>Send invoices, reports and notifications via email</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emailEnabled">Enable Email Integration</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="emailEnabled" name="emailEnabled" 
+                                           <%= settings.integration?.email?.enabled !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Enable email sending capabilities</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emailService">Email Service Provider</label>
+                                <select id="emailService" name="emailService" required>
+                                    <option value="gmail" <%= settings.integration?.email?.service === 'gmail' ? 'selected' : '' %>>Gmail</option>
+                                    <option value="outlook" <%= settings.integration?.email?.service === 'outlook' ? 'selected' : '' %>>Outlook</option>
+                                    <option value="yahoo" <%= settings.integration?.email?.service === 'yahoo' ? 'selected' : '' %>>Yahoo</option>
+                                    <option value="custom" <%= settings.integration?.email?.service === 'custom' ? 'selected' : '' %>>Custom SMTP</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="emailFrom">From Email Address</label>
+                                <input type="email" id="emailFrom" name="emailFrom" 
+                                       value="<%= settings.integration?.email?.from || '' %>" 
+                                       placeholder="noreply@vikramsteels.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="smtpHost">SMTP Host</label>
+                                <input type="text" id="smtpHost" name="smtpHost" 
+                                       value="<%= settings.integration?.email?.smtp?.host || '' %>" 
+                                       placeholder="smtp.gmail.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="smtpPort">SMTP Port</label>
+                                <input type="number" id="smtpPort" name="smtpPort" 
+                                       value="<%= settings.integration?.email?.smtp?.port || 587 %>" 
+                                       placeholder="587">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emailUsername">Email Username</label>
+                                <input type="text" id="emailUsername" name="emailUsername" 
+                                       value="<%= settings.integration?.email?.username || '' %>" 
+                                       placeholder="your-email@gmail.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="emailPassword">Email Password/App Password</label>
+                                <input type="password" id="emailPassword" name="emailPassword" 
+                                       value="<%= settings.integration?.email?.password || '' %>" 
+                                       placeholder="Your email password or app password">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SMS Integration -->
+                    <div class="form-section">
+                        <h3>📱 SMS Integration</h3>
+                        
+                        <div class="integration-status">
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <span class="status-icon">📱</span>
+                                    <h4>SMS Service</h4>
+                                    <span class="status-badge inactive">Inactive</span>
+                                </div>
+                                <p>Send SMS notifications and bill updates to customers</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="smsEnabled">Enable SMS Integration</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="smsEnabled" name="smsEnabled" 
+                                           <%= settings.integration?.sms?.enabled ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Enable SMS sending capabilities</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="smsProvider">SMS Provider</label>
+                                <select id="smsProvider" name="smsProvider">
+                                    <option value="twilio" <%= settings.integration?.sms?.provider === 'twilio' ? 'selected' : '' %>>Twilio</option>
+                                    <option value="textlocal" <%= settings.integration?.sms?.provider === 'textlocal' ? 'selected' : '' %>>TextLocal</option>
+                                    <option value="way2sms" <%= settings.integration?.sms?.provider === 'way2sms' ? 'selected' : '' %>>Way2SMS</option>
+                                    <option value="msg91" <%= settings.integration?.sms?.provider === 'msg91' ? 'selected' : '' %>>MSG91</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="smsApiKey">SMS API Key</label>
+                                <input type="password" id="smsApiKey" name="smsApiKey" 
+                                       value="<%= settings.integration?.sms?.apiKey || '' %>" 
+                                       placeholder="Your SMS provider API key">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="smsSenderId">Sender ID</label>
+                                <input type="text" id="smsSenderId" name="smsSenderId" 
+                                       value="<%= settings.integration?.sms?.senderId || '' %>" 
+                                       placeholder="VIKRAM" maxlength="6">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="smsTemplate">Default SMS Template</label>
+                                <textarea id="smsTemplate" name="smsTemplate" rows="3" 
+                                          placeholder="Dear {customer}, your bill #{billNumber} for Rs. {amount} is ready. Thank you! - Vikram Steels"><%= settings.integration?.sms?.template || '' %></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Gateway Integration -->
+                    <div class="form-section">
+                        <h3>💳 Payment Gateway Integration</h3>
+                        
+                        <div class="integration-status">
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <span class="status-icon">💳</span>
+                                    <h4>Payment Gateway</h4>
+                                    <span class="status-badge inactive">Inactive</span>
+                                </div>
+                                <p>Accept online payments via UPI, cards and net banking</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="paymentEnabled">Enable Payment Gateway</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="paymentEnabled" name="paymentEnabled" 
+                                           <%= settings.integration?.payment?.enabled ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Accept online payments from customers</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="paymentProvider">Payment Provider</label>
+                                <select id="paymentProvider" name="paymentProvider">
+                                    <option value="razorpay" <%= settings.integration?.payment?.provider === 'razorpay' ? 'selected' : '' %>>Razorpay</option>
+                                    <option value="payu" <%= settings.integration?.payment?.provider === 'payu' ? 'selected' : '' %>>PayU</option>
+                                    <option value="paytm" <%= settings.integration?.payment?.provider === 'paytm' ? 'selected' : '' %>>Paytm</option>
+                                    <option value="cashfree" <%= settings.integration?.payment?.provider === 'cashfree' ? 'selected' : '' %>>Cashfree</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="merchantId">Merchant ID</label>
+                                <input type="text" id="merchantId" name="merchantId" 
+                                       value="<%= settings.integration?.payment?.merchantId || '' %>" 
+                                       placeholder="Your merchant ID">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="paymentApiKey">API Key</label>
+                                <input type="password" id="paymentApiKey" name="paymentApiKey" 
+                                       value="<%= settings.integration?.payment?.apiKey || '' %>" 
+                                       placeholder="Payment gateway API key">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="paymentSecret">API Secret</label>
+                                <input type="password" id="paymentSecret" name="paymentSecret" 
+                                       value="<%= settings.integration?.payment?.secret || '' %>" 
+                                       placeholder="Payment gateway secret">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accounting Software Integration -->
+                    <div class="form-section">
+                        <h3>📊 Accounting Software Integration</h3>
+                        
+                        <div class="integration-status">
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <span class="status-icon">📊</span>
+                                    <h4>Accounting Software</h4>
+                                    <span class="status-badge inactive">Inactive</span>
+                                </div>
+                                <p>Sync data with Tally, QuickBooks or other accounting software</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="accountingEnabled">Enable Accounting Integration</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="accountingEnabled" name="accountingEnabled" 
+                                           <%= settings.integration?.accounting?.enabled ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Sync with external accounting software</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="accountingSoftware">Accounting Software</label>
+                                <select id="accountingSoftware" name="accountingSoftware">
+                                    <option value="tally" <%= settings.integration?.accounting?.software === 'tally' ? 'selected' : '' %>>Tally ERP</option>
+                                    <option value="quickbooks" <%= settings.integration?.accounting?.software === 'quickbooks' ? 'selected' : '' %>>QuickBooks</option>
+                                    <option value="sage" <%= settings.integration?.accounting?.software === 'sage' ? 'selected' : '' %>>Sage</option>
+                                    <option value="xero" <%= settings.integration?.accounting?.software === 'xero' ? 'selected' : '' %>>Xero</option>
+                                    <option value="zohobooks" <%= settings.integration?.accounting?.software === 'zohobooks' ? 'selected' : '' %>>Zoho Books</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="syncFrequency">Sync Frequency</label>
+                                <select id="syncFrequency" name="syncFrequency">
+                                    <option value="real_time" <%= settings.integration?.accounting?.syncFrequency === 'real_time' ? 'selected' : '' %>>Real-time</option>
+                                    <option value="hourly" <%= settings.integration?.accounting?.syncFrequency === 'hourly' ? 'selected' : '' %>>Hourly</option>
+                                    <option value="daily" <%= settings.integration?.accounting?.syncFrequency === 'daily' ? 'selected' : '' %>>Daily</option>
+                                    <option value="weekly" <%= settings.integration?.accounting?.syncFrequency === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backup Integration -->
+                    <div class="form-section">
+                        <h3>☁️ Cloud Backup Integration</h3>
+                        
+                        <div class="integration-status">
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <span class="status-icon">☁️</span>
+                                    <h4>Cloud Backup</h4>
+                                    <span class="status-badge inactive">Inactive</span>
+                                </div>
+                                <p>Automatically backup data to Google Drive, Dropbox or other cloud services</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cloudBackupEnabled">Enable Cloud Backup</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="cloudBackupEnabled" name="cloudBackupEnabled" 
+                                           <%= settings.integration?.cloudBackup?.enabled ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Automatically backup to cloud storage</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cloudProvider">Cloud Provider</label>
+                                <select id="cloudProvider" name="cloudProvider">
+                                    <option value="google_drive" <%= settings.integration?.cloudBackup?.provider === 'google_drive' ? 'selected' : '' %>>Google Drive</option>
+                                    <option value="dropbox" <%= settings.integration?.cloudBackup?.provider === 'dropbox' ? 'selected' : '' %>>Dropbox</option>
+                                    <option value="onedrive" <%= settings.integration?.cloudBackup?.provider === 'onedrive' ? 'selected' : '' %>>OneDrive</option>
+                                    <option value="aws_s3" <%= settings.integration?.cloudBackup?.provider === 'aws_s3' ? 'selected' : '' %>>AWS S3</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="backupFrequency">Backup Frequency</label>
+                                <select id="backupFrequency" name="backupFrequency">
+                                    <option value="daily" <%= settings.integration?.cloudBackup?.frequency === 'daily' ? 'selected' : '' %>>Daily</option>
+                                    <option value="weekly" <%= settings.integration?.cloudBackup?.frequency === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                                    <option value="monthly" <%= settings.integration?.cloudBackup?.frequency === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Save Integration Settings</button>
+                        <a href="/settings" class="btn btn-secondary">Cancel</a>
+                        <button type="button" onclick="testConnections()" class="btn btn-info">🔍 Test Connections</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Test connections function
+        function testConnections() {
+            const integrations = ['gst', 'email', 'sms', 'payment', 'accounting', 'cloudBackup'];
+            const results = [];
+            
+            integrations.forEach(integration => {
+                const enabled = document.getElementById(integration + 'Enabled')?.checked;
+                if (enabled) {
+                    // Simulate testing (in real implementation, this would make API calls)
+                    const success = Math.random() > 0.3; // 70% success rate for demo
+                    results.push({
+                        name: integration,
+                        status: success ? 'success' : 'failed',
+                        message: success ? 'Connection successful' : 'Connection failed'
+                    });
+                }
+            });
+            
+            if (results.length === 0) {
+                alert('No integrations are enabled to test.');
+                return;
+            }
+            
+            let message = 'Integration Test Results:\n\n';
+            results.forEach(result => {
+                message += `${result.name}: ${result.message}\n`;
+            });
+            
+            alert(message);
+        }
+
+        // Update SMTP settings based on email service selection
+        document.getElementById('emailService').addEventListener('change', function() {
+            const service = this.value;
+            const hostField = document.getElementById('smtpHost');
+            const portField = document.getElementById('smtpPort');
+            
+            switch(service) {
+                case 'gmail':
+                    hostField.value = 'smtp.gmail.com';
+                    portField.value = '587';
+                    break;
+                case 'outlook':
+                    hostField.value = 'smtp-mail.outlook.com';
+                    portField.value = '587';
+                    break;
+                case 'yahoo':
+                    hostField.value = 'smtp.mail.yahoo.com';
+                    portField.value = '587';
+                    break;
+                default:
+                    // Custom SMTP - don't change values
+                    break;
+            }
+        });
+
+        // Update status badges based on checkbox states
+        function updateStatusBadges() {
+            const integrations = [
+                { checkbox: 'gstPortalEnabled', badge: document.querySelector('.form-section:nth-child(1) .status-badge') },
+                { checkbox: 'emailEnabled', badge: document.querySelector('.form-section:nth-child(2) .status-badge') },
+                { checkbox: 'smsEnabled', badge: document.querySelector('.form-section:nth-child(3) .status-badge') },
+                { checkbox: 'paymentEnabled', badge: document.querySelector('.form-section:nth-child(4) .status-badge') },
+                { checkbox: 'accountingEnabled', badge: document.querySelector('.form-section:nth-child(5) .status-badge') },
+                { checkbox: 'cloudBackupEnabled', badge: document.querySelector('.form-section:nth-child(6) .status-badge') }
+            ];
+            
+            integrations.forEach(integration => {
+                const checkbox = document.getElementById(integration.checkbox);
+                if (checkbox && integration.badge) {
+                    if (checkbox.checked) {
+                        integration.badge.textContent = 'Active';
+                        integration.badge.className = 'status-badge active';
+                    } else {
+                        integration.badge.textContent = 'Inactive';
+                        integration.badge.className = 'status-badge inactive';
+                    }
+                }
+            });
+        }
+
+        // Add event listeners for status updates
+        ['gstPortalEnabled', 'emailEnabled', 'smsEnabled', 'paymentEnabled', 'accountingEnabled', 'cloudBackupEnabled'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', updateStatusBadges);
+            }
+        });
+
+        // Initialize status badges
+        updateStatusBadges();
+    </script>
+
+    <style>
+        .integration-status {
+            margin: 20px 0;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .status-icon {
+            font-size: 1.5em;
+        }
+
+        .status-header h4 {
+            flex: 1;
+            margin: 0;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</body>
+</html>

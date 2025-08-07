@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - Vikram Steels</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Edit User</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/settings">⚙️ Settings</a>
+            <span class="separator">></span>
+            <a href="/settings/users">👥 Users</a>
+            <span class="separator">></span>
+            <span class="current">✏️ Edit User</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>✏️ Edit User</h2>
+                    <p>Modify user account information and permissions</p>
+                </div>
+                <div class="header-right">
+                    <a href="/settings/users" class="btn btn-secondary">← Back to Users</a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-danger">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Edit User Form -->
+            <div class="form-container">
+                <form action="/settings/users/<%= editUser.id %>" method="POST" class="settings-form">
+                    <input type="hidden" name="_method" value="PUT">
+                    
+                    <!-- User Information -->
+                    <div class="form-section">
+                        <h3>👤 User Information</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="id">User ID</label>
+                                <input type="text" id="id" name="id" 
+                                       value="<%= editUser.id %>" 
+                                       readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" name="username" 
+                                       value="<%= editUser.username %>" 
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" name="name" 
+                                       value="<%= editUser.name %>" 
+                                       required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" 
+                                       value="<%= editUser.email || '' %>" 
+                                       placeholder="user@vikramsteels.com">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="role">User Role</label>
+                                <select id="role" name="role" required>
+                                    <option value="Admin" <%= editUser.role === 'Admin' ? 'selected' : '' %>>Admin</option>
+                                    <option value="Staff" <%= editUser.role === 'Staff' ? 'selected' : '' %>>Staff</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="status">Account Status</label>
+                                <select id="status" name="status" required>
+                                    <option value="Active" <%= editUser.status === 'Active' ? 'selected' : '' %>>Active</option>
+                                    <option value="Inactive" <%= editUser.status === 'Inactive' ? 'selected' : '' %>>Inactive</option>
+                                    <option value="Suspended" <%= editUser.status === 'Suspended' ? 'selected' : '' %>>Suspended</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Section -->
+                    <div class="form-section">
+                        <h3>🔒 Password Settings</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" name="newPassword" 
+                                       placeholder="Leave blank to keep current password">
+                                <small class="help-text">Minimum 6 characters required</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" 
+                                       placeholder="Confirm new password">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="forcePasswordChange">Force Password Change</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="forcePasswordChange" name="forcePasswordChange">
+                                    <span class="checkmark"></span>
+                                    <span>Require user to change password on next login</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Details -->
+                    <div class="form-section">
+                        <h3>📋 Account Details</h3>
+                        
+                        <div class="account-info-grid">
+                            <div class="info-item">
+                                <span class="label">Created:</span>
+                                <span class="value"><%= new Date(editUser.createdAt).toLocaleDateString('en-IN') %></span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="label">Last Login:</span>
+                                <span class="value">
+                                    <% if (editUser.lastLogin) { %>
+                                        <%= new Date(editUser.lastLogin).toLocaleString('en-IN') %>
+                                    <% } else { %>
+                                        Never
+                                    <% } %>
+                                </span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="label">Login Count:</span>
+                                <span class="value"><%= editUser.loginCount || 0 %></span>
+                            </div>
+                            
+                            <div class="info-item">
+                                <span class="label">Failed Attempts:</span>
+                                <span class="value"><%= editUser.failedLoginAttempts || 0 %></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Update User</button>
+                        <a href="/settings/users" class="btn btn-secondary">Cancel</a>
+                        <% if (editUser.status === 'Active') { %>
+                            <button type="button" onclick="suspendUser()" class="btn btn-warning">⛔ Suspend User</button>
+                        <% } else if (editUser.status === 'Suspended') { %>
+                            <button type="button" onclick="activateUser()" class="btn btn-success">✅ Activate User</button>
+                        <% } %>
+                        <button type="button" onclick="deleteUser()" class="btn btn-danger">🗑️ Delete User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = this.value;
+            
+            if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // Password strength indicator
+        document.getElementById('newPassword').addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 6) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^A-Za-z0-9]/)) strength++;
+            
+            const helpText = this.nextElementSibling;
+            if (password.length === 0) {
+                helpText.textContent = 'Minimum 6 characters required';
+                helpText.style.color = '#666';
+            } else if (strength < 2) {
+                helpText.textContent = 'Weak password';
+                helpText.style.color = '#dc3545';
+            } else if (strength < 3) {
+                helpText.textContent = 'Medium strength password';
+                helpText.style.color = '#ffc107';
+            } else {
+                helpText.textContent = 'Strong password';
+                helpText.style.color = '#28a745';
+            }
+        });
+
+        // Suspend user function
+        function suspendUser() {
+            if (confirm('Are you sure you want to suspend this user? They will not be able to login until reactivated.')) {
+                document.getElementById('status').value = 'Suspended';
+                document.querySelector('form').submit();
+            }
+        }
+
+        // Activate user function
+        function activateUser() {
+            if (confirm('Are you sure you want to activate this user?')) {
+                document.getElementById('status').value = 'Active';
+                document.querySelector('form').submit();
+            }
+        }
+
+        // Delete user function
+        function deleteUser() {
+            const userName = '<%= editUser.name %>';
+            if (confirm(`Are you sure you want to delete the user "${userName}"? This action cannot be undone.`)) {
+                if (confirm('This will permanently delete all user data. Are you absolutely sure?')) {
+                    // Create a form for DELETE request
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/settings/users/<%= editUser.id %>';
+                    
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'DELETE';
+                    form.appendChild(methodInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        }
+
+        // Role change warning
+        document.getElementById('role').addEventListener('change', function() {
+            const currentRole = '<%= editUser.role %>';
+            const newRole = this.value;
+            
+            if (currentRole === 'Admin' && newRole === 'Staff') {
+                alert('Warning: Changing from Admin to Staff will remove administrative privileges.');
+            }
+        });
+    </script>
+
+    <style>
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .account-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+            margin-top: 30px;
+            padding: 20px 0;
+            border-top: 2px solid #e9ecef;
+        }
+
+        input[readonly] {
+            background-color: #f8f9fa;
+            color: #666;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Vikram Steels</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+            color: #212529;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            color: white;
+        }
+        
+        .backups-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .backups-table th,
+        .backups-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .backups-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .backups-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .backup-name {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 24px;
+        }
+        
+        .empty-state p {
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .backup-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .backup-age {
+            color: #6c757d;
+            font-size: 12px;
+        }
+        
+        .backup-age.recent {
+            color: #28a745;
+        }
+        
+        .backup-age.old {
+            color: #ffc107;
+        }
+        
+        .backup-age.very-old {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h1>📁 Backup Management</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/data">Data Management</a>
+            <span>Welcome, <%= user.username %></span>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+        <% } %>
+        
+        <% if (error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <!-- Backup Statistics -->
+        <div class="backup-stats">
+            <div class="stat-card">
+                <div class="stat-number"><%= backups.length %></div>
+                <div class="stat-label">Total Backups</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    <%= backups.filter(b => {
+                        const date = new Date(b.created);
+                        const now = new Date();
+                        const diffHours = (now - date) / (1000 * 60 * 60);
+                        return diffHours <= 24;
+                    }).length %>
+                </div>
+                <div class="stat-label">Recent (24h)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    <% if (backups.length > 0) { %>
+                        <%= Math.round(backups.reduce((sum, b) => sum + parseFloat(b.size), 0) / 1024) %> MB
+                    <% } else { %>
+                        0 MB
+                    <% } %>
+                </div>
+                <div class="stat-label">Total Size</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    <% if (backups.length > 0) { %>
+                        <%= new Date(Math.max(...backups.map(b => new Date(b.created)))).toLocaleDateString() %>
+                    <% } else { %>
+                        Never
+                    <% } %>
+                </div>
+                <div class="stat-label">Last Backup</div>
+            </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="header-actions">
+            <h2>📁 Available Backups</h2>
+            <a href="/data/backup" class="btn btn-success">
+                💾 Create New Backup
+            </a>
+        </div>
+
+        <!-- Backups Table -->
+        <% if (backups.length > 0) { %>
+            <table class="backups-table">
+                <thead>
+                    <tr>
+                        <th>Backup Name</th>
+                        <th>Created</th>
+                        <th>Created By</th>
+                        <th>Size</th>
+                        <th>Files</th>
+                        <th>Age</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% backups.forEach(backup => { 
+                        const createdDate = new Date(backup.created);
+                        const now = new Date();
+                        const diffHours = (now - createdDate) / (1000 * 60 * 60);
+                        const diffDays = Math.floor(diffHours / 24);
+                        
+                        let ageClass = 'recent';
+                        let ageText = '';
+                        
+                        if (diffHours < 1) {
+                            ageText = 'Just now';
+                        } else if (diffHours < 24) {
+                            ageText = Math.floor(diffHours) + 'h ago';
+                        } else if (diffDays < 7) {
+                            ageText = diffDays + 'd ago';
+                            ageClass = diffDays > 3 ? 'old' : 'recent';
+                        } else {
+                            ageText = Math.floor(diffDays / 7) + 'w ago';
+                            ageClass = 'very-old';
+                        }
+                    %>
+                        <tr>
+                            <td>
+                                <span class="backup-name"><%= backup.name %></span>
+                            </td>
+                            <td><%= createdDate.toLocaleString() %></td>
+                            <td><%= backup.createdBy %></td>
+                            <td><%= backup.size %></td>
+                            <td><%= backup.files %></td>
+                            <td>
+                                <span class="backup-age <%= ageClass %>">
+                                    <%= ageText %>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <form style="display: inline;" method="POST" action="/data/restore/<%= backup.name %>" 
+                                          onsubmit="return confirm('Are you sure you want to restore from this backup? This will overwrite current data.')">
+                                        <button type="submit" class="btn-sm btn-warning">
+                                            🔄 Restore
+                                        </button>
+                                    </form>
+                                    <button class="btn-sm btn-primary" onclick="downloadBackup('<%= backup.name %>')">
+                                        💾 Download
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="empty-state">
+                <span class="empty-icon">📁</span>
+                <h3>No Backups Found</h3>
+                <p>You haven't created any backups yet. Create your first backup to secure your data.</p>
+                <a href="/data/backup" class="btn btn-success">
+                    💾 Create First Backup
+                </a>
+            </div>
+        <% } %>
+
+        <!-- Backup Guidelines -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 30px;">
+            <h4 style="color: #495057; margin-top: 0;">💡 Backup Guidelines</h4>
+            <ul style="color: #6c757d; margin: 0;">
+                <li><strong>Regular Backups:</strong> Create backups before major changes or daily for active systems</li>
+                <li><strong>Storage:</strong> Backups are stored locally in the backups folder</li>
+                <li><strong>Retention:</strong> Consider removing old backups to save disk space</li>
+                <li><strong>Testing:</strong> Periodically test backup restoration to ensure data integrity</li>
+                <li><strong>Security:</strong> Backup files contain sensitive data - secure your backup storage</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function downloadBackup(backupName) {
+            // In a full implementation, this would create a downloadable archive
+            alert(`Download functionality for backup "${backupName}" would be implemented here.\n\nFor now, backups are stored in the server's backups folder.`);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                window.location.href = '/data/backup';
+            }
+        });
+
+        // Auto-refresh every 30 seconds to show new backups
+        setInterval(() => {
+            // In a real application, this would refresh the backup list
+            console.log('Checking for new backups...');
+        }, 30000);
+    </script>
+</body>
+</html>

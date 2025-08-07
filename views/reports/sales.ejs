@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .export-actions {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, var(--primary-color), #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .summary-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .bills-table-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .date-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .print-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        @media print {
+            .filter-section, .export-actions, .breadcrumb, .main-header {
+                display: none;
+            }
+            
+            .print-section {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Sales Report</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/reports">📊 Reports</a>
+            <span class="separator">></span>
+            <span class="current">💰 Sales Report</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>💰 Sales Report</h2>
+                    <p>Detailed sales analysis and transaction history</p>
+                </div>
+                <div class="header-right">
+                    <button onclick="window.print()" class="btn btn-primary">
+                        🖨️ Print Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3>📅 Filter Options</h3>
+                <form method="GET" action="/reports/sales">
+                    <div class="filter-grid">
+                        <div class="form-group">
+                            <label for="dateFrom">From Date:</label>
+                            <input type="date" id="dateFrom" name="dateFrom" 
+                                   value="<%= filters.dateFrom || '' %>" class="date-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dateTo">To Date:</label>
+                            <input type="date" id="dateTo" name="dateTo" 
+                                   value="<%= filters.dateTo || '' %>" class="date-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerId">Customer:</label>
+                            <select id="customerId" name="customerId" class="filter-select">
+                                <option value="">All Customers</option>
+                                <% customers.forEach(customer => { %>
+                                    <option value="<%= customer.id %>" 
+                                            <%= filters.customerId === customer.id ? 'selected' : '' %>>
+                                        <%= customer.name %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                🔍 Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-label">Total Bills</div>
+                    <div class="summary-value"><%= summary.totalBills %></div>
+                </div>
+                
+                <div class="summary-card">
+                    <div class="summary-label">Total Revenue</div>
+                    <div class="summary-value">₹<%= summary.totalRevenue.toLocaleString() %></div>
+                </div>
+                
+                <div class="summary-card">
+                    <div class="summary-label">Total GST</div>
+                    <div class="summary-value">₹<%= summary.totalGst.toLocaleString() %></div>
+                </div>
+                
+                <div class="summary-card">
+                    <div class="summary-label">Average Order</div>
+                    <div class="summary-value">₹<%= summary.averageOrderValue.toLocaleString() %></div>
+                </div>
+            </div>
+
+            <!-- Export Actions -->
+            <div class="export-actions">
+                <a href="/reports/export/csv?type=sales&dateFrom=<%= filters.dateFrom || '' %>&dateTo=<%= filters.dateTo || '' %>&customerId=<%= filters.customerId || '' %>" 
+                   class="btn btn-secondary">
+                    📊 Export to CSV
+                </a>
+                <button onclick="exportToPDF()" class="btn btn-secondary">
+                    📄 Export to PDF
+                </button>
+                <a href="/reports" class="btn btn-outline">
+                    ← Back to Reports
+                </a>
+            </div>
+
+            <!-- Print Section -->
+            <div class="print-section">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1>🏢 Vikram Steels</h1>
+                    <h2>Sales Report</h2>
+                    <% if (filters.dateFrom || filters.dateTo) { %>
+                        <p>
+                            Period: 
+                            <%= filters.dateFrom ? new Date(filters.dateFrom).toLocaleDateString('en-IN') : 'Beginning' %> 
+                            to 
+                            <%= filters.dateTo ? new Date(filters.dateTo).toLocaleDateString('en-IN') : 'Today' %>
+                        </p>
+                    <% } %>
+                    <p>Generated on: <%= new Date().toLocaleDateString('en-IN') %> at <%= new Date().toLocaleTimeString('en-IN') %></p>
+                </div>
+
+                <!-- Bills Table -->
+                <div class="bills-table-container">
+                    <% if (bills.length === 0) { %>
+                        <div class="empty-state">
+                            <div class="empty-icon">📊</div>
+                            <h3>No Sales Data Found</h3>
+                            <p>No bills match the selected criteria.</p>
+                        </div>
+                    <% } else { %>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Bill #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Subtotal</th>
+                                    <th>CGST</th>
+                                    <th>SGST</th>
+                                    <th>Total</th>
+                                    <th>Payment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% bills.forEach(bill => { %>
+                                    <tr>
+                                        <td>
+                                            <strong>#<%= bill.billNumber %></strong>
+                                            <small style="display: block; color: #666;"><%= bill.id %></small>
+                                        </td>
+                                        <td>
+                                            <div style="font-size: 14px;">
+                                                <%= new Date(bill.createdAt || bill.billDate).toLocaleDateString('en-IN') %>
+                                            </div>
+                                            <small style="color: #666;">
+                                                <%= new Date(bill.createdAt || bill.billDate).toLocaleTimeString('en-IN') %>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <strong><%= bill.customerName %></strong>
+                                            <% if (bill.customerGstin) { %>
+                                                <small style="display: block; color: #666;">
+                                                    GST: <%= bill.customerGstin %>
+                                                </small>
+                                            <% } %>
+                                        </td>
+                                        <td><%= bill.customerPhone %></td>
+                                        <td>₹<%= (bill.subtotal || 0).toLocaleString() %></td>
+                                        <td>₹<%= (bill.cgstAmount || 0).toLocaleString() %></td>
+                                        <td>₹<%= (bill.sgstAmount || 0).toLocaleString() %></td>
+                                        <td>
+                                            <strong>₹<%= (bill.finalTotal || bill.grandTotal || 0).toLocaleString() %></strong>
+                                        </td>
+                                        <td>
+                                            <span class="payment-method-badge <%= (bill.paymentMethod || 'Cash').toLowerCase() %>-badge">
+                                                <%= bill.paymentMethod || 'Cash' %>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background-color: #f8f9fa; font-weight: bold;">
+                                    <td colspan="4" style="text-align: right;">TOTALS:</td>
+                                    <td>₹<%= bills.reduce((sum, bill) => sum + (bill.subtotal || 0), 0).toLocaleString() %></td>
+                                    <td>₹<%= bills.reduce((sum, bill) => sum + (bill.cgstAmount || 0), 0).toLocaleString() %></td>
+                                    <td>₹<%= bills.reduce((sum, bill) => sum + (bill.sgstAmount || 0), 0).toLocaleString() %></td>
+                                    <td>₹<%= bills.reduce((sum, bill) => sum + (bill.finalTotal || bill.grandTotal || 0), 0).toLocaleString() %></td>
+                                    <td>-</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Quick date filters
+        function setDateFilter(days) {
+            const today = new Date();
+            const fromDate = new Date(today);
+            fromDate.setDate(today.getDate() - days);
+            
+            document.getElementById('dateFrom').value = fromDate.toISOString().split('T')[0];
+            document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+        }
+
+        // Add quick filter buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterGrid = document.querySelector('.filter-grid');
+            const quickFiltersDiv = document.createElement('div');
+            quickFiltersDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Quick Filters:</label>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <button type="button" onclick="setDateFilter(7)" class="btn btn-sm btn-outline">Last 7 Days</button>
+                        <button type="button" onclick="setDateFilter(30)" class="btn btn-sm btn-outline">Last Month</button>
+                        <button type="button" onclick="setDateFilter(90)" class="btn btn-sm btn-outline">Last 3 Months</button>
+                    </div>
+                </div>
+            `;
+            filterGrid.appendChild(quickFiltersDiv);
+        });
+
+        // Export to PDF function
+        function exportToPDF() {
+            window.print();
+        }
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

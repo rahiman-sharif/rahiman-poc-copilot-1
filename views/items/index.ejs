@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .toggle-controls {
+            margin-left: 10px;
+        }
+        
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #6c757d;
+            color: #6c757d;
+        }
+        
+        .btn-outline:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Items Management</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <span class="current">📦 Items Management</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>📦 Items Management</h2>
+                    <p>Manage your inventory items and stock levels</p>
+                </div>
+                <div class="header-right">
+                    <% if (user.role === 'admin') { %>
+                        <a href="/items/new" class="btn btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Add New Item
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3>Total Items</h3>
+                        <p class="stat-number"><%= totalItems %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <h3>Low Stock</h3>
+                        <p class="stat-number <% if (lowStockItems > 0) { %>text-warning<% } %>"><%= lowStockItems %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🏷️</div>
+                    <div class="stat-info">
+                        <h3>Categories</h3>
+                        <p class="stat-number"><%= categories.length %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🔧</div>
+                    <div class="stat-info">
+                        <h3>Service Items</h3>
+                        <p class="stat-number"><%= items.filter(item => item.isServiceItem).length %></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="search-section">
+                <div class="search-controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="🔍 Search items..." class="search-input">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="categoryFilter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <% categories.forEach(category => { %>
+                                <option value="<%= category.id %>"><%= category.name %></option>
+                            <% }) %>
+                        </select>
+                        <select id="stockFilter" class="filter-select">
+                            <option value="">All Stock Levels</option>
+                            <option value="low">Low Stock</option>
+                            <option value="normal">Normal Stock</option>
+                            <option value="service">Service Items</option>
+                        </select>
+                        
+                        <!-- Toggle for inactive items -->
+                        <div class="toggle-controls">
+                            <% const toggleInactive = typeof showInactive !== 'undefined' ? showInactive : false; %>
+                            <% const toggleInactiveCount = typeof inactiveCount !== 'undefined' ? inactiveCount : 0; %>
+                            <a href="/items?t=<%= Date.now() %>&showInactive=<%= !toggleInactive %>" 
+                               class="btn <%= toggleInactive ? 'btn-secondary' : 'btn-outline' %>">
+                                <% if (toggleInactive) { %>
+                                    👁️ Show Active Only
+                                <% } else { %>
+                                    👁️‍🗨️ Show All Items (<%= toggleInactiveCount %> inactive)
+                                <% } %>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="items-table-container">
+                <% if (items.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <h3>No Items Found</h3>
+                        <p>Start by adding your first item to the inventory.</p>
+                        <% if (user.role === 'admin') { %>
+                            <a href="/items/new" class="btn btn-primary">Add First Item</a>
+                        <% } %>
+                    </div>
+                <% } else { %>
+                    <table class="items-table" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Unit</th>
+                                <th>GST %</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% items.forEach(item => { %>
+                                <tr class="item-row" 
+                                    data-category="<%= item.categoryId %>" 
+                                    data-stock-status="<%= item.isServiceItem ? 'service' : (item.stock.quantity <= item.stock.minLevel ? 'low' : 'normal') %>">
+                                    <td>
+                                        <div class="item-info">
+                                            <strong><%= item.name %></strong>
+                                            <% if (item.brand) { %>
+                                                <small class="item-brand">Brand: <%= item.brand %></small>
+                                            <% } %>
+                                            <% if (item.bundleInfo) { %>
+                                                <small class="item-bundle">📏 <%= item.bundleInfo %></small>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="category-badge"><%= item.categoryName %></span>
+                                    </td>
+                                    <td>
+                                        <span class="price">₹<%= item.price.toFixed(2) %></span>
+                                        <% if (item.priceEditableAtBilling) { %>
+                                            <small class="editable-price">✏️ Editable</small>
+                                        <% } %>
+                                    </td>
+                                    <td><%= item.unit %></td>
+                                    <td>
+                                        <% if (item.isTaxable) { %>
+                                            <span class="gst-rate"><%= item.gstRate %>%</span>
+                                        <% } else { %>
+                                            <span class="no-gst">0%</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (item.isServiceItem) { %>
+                                            <span class="service-item">Service</span>
+                                        <% } else { %>
+                                            <div class="stock-info">
+                                                <span class="stock-qty 
+                                                    <% if (item.stock.quantity <= item.stock.minLevel) { %>stock-low<% } %>">
+                                                    <%= item.stock.quantity %>
+                                                </span>
+                                                <small>Min: <%= item.stock.minLevel %></small>
+                                            </div>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (!item.isActive) { %>
+                                            <span class="status-badge status-inactive">❌ Inactive</span>
+                                        <% } else if (item.isServiceItem) { %>
+                                            <span class="status-badge status-service">🔧 Service</span>
+                                        <% } else if (item.stock.quantity <= item.stock.minLevel) { %>
+                                            <span class="status-badge status-low">⚠️ Low Stock</span>
+                                        <% } else { %>
+                                            <span class="status-badge status-ok">✅ In Stock</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/items/<%= item.id %>" class="btn btn-sm btn-info" title="View Item Details">
+                                                👁️
+                                            </a>
+                                            <% if (user.role === 'admin') { %>
+                                                <% if (item.isActive) { %>
+                                                    <a href="/items/<%= item.id %>/edit" class="btn btn-sm btn-secondary" title="Edit Item">
+                                                        ✏️
+                                                    </a>
+                                                    <button onclick="deactivateItem('<%= item.id %>', '<%= item.name %>')" 
+                                                            class="btn btn-sm btn-warning" title="Deactivate Item">
+                                                        ❌
+                                                    </button>
+                                                    <button onclick="deleteItem('<%= item.id %>', '<%= item.name %>')" 
+                                                            class="btn btn-sm btn-danger" title="Permanently Delete">
+                                                        🗑️
+                                                    </button>
+                                                <% } else { %>
+                                                    <button onclick="activateItem('<%= item.id %>', '<%= item.name %>')" 
+                                                            class="btn btn-sm btn-success" title="Activate Item">
+                                                        ✅
+                                                    </button>
+                                                    <button onclick="deleteItem('<%= item.id %>', '<%= item.name %>')" 
+                                                            class="btn btn-sm btn-danger" title="Permanently Delete">
+                                                        🗑️
+                                                    </button>
+                                                <% } %>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>🗑️ Delete Item</h3>
+            <p>Are you sure you want to delete <strong id="deleteItemName"></strong>?</p>
+            <p class="warning-text">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterItems();
+        });
+
+        // Filter functionality
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            filterItems();
+        });
+
+        document.getElementById('stockFilter').addEventListener('change', function() {
+            filterItems();
+        });
+
+        function filterItems() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const stockFilter = document.getElementById('stockFilter').value;
+            const rows = document.querySelectorAll('.item-row');
+
+            rows.forEach(row => {
+                const itemName = row.querySelector('.item-info strong').textContent.toLowerCase();
+                const category = row.dataset.category;
+                const stockStatus = row.dataset.stockStatus;
+
+                const matchesSearch = itemName.includes(searchTerm);
+                const matchesCategory = !categoryFilter || category === categoryFilter;
+                const matchesStock = !stockFilter || stockStatus === stockFilter;
+
+                if (matchesSearch && matchesCategory && matchesStock) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Delete item functionality
+        function deleteItem(itemId, itemName) {
+            if (confirm(`⚠️ Are you sure you want to PERMANENTLY DELETE "${itemName}"? This action cannot be undone and will remove all data.`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/items/${itemId}/delete`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Deactivate item functionality
+        function deactivateItem(itemId, itemName) {
+            if (confirm(`❌ Are you sure you want to deactivate "${itemName}"? The item will be hidden from active lists but data will be preserved.`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/items/${itemId}/deactivate`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Activate item functionality
+        function activateItem(itemId, itemName) {
+            if (confirm(`✅ Are you sure you want to reactivate "${itemName}"? The item will be available again.`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/items/${itemId}/activate`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('deleteModal')) {
+                closeDeleteModal();
+            }
+        });
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

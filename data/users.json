@@ -1,0 +1,24 @@
+{
+  "users": [
+    {
+      "id": "user_001",
+      "username": "admin",
+      "password": "$2b$10$neQpABQG4/nL4xbVFTIVze4oN4Rxegrto89Q2cmIN/MbXKOSZo4Zi",
+      "role": "admin",
+      "name": "Administrator",
+      "createdAt": "2025-08-06T14:44:48.505Z",
+      "isActive": true,
+      "lastLogin": "2025-08-07T08:33:39.014Z",
+      "updatedAt": "2025-08-07T08:33:39.015Z"
+    },
+    {
+      "id": "user_002",
+      "username": "staff",
+      "password": "$2b$10$RoccSK4iu6zkVnIwg8617elQM2l4gUN0oof0cb20kQ5WIFDADqaru",
+      "role": "staff",
+      "name": "Staff User",
+      "createdAt": "2025-08-06T14:51:23.417Z",
+      "isActive": true
+    }
+  ]
+}

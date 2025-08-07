@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1><i class="fas fa-sliders-h"></i> System Configuration</h1>
+                <p>System-wide Settings & Preferences</p>
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-name"><%= user.fullName %></div>
+                    <div class="user-role"><%= user.role %></div>
+                </div>
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <span class="separator">/</span>
+            <a href="/settings">Settings</a>
+            <span class="separator">/</span>
+            <span class="current">System Configuration</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <h2><i class="fas fa-sliders-h"></i> System Configuration</h2>
+                <p>Configure system-wide settings and preferences</p>
+            </div>
+            <div class="header-right">
+                <a href="/settings" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Settings
+                </a>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <% if (typeof message !== 'undefined' && message) { %>
+            <div class="alert alert-<%= message.type %>">
+                <i class="fas fa-<%= message.type === 'success' ? 'check-circle' : 'exclamation-triangle' %>"></i>
+                <%= message.text %>
+            </div>
+        <% } %>
+
+        <!-- System Settings Form -->
+        <div class="form-container">
+            <form action="/settings/system" method="POST" class="form-card">
+                <!-- General Settings -->
+                <div class="form-section">
+                    <h3><i class="fas fa-cog"></i> General Settings</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="currency">Currency</label>
+                            <select id="currency" name="currency">
+                                <option value="INR" <%= settings && settings.currency === 'INR' ? 'selected' : '' %>>Indian Rupee (₹)</option>
+                                <option value="USD" <%= settings && settings.currency === 'USD' ? 'selected' : '' %>>US Dollar ($)</option>
+                                <option value="EUR" <%= settings && settings.currency === 'EUR' ? 'selected' : '' %>>Euro (€)</option>
+                                <option value="GBP" <%= settings && settings.currency === 'GBP' ? 'selected' : '' %>>British Pound (£)</option>
+                            </select>
+                            <small class="form-help">Default currency for the system</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dateFormat">Date Format</label>
+                            <select id="dateFormat" name="dateFormat">
+                                <option value="DD/MM/YYYY" <%= settings && settings.dateFormat === 'DD/MM/YYYY' ? 'selected' : '' %>>DD/MM/YYYY (Indian)</option>
+                                <option value="MM/DD/YYYY" <%= settings && settings.dateFormat === 'MM/DD/YYYY' ? 'selected' : '' %>>MM/DD/YYYY (US)</option>
+                                <option value="YYYY-MM-DD" <%= settings && settings.dateFormat === 'YYYY-MM-DD' ? 'selected' : '' %>>YYYY-MM-DD (ISO)</option>
+                                <option value="DD-MM-YYYY" <%= settings && settings.dateFormat === 'DD-MM-YYYY' ? 'selected' : '' %>>DD-MM-YYYY</option>
+                            </select>
+                            <small class="form-help">Default date format for display</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="timeFormat">Time Format</label>
+                            <select id="timeFormat" name="timeFormat">
+                                <option value="12" <%= settings && settings.timeFormat === '12' ? 'selected' : '' %>>12 Hour (AM/PM)</option>
+                                <option value="24" <%= settings && settings.timeFormat === '24' ? 'selected' : '' %>>24 Hour</option>
+                            </select>
+                            <small class="form-help">Time display format</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="timezone">Timezone</label>
+                            <select id="timezone" name="timezone">
+                                <option value="Asia/Kolkata" <%= settings && settings.timezone === 'Asia/Kolkata' ? 'selected' : '' %>>Asia/Kolkata (IST)</option>
+                                <option value="Asia/Mumbai" <%= settings && settings.timezone === 'Asia/Mumbai' ? 'selected' : '' %>>Asia/Mumbai (IST)</option>
+                                <option value="UTC" <%= settings && settings.timezone === 'UTC' ? 'selected' : '' %>>UTC</option>
+                                <option value="America/New_York" <%= settings && settings.timezone === 'America/New_York' ? 'selected' : '' %>>America/New_York (EST)</option>
+                            </select>
+                            <small class="form-help">System timezone</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Settings -->
+                <div class="form-section">
+                    <h3><i class="fas fa-file-invoice"></i> Invoice Settings</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="invoicePrefix">Invoice Prefix</label>
+                            <input type="text" id="invoicePrefix" name="invoicePrefix" 
+                                   value="<%= settings ? settings.invoicePrefix : 'VS' %>" 
+                                   maxlength="5" required>
+                            <small class="form-help">Prefix for invoice numbers (e.g., VS, INV)</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="invoiceStartNumber">Starting Invoice Number</label>
+                            <input type="number" id="invoiceStartNumber" name="invoiceStartNumber" 
+                                   value="<%= settings ? settings.invoiceStartNumber : 1 %>" 
+                                   min="1" required>
+                            <small class="form-help">Starting number for invoice sequence</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="invoiceDigits">Invoice Number Digits</label>
+                            <select id="invoiceDigits" name="invoiceDigits">
+                                <option value="3" <%= settings && settings.invoiceDigits === 3 ? 'selected' : '' %>>3 digits (001)</option>
+                                <option value="4" <%= settings && settings.invoiceDigits === 4 ? 'selected' : '' %>>4 digits (0001)</option>
+                                <option value="5" <%= settings && settings.invoiceDigits === 5 ? 'selected' : '' %>>5 digits (00001)</option>
+                                <option value="6" <%= settings && settings.invoiceDigits === 6 ? 'selected' : '' %>>6 digits (000001)</option>
+                            </select>
+                            <small class="form-help">Number of digits in invoice sequence</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="duplicateInvoice">Allow Duplicate Invoice</label>
+                            <select id="duplicateInvoice" name="duplicateInvoice">
+                                <option value="false" <%= settings && settings.duplicateInvoice === false ? 'selected' : '' %>>No</option>
+                                <option value="true" <%= settings && settings.duplicateInvoice === true ? 'selected' : '' %>>Yes</option>
+                            </select>
+                            <small class="form-help">Allow creating duplicate invoices</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tax Settings -->
+                <div class="form-section">
+                    <h3><i class="fas fa-calculator"></i> Tax Settings</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="taxSystem">Tax System</label>
+                            <select id="taxSystem" name="taxSystem" required>
+                                <option value="GST" <%= settings && settings.taxSystem === 'GST' ? 'selected' : '' %>>GST (Goods & Services Tax)</option>
+                                <option value="VAT" <%= settings && settings.taxSystem === 'VAT' ? 'selected' : '' %>>VAT (Value Added Tax)</option>
+                                <option value="Sales Tax" <%= settings && settings.taxSystem === 'Sales Tax' ? 'selected' : '' %>>Sales Tax</option>
+                                <option value="None" <%= settings && settings.taxSystem === 'None' ? 'selected' : '' %>>No Tax</option>
+                            </select>
+                            <small class="form-help">Primary tax system for calculations</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="defaultGstRate">Default GST Rate (%)</label>
+                            <select id="defaultGstRate" name="defaultGstRate">
+                                <option value="0" <%= settings && settings.defaultGstRate === 0 ? 'selected' : '' %>>0% (Exempt)</option>
+                                <option value="5" <%= settings && settings.defaultGstRate === 5 ? 'selected' : '' %>>5%</option>
+                                <option value="12" <%= settings && settings.defaultGstRate === 12 ? 'selected' : '' %>>12%</option>
+                                <option value="18" <%= settings && settings.defaultGstRate === 18 ? 'selected' : '' %>>18%</option>
+                                <option value="28" <%= settings && settings.defaultGstRate === 28 ? 'selected' : '' %>>28%</option>
+                            </select>
+                            <small class="form-help">Default GST rate for new items</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cgstSgstSplit">CGST/SGST Split</label>
+                            <select id="cgstSgstSplit" name="cgstSgstSplit">
+                                <option value="true" <%= settings && settings.cgstSgstSplit === true ? 'selected' : '' %>>Yes (Split equally)</option>
+                                <option value="false" <%= settings && settings.cgstSgstSplit === false ? 'selected' : '' %>>No (Use IGST)</option>
+                            </select>
+                            <small class="form-help">Split GST into CGST and SGST</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="autoCalculateGST">Auto Calculate GST</label>
+                            <select id="autoCalculateGST" name="autoCalculateGST">
+                                <option value="true" <%= settings && settings.autoCalculateGST === true ? 'selected' : '' %>>Yes</option>
+                                <option value="false" <%= settings && settings.autoCalculateGST === false ? 'selected' : '' %>>No</option>
+                            </select>
+                            <small class="form-help">Automatically calculate GST in invoices</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock Settings -->
+                <div class="form-section">
+                    <h3><i class="fas fa-boxes"></i> Stock Settings</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="enableStockTracking">Enable Stock Tracking</label>
+                            <select id="enableStockTracking" name="enableStockTracking">
+                                <option value="true" <%= settings && settings.enableStockTracking === true ? 'selected' : '' %>>Yes</option>
+                                <option value="false" <%= settings && settings.enableStockTracking === false ? 'selected' : '' %>>No</option>
+                            </select>
+                            <small class="form-help">Track stock quantities for items</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="lowStockThreshold">Low Stock Threshold</label>
+                            <input type="number" id="lowStockThreshold" name="lowStockThreshold" 
+                                   value="<%= settings ? settings.lowStockThreshold : 10 %>" 
+                                   min="0" required>
+                            <small class="form-help">Alert when stock falls below this level</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="negativeStock">Allow Negative Stock</label>
+                            <select id="negativeStock" name="negativeStock">
+                                <option value="false" <%= settings && settings.negativeStock === false ? 'selected' : '' %>>No</option>
+                                <option value="true" <%= settings && settings.negativeStock === true ? 'selected' : '' %>>Yes</option>
+                            </select>
+                            <small class="form-help">Allow selling even with zero stock</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="stockMethod">Stock Valuation Method</label>
+                            <select id="stockMethod" name="stockMethod">
+                                <option value="FIFO" <%= settings && settings.stockMethod === 'FIFO' ? 'selected' : '' %>>FIFO (First In, First Out)</option>
+                                <option value="LIFO" <%= settings && settings.stockMethod === 'LIFO' ? 'selected' : '' %>>LIFO (Last In, First Out)</option>
+                                <option value="Average" <%= settings && settings.stockMethod === 'Average' ? 'selected' : '' %>>Average Cost</option>
+                            </select>
+                            <small class="form-help">Method for stock cost calculation</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Settings -->
+                <div class="form-section">
+                    <h3><i class="fas fa-tachometer-alt"></i> Performance Settings</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="autoSave">Auto Save Interval (seconds)</label>
+                            <select id="autoSave" name="autoSave">
+                                <option value="30" <%= settings && settings.autoSave === 30 ? 'selected' : '' %>>30 seconds</option>
+                                <option value="60" <%= settings && settings.autoSave === 60 ? 'selected' : '' %>>1 minute</option>
+                                <option value="300" <%= settings && settings.autoSave === 300 ? 'selected' : '' %>>5 minutes</option>
+                                <option value="0" <%= settings && settings.autoSave === 0 ? 'selected' : '' %>>Disabled</option>
+                            </select>
+                            <small class="form-help">Auto save forms at intervals</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="sessionTimeout">Session Timeout (minutes)</label>
+                            <select id="sessionTimeout" name="sessionTimeout">
+                                <option value="15" <%= settings && settings.sessionTimeout === 15 ? 'selected' : '' %>>15 minutes</option>
+                                <option value="30" <%= settings && settings.sessionTimeout === 30 ? 'selected' : '' %>>30 minutes</option>
+                                <option value="60" <%= settings && settings.sessionTimeout === 60 ? 'selected' : '' %>>1 hour</option>
+                                <option value="120" <%= settings && settings.sessionTimeout === 120 ? 'selected' : '' %>>2 hours</option>
+                            </select>
+                            <small class="form-help">Automatic logout after inactivity</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="recordsPerPage">Records Per Page</label>
+                            <select id="recordsPerPage" name="recordsPerPage">
+                                <option value="10" <%= settings && settings.recordsPerPage === 10 ? 'selected' : '' %>>10</option>
+                                <option value="25" <%= settings && settings.recordsPerPage === 25 ? 'selected' : '' %>>25</option>
+                                <option value="50" <%= settings && settings.recordsPerPage === 50 ? 'selected' : '' %>>50</option>
+                                <option value="100" <%= settings && settings.recordsPerPage === 100 ? 'selected' : '' %>>100</option>
+                            </select>
+                            <small class="form-help">Number of records to display per page</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="enableSearch">Enable Search</label>
+                            <select id="enableSearch" name="enableSearch">
+                                <option value="true" <%= settings && settings.enableSearch === true ? 'selected' : '' %>>Yes</option>
+                                <option value="false" <%= settings && settings.enableSearch === false ? 'selected' : '' %>>No</option>
+                            </select>
+                            <small class="form-help">Enable search functionality</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup Settings -->
+                <div class="form-section">
+                    <h3><i class="fas fa-shield-alt"></i> Backup Settings</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="backupFrequency">Auto Backup Frequency</label>
+                            <select id="backupFrequency" name="backupFrequency">
+                                <option value="daily" <%= settings && settings.backupFrequency === 'daily' ? 'selected' : '' %>>Daily</option>
+                                <option value="weekly" <%= settings && settings.backupFrequency === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                                <option value="monthly" <%= settings && settings.backupFrequency === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                                <option value="disabled" <%= settings && settings.backupFrequency === 'disabled' ? 'selected' : '' %>>Disabled</option>
+                            </select>
+                            <small class="form-help">Automatic backup schedule</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="backupRetention">Backup Retention (days)</label>
+                            <select id="backupRetention" name="backupRetention">
+                                <option value="7" <%= settings && settings.backupRetention === 7 ? 'selected' : '' %>>7 days</option>
+                                <option value="30" <%= settings && settings.backupRetention === 30 ? 'selected' : '' %>>30 days</option>
+                                <option value="90" <%= settings && settings.backupRetention === 90 ? 'selected' : '' %>>90 days</option>
+                                <option value="365" <%= settings && settings.backupRetention === 365 ? 'selected' : '' %>>1 year</option>
+                            </select>
+                            <small class="form-help">How long to keep backup files</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="compressBackups">Compress Backups</label>
+                            <select id="compressBackups" name="compressBackups">
+                                <option value="true" <%= settings && settings.compressBackups === true ? 'selected' : '' %>>Yes</option>
+                                <option value="false" <%= settings && settings.compressBackups === false ? 'selected' : '' %>>No</option>
+                            </select>
+                            <small class="form-help">Compress backup files to save space</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="backupLocation">Backup Location</label>
+                            <input type="text" id="backupLocation" name="backupLocation" 
+                                   value="<%= settings ? settings.backupLocation : './backups' %>" 
+                                   readonly>
+                            <small class="form-help">Directory where backups are stored</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save System Settings
+                    </button>
+                    <a href="/settings" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="button" class="btn btn-warning" onclick="resetToDefaults()">
+                        <i class="fas fa-undo"></i> Reset to Defaults
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p>&copy; 2024 Vikram Steels. System Configuration Settings</p>
+    </footer>
+
+    <script>
+        // Auto-hide alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+
+        // Reset to defaults function
+        function resetToDefaults() {
+            if (confirm('Reset all system settings to default values? This action cannot be undone.')) {
+                // Set default values
+                document.getElementById('currency').value = 'INR';
+                document.getElementById('dateFormat').value = 'DD/MM/YYYY';
+                document.getElementById('timeFormat').value = '12';
+                document.getElementById('timezone').value = 'Asia/Kolkata';
+                document.getElementById('invoicePrefix').value = 'VS';
+                document.getElementById('invoiceStartNumber').value = '1';
+                document.getElementById('invoiceDigits').value = '3';
+                document.getElementById('duplicateInvoice').value = 'false';
+                document.getElementById('taxSystem').value = 'GST';
+                document.getElementById('defaultGstRate').value = '18';
+                document.getElementById('cgstSgstSplit').value = 'true';
+                document.getElementById('autoCalculateGST').value = 'true';
+                document.getElementById('enableStockTracking').value = 'true';
+                document.getElementById('lowStockThreshold').value = '10';
+                document.getElementById('negativeStock').value = 'false';
+                document.getElementById('stockMethod').value = 'FIFO';
+                document.getElementById('autoSave').value = '60';
+                document.getElementById('sessionTimeout').value = '30';
+                document.getElementById('recordsPerPage').value = '25';
+                document.getElementById('enableSearch').value = 'true';
+                document.getElementById('backupFrequency').value = 'daily';
+                document.getElementById('backupRetention').value = '30';
+                document.getElementById('compressBackups').value = 'true';
+            }
+        }
+
+        // Toggle dependent settings
+        document.getElementById('enableStockTracking').addEventListener('change', function() {
+            const stockSettings = ['lowStockThreshold', 'negativeStock', 'stockMethod'];
+            const isEnabled = this.value === 'true';
+            
+            stockSettings.forEach(id => {
+                const element = document.getElementById(id);
+                element.disabled = !isEnabled;
+                if (!isEnabled) {
+                    element.style.opacity = '0.5';
+                } else {
+                    element.style.opacity = '1';
+                }
+            });
+        });
+
+        // Trigger initial state
+        document.getElementById('enableStockTracking').dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>

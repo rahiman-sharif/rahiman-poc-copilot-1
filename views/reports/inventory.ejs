@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .inventory-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .inventory-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .inventory-card.warning {
+            border-left-color: #ffc107;
+        }
+        
+        .inventory-card.danger {
+            border-left-color: #dc3545;
+        }
+        
+        .inventory-card.success {
+            border-left-color: #28a745;
+        }
+        
+        .stock-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-low-stock {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .valuation-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .category-group {
+            margin: 30px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .category-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1px;
+            background: #eee;
+        }
+        
+        .item-card {
+            background: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .item-meta {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .item-stats {
+            text-align: right;
+            min-width: 100px;
+        }
+        
+        .stock-quantity {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .stock-value {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .turnover-info {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .inventory-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .item-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media print {
+            .breadcrumb, .main-header, .page-header {
+                display: none;
+            }
+            
+            .category-group {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Inventory Report</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/reports">📊 Reports</a>
+            <span class="separator">></span>
+            <span class="current">📦 Inventory Report</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>📦 Inventory Report</h2>
+                    <p>Stock levels, valuation and movement analysis</p>
+                </div>
+                <div class="header-right">
+                    <button onclick="window.print()" class="btn btn-primary">
+                        🖨️ Print Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+
+            <!-- Report Header -->
+            <div style="text-align: center; margin: 20px 0; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <h1>🏢 Vikram Steels</h1>
+                <h2>INVENTORY VALUATION REPORT</h2>
+                <p>Generated on: <%= new Date().toLocaleDateString('en-IN') %> at <%= new Date().toLocaleTimeString('en-IN') %></p>
+            </div>
+
+            <!-- Inventory Summary -->
+            <div class="inventory-summary">
+                <div class="inventory-card">
+                    <div style="font-size: 2em; margin-bottom: 10px;">📦</div>
+                    <h3>Total Items</h3>
+                    <div style="font-size: 2em; font-weight: bold; color: var(--primary-color);">
+                        <%= summary.totalItems %>
+                    </div>
+                    <p>Active inventory items</p>
+                </div>
+                
+                <div class="inventory-card success">
+                    <div style="font-size: 2em; margin-bottom: 10px;">✅</div>
+                    <h3>In Stock</h3>
+                    <div style="font-size: 2em; font-weight: bold; color: #28a745;">
+                        <%= summary.inStockItems %>
+                    </div>
+                    <p>Items with adequate stock</p>
+                </div>
+                
+                <div class="inventory-card warning">
+                    <div style="font-size: 2em; margin-bottom: 10px;">⚠️</div>
+                    <h3>Low Stock</h3>
+                    <div style="font-size: 2em; font-weight: bold; color: #856404;">
+                        <%= summary.lowStockItems %>
+                    </div>
+                    <p>Items below minimum level</p>
+                </div>
+                
+                <div class="inventory-card danger">
+                    <div style="font-size: 2em; margin-bottom: 10px;">🚨</div>
+                    <h3>Out of Stock</h3>
+                    <div style="font-size: 2em; font-weight: bold; color: #721c24;">
+                        <%= summary.outOfStockItems %>
+                    </div>
+                    <p>Items with zero stock</p>
+                </div>
+            </div>
+
+            <!-- Total Valuation -->
+            <div class="valuation-highlight">
+                <h2>💰 Total Inventory Valuation</h2>
+                <div style="font-size: 3em; font-weight: bold; margin: 10px 0;">
+                    ₹<%= summary.totalStockValue.toLocaleString() %>
+                </div>
+                <p>Based on current purchase prices</p>
+            </div>
+
+            <!-- Inventory by Category -->
+            <% 
+            const groupedInventory = {};
+            inventory.forEach(item => {
+                if (!groupedInventory[item.categoryName]) {
+                    groupedInventory[item.categoryName] = [];
+                }
+                groupedInventory[item.categoryName].push(item);
+            });
+            
+            Object.keys(groupedInventory).sort().forEach(categoryName => {
+                const categoryItems = groupedInventory[categoryName];
+                const categoryValue = categoryItems.reduce((sum, item) => sum + item.stockValue, 0);
+            %>
+                <div class="category-group">
+                    <div class="category-header">
+                        🏷️ <%= categoryName %> 
+                        <span style="float: right;">
+                            <%= categoryItems.length %> items | ₹<%= categoryValue.toLocaleString() %>
+                        </span>
+                    </div>
+                    <div class="item-grid">
+                        <% categoryItems.forEach(item => { %>
+                            <div class="item-card">
+                                <div class="item-details">
+                                    <div class="item-name"><%= item.name %></div>
+                                    <div class="item-meta">
+                                        <% if (item.brand) { %>
+                                            Brand: <%= item.brand %> | 
+                                        <% } %>
+                                        ₹<%= item.price %> per <%= item.unit %>
+                                        <% if (item.bundleInfo) { %>
+                                            <br><small>📏 <%= item.bundleInfo %></small>
+                                        <% } %>
+                                    </div>
+                                    <div style="margin-top: 8px;">
+                                        <span class="stock-status-indicator status-<%= item.stockStatus.toLowerCase().replace(' ', '-') %>">
+                                            <% if (item.stockStatus === 'Out of Stock') { %>🚨<% } else if (item.stockStatus === 'Low Stock') { %>⚠️<% } else { %>✅<% } %>
+                                            <%= item.stockStatus %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="item-stats">
+                                    <div class="stock-quantity">
+                                        <%= item.currentStock %> <%= item.unit %>
+                                    </div>
+                                    <div style="font-size: 11px; color: #666;">
+                                        Min: <%= item.minLevel %> <%= item.unit %>
+                                    </div>
+                                    <div class="stock-value">
+                                        ₹<%= item.stockValue.toLocaleString() %>
+                                    </div>
+                                    <div class="turnover-info">
+                                        Sold: <%= item.totalSold %> <%= item.unit %>
+                                        <% if (item.turnoverRatio !== 'N/A') { %>
+                                            <br>Ratio: <%= item.turnoverRatio %>x
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            <% }) %>
+
+            <!-- Detailed Table -->
+            <div style="background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <h3>📋 Detailed Inventory List</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Current Stock</th>
+                            <th>Min Level</th>
+                            <th>Unit Price</th>
+                            <th>Stock Value</th>
+                            <th>Total Sold</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% inventory.forEach(item => { %>
+                            <tr>
+                                <td>
+                                    <strong><%= item.name %></strong>
+                                    <% if (item.brand) { %>
+                                        <small style="display: block; color: #666;">
+                                            Brand: <%= item.brand %>
+                                        </small>
+                                    <% } %>
+                                    <% if (item.hsnCode) { %>
+                                        <small style="display: block; color: #666;">
+                                            HSN: <%= item.hsnCode %>
+                                        </small>
+                                    <% } %>
+                                </td>
+                                <td><%= item.categoryName %></td>
+                                <td>
+                                    <strong><%= item.currentStock %></strong> <%= item.unit %>
+                                </td>
+                                <td><%= item.minLevel %> <%= item.unit %></td>
+                                <td>₹<%= item.price.toLocaleString() %></td>
+                                <td><strong>₹<%= item.stockValue.toLocaleString() %></strong></td>
+                                <td><%= item.totalSold %> <%= item.unit %></td>
+                                <td>
+                                    <span class="stock-status-indicator status-<%= item.stockStatus.toLowerCase().replace(' ', '-') %>">
+                                        <% if (item.stockStatus === 'Out of Stock') { %>🚨<% } else if (item.stockStatus === 'Low Stock') { %>⚠️<% } else { %>✅<% } %>
+                                        <%= item.stockStatus %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #f8f9fa; font-weight: bold;">
+                            <td colspan="5" style="text-align: right;">TOTAL INVENTORY VALUE:</td>
+                            <td>₹<%= summary.totalStockValue.toLocaleString() %></td>
+                            <td colspan="2">-</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="/reports" class="btn btn-secondary">← Back to Reports</a>
+                <a href="/stock" class="btn btn-primary">📈 Manage Stock</a>
+                <button onclick="exportInventoryData()" class="btn btn-primary">📊 Export CSV</button>
+                <button onclick="window.print()" class="btn btn-primary">🖨️ Print Report</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        function exportInventoryData() {
+            // Create CSV content
+            let csv = 'Item Name,Category,Brand,Current Stock,Unit,Min Level,Unit Price,Stock Value,Total Sold,Turnover Ratio,Status\n';
+            
+            <% inventory.forEach(item => { %>
+                csv += '"<%= item.name.replace(/"/g, '""') %>",' +
+                       '"<%= item.categoryName %>",' +
+                       '"<%= item.brand || '' %>",' +
+                       '<%= item.currentStock %>,' +
+                       '"<%= item.unit %>",' +
+                       '<%= item.minLevel %>,' +
+                       '<%= item.price %>,' +
+                       '<%= item.stockValue %>,' +
+                       '<%= item.totalSold %>,' +
+                       '"<%= item.turnoverRatio %>",' +
+                       '"<%= item.stockStatus %>"\n';
+            <% }) %>
+            
+            // Create and download file
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'inventory_report_' + new Date().toISOString().split('T')[0] + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

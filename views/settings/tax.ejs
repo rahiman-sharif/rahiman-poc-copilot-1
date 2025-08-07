@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax & GST Settings - Vikram Steels</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Tax & GST Settings</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/settings">⚙️ Settings</a>
+            <span class="separator">></span>
+            <span class="current">💰 Tax & GST</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>💰 Tax & GST Settings</h2>
+                    <p>Configure GST rates, tax settings and compliance options</p>
+                </div>
+                <div class="header-right">
+                    <a href="/settings" class="btn btn-secondary">← Back to Settings</a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-danger">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Tax Settings Form -->
+            <div class="form-container">
+                <form action="/settings/tax" method="POST" class="settings-form">
+                    <!-- GST Configuration -->
+                    <div class="form-section">
+                        <h3>🏛️ GST Configuration</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="gstEnabled">Enable GST</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="gstEnabled" name="gstEnabled" 
+                                           <%= settings.tax?.gstEnabled ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Apply GST to all applicable items</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="defaultGstRate">Default GST Rate (%)</label>
+                                <select id="defaultGstRate" name="defaultGstRate" required>
+                                    <option value="0" <%= settings.tax?.defaultGstRate === 0 ? 'selected' : '' %>>0% (Exempt)</option>
+                                    <option value="5" <%= settings.tax?.defaultGstRate === 5 ? 'selected' : '' %>>5%</option>
+                                    <option value="12" <%= settings.tax?.defaultGstRate === 12 ? 'selected' : '' %>>12%</option>
+                                    <option value="18" <%= settings.tax?.defaultGstRate === 18 ? 'selected' : '' %>>18%</option>
+                                    <option value="28" <%= settings.tax?.defaultGstRate === 28 ? 'selected' : '' %>>28%</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="gstSplitType">GST Split Type</label>
+                                <select id="gstSplitType" name="gstSplitType" required>
+                                    <option value="cgst_sgst" <%= settings.tax?.gstSplitType === 'cgst_sgst' ? 'selected' : '' %>>CGST + SGST</option>
+                                    <option value="igst" <%= settings.tax?.gstSplitType === 'igst' ? 'selected' : '' %>>IGST (Inter-state)</option>
+                                    <option value="auto" <%= settings.tax?.gstSplitType === 'auto' ? 'selected' : '' %>>Auto (Based on State)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- State Configuration -->
+                    <div class="form-section">
+                        <h3>📍 State Configuration</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="businessState">Business State</label>
+                                <select id="businessState" name="businessState" required>
+                                    <option value="">Select State</option>
+                                    <option value="Andhra Pradesh" <%= settings.tax?.businessState === 'Andhra Pradesh' ? 'selected' : '' %>>Andhra Pradesh</option>
+                                    <option value="Arunachal Pradesh" <%= settings.tax?.businessState === 'Arunachal Pradesh' ? 'selected' : '' %>>Arunachal Pradesh</option>
+                                    <option value="Assam" <%= settings.tax?.businessState === 'Assam' ? 'selected' : '' %>>Assam</option>
+                                    <option value="Bihar" <%= settings.tax?.businessState === 'Bihar' ? 'selected' : '' %>>Bihar</option>
+                                    <option value="Chhattisgarh" <%= settings.tax?.businessState === 'Chhattisgarh' ? 'selected' : '' %>>Chhattisgarh</option>
+                                    <option value="Goa" <%= settings.tax?.businessState === 'Goa' ? 'selected' : '' %>>Goa</option>
+                                    <option value="Gujarat" <%= settings.tax?.businessState === 'Gujarat' ? 'selected' : '' %>>Gujarat</option>
+                                    <option value="Haryana" <%= settings.tax?.businessState === 'Haryana' ? 'selected' : '' %>>Haryana</option>
+                                    <option value="Himachal Pradesh" <%= settings.tax?.businessState === 'Himachal Pradesh' ? 'selected' : '' %>>Himachal Pradesh</option>
+                                    <option value="Jharkhand" <%= settings.tax?.businessState === 'Jharkhand' ? 'selected' : '' %>>Jharkhand</option>
+                                    <option value="Karnataka" <%= settings.tax?.businessState === 'Karnataka' ? 'selected' : '' %>>Karnataka</option>
+                                    <option value="Kerala" <%= settings.tax?.businessState === 'Kerala' ? 'selected' : '' %>>Kerala</option>
+                                    <option value="Madhya Pradesh" <%= settings.tax?.businessState === 'Madhya Pradesh' ? 'selected' : '' %>>Madhya Pradesh</option>
+                                    <option value="Maharashtra" <%= settings.tax?.businessState === 'Maharashtra' ? 'selected' : '' %>>Maharashtra</option>
+                                    <option value="Manipur" <%= settings.tax?.businessState === 'Manipur' ? 'selected' : '' %>>Manipur</option>
+                                    <option value="Meghalaya" <%= settings.tax?.businessState === 'Meghalaya' ? 'selected' : '' %>>Meghalaya</option>
+                                    <option value="Mizoram" <%= settings.tax?.businessState === 'Mizoram' ? 'selected' : '' %>>Mizoram</option>
+                                    <option value="Nagaland" <%= settings.tax?.businessState === 'Nagaland' ? 'selected' : '' %>>Nagaland</option>
+                                    <option value="Odisha" <%= settings.tax?.businessState === 'Odisha' ? 'selected' : '' %>>Odisha</option>
+                                    <option value="Punjab" <%= settings.tax?.businessState === 'Punjab' ? 'selected' : '' %>>Punjab</option>
+                                    <option value="Rajasthan" <%= settings.tax?.businessState === 'Rajasthan' ? 'selected' : '' %>>Rajasthan</option>
+                                    <option value="Sikkim" <%= settings.tax?.businessState === 'Sikkim' ? 'selected' : '' %>>Sikkim</option>
+                                    <option value="Tamil Nadu" <%= settings.tax?.businessState === 'Tamil Nadu' ? 'selected' : '' %>>Tamil Nadu</option>
+                                    <option value="Telangana" <%= settings.tax?.businessState === 'Telangana' ? 'selected' : '' %>>Telangana</option>
+                                    <option value="Tripura" <%= settings.tax?.businessState === 'Tripura' ? 'selected' : '' %>>Tripura</option>
+                                    <option value="Uttar Pradesh" <%= settings.tax?.businessState === 'Uttar Pradesh' ? 'selected' : '' %>>Uttar Pradesh</option>
+                                    <option value="Uttarakhand" <%= settings.tax?.businessState === 'Uttarakhand' ? 'selected' : '' %>>Uttarakhand</option>
+                                    <option value="West Bengal" <%= settings.tax?.businessState === 'West Bengal' ? 'selected' : '' %>>West Bengal</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="stateCode">State Code</label>
+                                <input type="text" id="stateCode" name="stateCode" maxlength="2" 
+                                       value="<%= settings.tax?.stateCode || '' %>" 
+                                       placeholder="e.g., 27 for Maharashtra">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tax Calculation -->
+                    <div class="form-section">
+                        <h3>🧮 Tax Calculation</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="taxCalculationMethod">Tax Calculation Method</label>
+                                <select id="taxCalculationMethod" name="taxCalculationMethod" required>
+                                    <option value="exclusive" <%= settings.tax?.taxCalculationMethod === 'exclusive' ? 'selected' : '' %>>Tax Exclusive (Add tax to price)</option>
+                                    <option value="inclusive" <%= settings.tax?.taxCalculationMethod === 'inclusive' ? 'selected' : '' %>>Tax Inclusive (Tax included in price)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="roundingMethod">Tax Rounding</label>
+                                <select id="roundingMethod" name="roundingMethod" required>
+                                    <option value="round" <%= settings.tax?.roundingMethod === 'round' ? 'selected' : '' %>>Round to nearest paisa</option>
+                                    <option value="floor" <%= settings.tax?.roundingMethod === 'floor' ? 'selected' : '' %>>Round down</option>
+                                    <option value="ceil" <%= settings.tax?.roundingMethod === 'ceil' ? 'selected' : '' %>>Round up</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compliance Settings -->
+                    <div class="form-section">
+                        <h3>📋 Compliance Settings</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hsnRequired">HSN Code Required</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="hsnRequired" name="hsnRequired" 
+                                           <%= settings.tax?.hsnRequired ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Require HSN codes for all items</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sacRequired">SAC Code Required</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="sacRequired" name="sacRequired" 
+                                           <%= settings.tax?.sacRequired ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Require SAC codes for services</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="eInvoiceEnabled">E-Invoice</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="eInvoiceEnabled" name="eInvoiceEnabled" 
+                                           <%= settings.tax?.eInvoiceEnabled ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Enable E-Invoice for bills above ₹5 Lakhs</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="eWayBillEnabled">E-Way Bill</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="eWayBillEnabled" name="eWayBillEnabled" 
+                                           <%= settings.tax?.eWayBillEnabled ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Enable E-Way Bill for interstate transport</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current GST Rates Display -->
+                    <div class="form-section">
+                        <h3>📊 Current GST Rates</h3>
+                        <div class="gst-rates-grid">
+                            <div class="rate-card">
+                                <h4>0% GST</h4>
+                                <p>Exempt items, basic necessities</p>
+                            </div>
+                            <div class="rate-card">
+                                <h4>5% GST</h4>
+                                <p>Essential goods, some food items</p>
+                            </div>
+                            <div class="rate-card">
+                                <h4>12% GST</h4>
+                                <p>Processed foods, some medicines</p>
+                            </div>
+                            <div class="rate-card">
+                                <h4>18% GST</h4>
+                                <p>Most goods and services</p>
+                            </div>
+                            <div class="rate-card">
+                                <h4>28% GST</h4>
+                                <p>Luxury items, automobiles</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Save Tax Settings</button>
+                        <a href="/settings" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // State code mapping
+        const stateCodes = {
+            'Andhra Pradesh': '37',
+            'Arunachal Pradesh': '12',
+            'Assam': '18',
+            'Bihar': '10',
+            'Chhattisgarh': '22',
+            'Goa': '30',
+            'Gujarat': '24',
+            'Haryana': '06',
+            'Himachal Pradesh': '02',
+            'Jharkhand': '20',
+            'Karnataka': '29',
+            'Kerala': '32',
+            'Madhya Pradesh': '23',
+            'Maharashtra': '27',
+            'Manipur': '14',
+            'Meghalaya': '17',
+            'Mizoram': '15',
+            'Nagaland': '13',
+            'Odisha': '21',
+            'Punjab': '03',
+            'Rajasthan': '08',
+            'Sikkim': '11',
+            'Tamil Nadu': '33',
+            'Telangana': '36',
+            'Tripura': '16',
+            'Uttar Pradesh': '09',
+            'Uttarakhand': '05',
+            'West Bengal': '19'
+        };
+
+        // Auto-fill state code when state is selected
+        document.getElementById('businessState').addEventListener('change', function() {
+            const selectedState = this.value;
+            const stateCodeField = document.getElementById('stateCode');
+            if (stateCodes[selectedState]) {
+                stateCodeField.value = stateCodes[selectedState];
+            }
+        });
+    </script>
+
+    <style>
+        .gst-rates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .rate-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .rate-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+        }
+
+        .rate-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+    </style>
+</body>
+</html>

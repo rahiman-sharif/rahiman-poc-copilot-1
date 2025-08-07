@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Settings - Vikram Steels</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Invoice Settings</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/settings">⚙️ Settings</a>
+            <span class="separator">></span>
+            <span class="current">🧾 Invoice Settings</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>🧾 Invoice Settings</h2>
+                    <p>Configure invoice format, numbering and printing options</p>
+                </div>
+                <div class="header-right">
+                    <a href="/settings" class="btn btn-secondary">← Back to Settings</a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-danger">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Invoice Settings Form -->
+            <div class="form-container">
+                <form action="/settings/invoice" method="POST" class="settings-form">
+                    <!-- Invoice Format -->
+                    <div class="form-section">
+                        <h3>📄 Invoice Format</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="invoiceTemplate">Invoice Template</label>
+                                <select id="invoiceTemplate" name="invoiceTemplate" required>
+                                    <option value="classic" <%= settings.invoice?.template === 'classic' ? 'selected' : '' %>>Classic</option>
+                                    <option value="modern" <%= settings.invoice?.template === 'modern' ? 'selected' : '' %>>Modern</option>
+                                    <option value="minimal" <%= settings.invoice?.template === 'minimal' ? 'selected' : '' %>>Minimal</option>
+                                    <option value="detailed" <%= settings.invoice?.template === 'detailed' ? 'selected' : '' %>>Detailed</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="paperSize">Paper Size</label>
+                                <select id="paperSize" name="paperSize" required>
+                                    <option value="A4" <%= settings.invoice?.paperSize === 'A4' ? 'selected' : '' %>>A4</option>
+                                    <option value="A5" <%= settings.invoice?.paperSize === 'A5' ? 'selected' : '' %>>A5</option>
+                                    <option value="Letter" <%= settings.invoice?.paperSize === 'Letter' ? 'selected' : '' %>>Letter</option>
+                                    <option value="Thermal" <%= settings.invoice?.paperSize === 'Thermal' ? 'selected' : '' %>>Thermal (80mm)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="showLogo">Show Company Logo</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="showLogo" name="showLogo" 
+                                           <%= settings.invoice?.showLogo ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Display company logo on invoices</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="showBarcode">Show Barcode</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="showBarcode" name="showBarcode" 
+                                           <%= settings.invoice?.showBarcode ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Display barcode for invoice number</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Numbering -->
+                    <div class="form-section">
+                        <h3>🔢 Invoice Numbering</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="invoicePrefix">Invoice Prefix</label>
+                                <input type="text" id="invoicePrefix" name="invoicePrefix" 
+                                       value="<%= settings.invoice?.prefix || 'VS' %>" 
+                                       placeholder="e.g., VS, INV" maxlength="10" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="invoiceSuffix">Invoice Suffix</label>
+                                <input type="text" id="invoiceSuffix" name="invoiceSuffix" 
+                                       value="<%= settings.invoice?.suffix || '' %>" 
+                                       placeholder="e.g., -2025" maxlength="10">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nextInvoiceNumber">Next Invoice Number</label>
+                                <input type="number" id="nextInvoiceNumber" name="nextInvoiceNumber" 
+                                       value="<%= settings.invoice?.nextNumber || 1 %>" 
+                                       min="1" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="numberLength">Number Length (Padding)</label>
+                                <select id="numberLength" name="numberLength" required>
+                                    <option value="3" <%= settings.invoice?.numberLength === 3 ? 'selected' : '' %>>3 digits (001)</option>
+                                    <option value="4" <%= settings.invoice?.numberLength === 4 ? 'selected' : '' %>>4 digits (0001)</option>
+                                    <option value="5" <%= settings.invoice?.numberLength === 5 ? 'selected' : '' %>>5 digits (00001)</option>
+                                    <option value="6" <%= settings.invoice?.numberLength === 6 ? 'selected' : '' %>>6 digits (000001)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Preview Invoice Number</label>
+                                <div class="preview-box" id="invoicePreview">
+                                    <strong id="previewNumber">VS-00001</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="resetNumbering">Reset Numbering</label>
+                                <select id="resetNumbering" name="resetNumbering" required>
+                                    <option value="never" <%= settings.invoice?.resetNumbering === 'never' ? 'selected' : '' %>>Never</option>
+                                    <option value="monthly" <%= settings.invoice?.resetNumbering === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                                    <option value="yearly" <%= settings.invoice?.resetNumbering === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                                    <option value="financial_year" <%= settings.invoice?.resetNumbering === 'financial_year' ? 'selected' : '' %>>Financial Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Content -->
+                    <div class="form-section">
+                        <h3>📝 Invoice Content</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="showItemCode">Show Item Codes</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="showItemCode" name="showItemCode" 
+                                           <%= settings.invoice?.showItemCode ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Display item codes in invoice</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="showHSN">Show HSN Codes</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="showHSN" name="showHSN" 
+                                           <%= settings.invoice?.showHSN ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Display HSN codes for items</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="showUnitRate">Show Unit Rate</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="showUnitRate" name="showUnitRate" 
+                                           <%= settings.invoice?.showUnitRate !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Display unit rate for items</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="showTaxBreakup">Show Tax Breakup</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="showTaxBreakup" name="showTaxBreakup" 
+                                           <%= settings.invoice?.showTaxBreakup !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Display CGST, SGST breakup</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="termsAndConditions">Terms & Conditions</label>
+                                <textarea id="termsAndConditions" name="termsAndConditions" rows="4" 
+                                          placeholder="Enter default terms and conditions"><%= settings.invoice?.termsAndConditions || '' %></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="form-section">
+                        <h3>💳 Payment Information</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="showBankDetails">Show Bank Details</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="showBankDetails" name="showBankDetails" 
+                                           <%= settings.invoice?.showBankDetails ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Display bank account details</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="showQRCode">Show Payment QR Code</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="showQRCode" name="showQRCode" 
+                                           <%= settings.invoice?.showQRCode ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Display UPI QR code for payments</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="defaultPaymentTerms">Default Payment Terms</label>
+                                <select id="defaultPaymentTerms" name="defaultPaymentTerms" required>
+                                    <option value="immediate" <%= settings.invoice?.defaultPaymentTerms === 'immediate' ? 'selected' : '' %>>Immediate</option>
+                                    <option value="cash" <%= settings.invoice?.defaultPaymentTerms === 'cash' ? 'selected' : '' %>>Cash on Delivery</option>
+                                    <option value="net_7" <%= settings.invoice?.defaultPaymentTerms === 'net_7' ? 'selected' : '' %>>Net 7 days</option>
+                                    <option value="net_15" <%= settings.invoice?.defaultPaymentTerms === 'net_15' ? 'selected' : '' %>>Net 15 days</option>
+                                    <option value="net_30" <%= settings.invoice?.defaultPaymentTerms === 'net_30' ? 'selected' : '' %>>Net 30 days</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="defaultPaymentMethod">Default Payment Method</label>
+                                <select id="defaultPaymentMethod" name="defaultPaymentMethod" required>
+                                    <option value="cash" <%= settings.invoice?.defaultPaymentMethod === 'cash' ? 'selected' : '' %>>Cash</option>
+                                    <option value="card" <%= settings.invoice?.defaultPaymentMethod === 'card' ? 'selected' : '' %>>Card</option>
+                                    <option value="upi" <%= settings.invoice?.defaultPaymentMethod === 'upi' ? 'selected' : '' %>>UPI</option>
+                                    <option value="bank_transfer" <%= settings.invoice?.defaultPaymentMethod === 'bank_transfer' ? 'selected' : '' %>>Bank Transfer</option>
+                                    <option value="cheque" <%= settings.invoice?.defaultPaymentMethod === 'cheque' ? 'selected' : '' %>>Cheque</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Print Settings -->
+                    <div class="form-section">
+                        <h3>🖨️ Print Settings</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="autoPrint">Auto Print</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="autoPrint" name="autoPrint" 
+                                           <%= settings.invoice?.autoPrint ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Automatically print after saving invoice</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="printCopies">Number of Copies</label>
+                                <select id="printCopies" name="printCopies" required>
+                                    <option value="1" <%= settings.invoice?.printCopies === 1 ? 'selected' : '' %>>1 copy</option>
+                                    <option value="2" <%= settings.invoice?.printCopies === 2 ? 'selected' : '' %>>2 copies</option>
+                                    <option value="3" <%= settings.invoice?.printCopies === 3 ? 'selected' : '' %>>3 copies</option>
+                                    <option value="4" <%= settings.invoice?.printCopies === 4 ? 'selected' : '' %>>4 copies</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="printerName">Default Printer</label>
+                                <input type="text" id="printerName" name="printerName" 
+                                       value="<%= settings.invoice?.printerName || '' %>" 
+                                       placeholder="e.g., HP LaserJet, Canon, Default">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="printMargin">Print Margins</label>
+                                <select id="printMargin" name="printMargin" required>
+                                    <option value="minimal" <%= settings.invoice?.printMargin === 'minimal' ? 'selected' : '' %>>Minimal (5mm)</option>
+                                    <option value="normal" <%= settings.invoice?.printMargin === 'normal' ? 'selected' : '' %>>Normal (10mm)</option>
+                                    <option value="large" <%= settings.invoice?.printMargin === 'large' ? 'selected' : '' %>>Large (15mm)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Save Invoice Settings</button>
+                        <a href="/settings" class="btn btn-secondary">Cancel</a>
+                        <button type="button" onclick="previewInvoice()" class="btn btn-info">👁️ Preview Invoice</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Update invoice number preview
+        function updatePreview() {
+            const prefix = document.getElementById('invoicePrefix').value || '';
+            const suffix = document.getElementById('invoiceSuffix').value || '';
+            const number = document.getElementById('nextInvoiceNumber').value || '1';
+            const length = parseInt(document.getElementById('numberLength').value) || 3;
+            
+            const paddedNumber = number.padStart(length, '0');
+            const fullNumber = `${prefix}${prefix ? '-' : ''}${paddedNumber}${suffix}`;
+            
+            document.getElementById('previewNumber').textContent = fullNumber;
+        }
+
+        // Add event listeners for preview update
+        ['invoicePrefix', 'invoiceSuffix', 'nextInvoiceNumber', 'numberLength'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePreview);
+        });
+
+        // Initialize preview
+        updatePreview();
+
+        // Preview invoice function
+        function previewInvoice() {
+            const newWindow = window.open('/bills/preview-template', '_blank', 'width=800,height=600');
+            if (!newWindow) {
+                alert('Please allow popups to preview the invoice template.');
+            }
+        }
+    </script>
+
+    <style>
+        .preview-box {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</body>
+</html>

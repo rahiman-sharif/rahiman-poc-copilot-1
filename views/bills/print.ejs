@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill #<%= bill.billNumber %> - <%= bill.customerName %></title>
+    <style>
+        /* Print-specific styling */
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none !important; }
+            .print-break { page-break-after: always; }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: white;
+            color: #333;
+        }
+        
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+        }
+        
+        .invoice-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 3px solid #007bff;
+            text-align: center;
+        }
+        
+        .company-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .company-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .invoice-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: #007bff;
+            color: white;
+            padding: 10px;
+        }
+        
+        .bill-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .bill-info, .customer-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 2px 0;
+        }
+        
+        .info-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .items-section {
+            padding: 20px;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .items-table th {
+            background: #007bff;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #007bff;
+        }
+        
+        .items-table td {
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        
+        .items-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .item-details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .amount-column {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .charges-section {
+            margin-top: 20px;
+        }
+        
+        .charges-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .charges-table th {
+            background: #28a745;
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            border: 1px solid #28a745;
+        }
+        
+        .charges-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .totals-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-top: 2px solid #007bff;
+        }
+        
+        .totals-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+        }
+        
+        .payment-info {
+            padding: 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .totals-table {
+            min-width: 300px;
+        }
+        
+        .totals-table tr {
+            border-bottom: 1px solid #eee;
+        }
+        
+        .totals-table td {
+            padding: 8px 12px;
+            text-align: right;
+        }
+        
+        .totals-table .label {
+            text-align: left;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .totals-table .final-total {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .print-controls {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .payment-method-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .upi-badge { background: #ff6b35; }
+        .bank-badge { background: #007bff; }
+        .cheque-badge { background: #6f42c1; }
+        .card-badge { background: #fd7e14; }
+        .credit-badge { background: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="company-name">🏢 <%= company.name || 'Vikram Steels' %></div>
+            <div class="company-details">
+                <% if (company.address) { %>
+                    <%= company.address.line1 %><br>
+                    <%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %><br>
+                <% } %>
+                <% if (company.contact) { %>
+                    Phone: <%= company.contact.phone %> | Email: <%= company.contact.email %><br>
+                <% } %>
+                <% if (company.gst && company.gst.gstin) { %>
+                    GST No: <%= company.gst.gstin %>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Invoice Title -->
+        <div class="invoice-title">Tax Invoice</div>
+
+        <!-- Bill Details -->
+        <div class="bill-details">
+            <div class="bill-info">
+                <div class="section-title">📄 Bill Information</div>
+                <div class="info-row">
+                    <span class="info-label">Bill Number:</span>
+                    <span class="info-value">#<%= bill.billNumber %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date:</span>
+                    <span class="info-value"><%= new Date(bill.billDate).toLocaleDateString() %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Time:</span>
+                    <span class="info-value"><%= new Date(bill.billDate).toLocaleTimeString() %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Payment Method:</span>
+                    <span class="info-value">
+                        <span class="payment-method-badge <%= (bill.paymentMethod || 'Cash').toLowerCase() %>-badge">
+                            <%= bill.paymentMethod || 'Cash' %>
+                        </span>
+                    </span>
+                </div>
+                <% if (bill.paymentDetails && Object.keys(bill.paymentDetails).length > 1) { %>
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Payment Details:</div>
+                        <% if (bill.paymentDetails.transactionId) { %>
+                            <div style="font-size: 11px;">Transaction ID: <%= bill.paymentDetails.transactionId %></div>
+                        <% } %>
+                        <% if (bill.paymentDetails.referenceNumber) { %>
+                            <div style="font-size: 11px;">Reference: <%= bill.paymentDetails.referenceNumber %></div>
+                        <% } %>
+                        <% if (bill.paymentDetails.chequeNumber) { %>
+                            <div style="font-size: 11px;">Cheque #: <%= bill.paymentDetails.chequeNumber %></div>
+                        <% } %>
+                        <% if (bill.paymentDetails.last4Digits) { %>
+                            <div style="font-size: 11px;">Card: ****<%= bill.paymentDetails.last4Digits %></div>
+                        <% } %>
+                        <% if (bill.paymentDetails.bankName) { %>
+                            <div style="font-size: 11px;">Bank: <%= bill.paymentDetails.bankName %></div>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+            
+            <div class="customer-info">
+                <div class="section-title">👤 Customer Information</div>
+                <div class="info-row">
+                    <span class="info-label">Name:</span>
+                    <span class="info-value"><%= bill.customerName %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phone:</span>
+                    <span class="info-value"><%= bill.customerPhone %></span>
+                </div>
+                <% if (bill.customerGstin) { %>
+                    <div class="info-row">
+                        <span class="info-label">GST Number:</span>
+                        <span class="info-value"><%= bill.customerGstin %></span>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="items-section">
+            <h3 style="color: #007bff; margin-bottom: 15px;">📦 Items & Services</h3>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">S.No</th>
+                        <th style="width: 35%;">Description</th>
+                        <th style="width: 10%;">HSN</th>
+                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 12%;">Rate</th>
+                        <th style="width: 10%;">GST %</th>
+                        <th style="width: 15%;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% bill.items.forEach((item, index) => { %>
+                        <tr>
+                            <td style="text-align: center;"><%= index + 1 %></td>
+                            <td>
+                                <div class="item-name"><%= item.itemName %></div>
+                                <% if (!item.isServiceItem) { %>
+                                    <div class="item-details">Physical Item</div>
+                                <% } else { %>
+                                    <div class="item-details">Service Item</div>
+                                <% } %>
+                            </td>
+                            <td style="text-align: center;"><%= item.hsnCode %></td>
+                            <td style="text-align: center;"><%= item.quantity %></td>
+                            <td class="amount-column">₹<%= item.rate.toLocaleString() %></td>
+                            <td style="text-align: center;"><%= item.gstRate %>%</td>
+                            <td class="amount-column">₹<%= item.amount.toLocaleString() %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+
+            <!-- Extra Charges -->
+            <% if (bill.extraCharges && bill.extraCharges.length > 0) { %>
+                <div class="charges-section">
+                    <h4 style="color: #28a745; margin-bottom: 10px;">💰 Additional Charges</h4>
+                    <table class="charges-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th style="width: 15%;">GST %</th>
+                                <th style="width: 20%;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% bill.extraCharges.forEach(charge => { %>
+                                <tr>
+                                    <td><%= charge.description %></td>
+                                    <td style="text-align: center;"><%= charge.gstRate %>%</td>
+                                    <td class="amount-column">₹<%= charge.amount.toLocaleString() %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <div class="totals-grid">
+                <div class="payment-info">
+                    <div class="section-title">💳 Payment Information</div>
+                    <div><strong>Method:</strong> <%= bill.paymentMethod || 'Cash' %></div>
+                    <% if (bill.paymentDetails && bill.paymentDetails.transactionId) { %>
+                        <div><strong>Transaction ID:</strong> <%= bill.paymentDetails.transactionId %></div>
+                    <% } %>
+                    <% if (bill.paymentDetails && bill.paymentDetails.dueDate) { %>
+                        <div><strong>Due Date:</strong> <%= new Date(bill.paymentDetails.dueDate).toLocaleDateString() %></div>
+                    <% } %>
+                    <% if (bill.paymentDetails && bill.paymentDetails.terms) { %>
+                        <div><strong>Terms:</strong> <%= bill.paymentDetails.terms %></div>
+                    <% } %>
+                </div>
+                
+                <table class="totals-table">
+                    <tr>
+                        <td class="label">Subtotal:</td>
+                        <td>₹<%= bill.subtotal.toLocaleString() %></td>
+                    </tr>
+                    <% if (bill.cgstAmount > 0) { %>
+                        <tr>
+                            <td class="label">CGST:</td>
+                            <td>₹<%= bill.cgstAmount.toLocaleString() %></td>
+                        </tr>
+                        <tr>
+                            <td class="label">SGST:</td>
+                            <td>₹<%= bill.sgstAmount.toLocaleString() %></td>
+                        </tr>
+                    <% } %>
+                    <tr>
+                        <td class="label">Total GST:</td>
+                        <td>₹<%= bill.totalGst.toLocaleString() %></td>
+                    </tr>
+                    <tr class="final-total">
+                        <td class="label">Grand Total:</td>
+                        <td>₹<%= bill.finalTotal.toLocaleString() %></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Print Controls -->
+        <div class="print-controls no-print">
+            <button onclick="window.print()" class="btn btn-primary">🖨️ Print Bill</button>
+            <a href="/bills/<%= bill.id %>" class="btn btn-secondary">👁️ View Bill</a>
+            <a href="/bills" class="btn btn-secondary">📋 All Bills</a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-print when page loads (optional)
+        // window.onload = function() { window.print(); };
+        
+        // Print functionality
+        function printBill() {
+            window.print();
+        }
+        
+        // Optional: Print when user presses Ctrl+P
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>

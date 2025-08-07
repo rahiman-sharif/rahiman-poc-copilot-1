@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Settings - Vikram Steels</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Security Settings</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/settings">⚙️ Settings</a>
+            <span class="separator">></span>
+            <span class="current">🔒 Security</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>🔒 Security Settings</h2>
+                    <p>Configure security policies, access controls and data protection</p>
+                </div>
+                <div class="header-right">
+                    <a href="/settings" class="btn btn-secondary">← Back to Settings</a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-danger">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Security Settings Form -->
+            <div class="form-container">
+                <form action="/settings/security" method="POST" class="settings-form">
+                    <!-- Session Management -->
+                    <div class="form-section">
+                        <h3>⏰ Session Management</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sessionTimeout">Session Timeout (minutes)</label>
+                                <select id="sessionTimeout" name="sessionTimeout" required>
+                                    <option value="15" <%= settings.security?.sessionTimeout === 15 ? 'selected' : '' %>>15 minutes</option>
+                                    <option value="30" <%= settings.security?.sessionTimeout === 30 ? 'selected' : '' %>>30 minutes</option>
+                                    <option value="60" <%= settings.security?.sessionTimeout === 60 ? 'selected' : '' %>>1 hour</option>
+                                    <option value="120" <%= settings.security?.sessionTimeout === 120 ? 'selected' : '' %>>2 hours</option>
+                                    <option value="240" <%= settings.security?.sessionTimeout === 240 ? 'selected' : '' %>>4 hours</option>
+                                    <option value="480" <%= settings.security?.sessionTimeout === 480 ? 'selected' : '' %>>8 hours</option>
+                                </select>
+                                <small class="help-text">Auto-logout after this duration of inactivity</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="multipleLogins">Allow Multiple Logins</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="multipleLogins" name="multipleLogins" 
+                                           <%= settings.security?.multipleLogins !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Allow same user to login from multiple devices</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="rememberMe">Enable "Remember Me"</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="rememberMe" name="rememberMe" 
+                                           <%= settings.security?.rememberMe !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Allow users to stay logged in for extended periods</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="rememberMeDuration">Remember Me Duration (days)</label>
+                                <select id="rememberMeDuration" name="rememberMeDuration" required>
+                                    <option value="7" <%= settings.security?.rememberMeDuration === 7 ? 'selected' : '' %>>7 days</option>
+                                    <option value="14" <%= settings.security?.rememberMeDuration === 14 ? 'selected' : '' %>>14 days</option>
+                                    <option value="30" <%= settings.security?.rememberMeDuration === 30 ? 'selected' : '' %>>30 days</option>
+                                    <option value="90" <%= settings.security?.rememberMeDuration === 90 ? 'selected' : '' %>>90 days</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Policy -->
+                    <div class="form-section">
+                        <h3>🔐 Password Policy</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="minPasswordLength">Minimum Password Length</label>
+                                <select id="minPasswordLength" name="minPasswordLength" required>
+                                    <option value="6" <%= settings.security?.minPasswordLength === 6 ? 'selected' : '' %>>6 characters</option>
+                                    <option value="8" <%= settings.security?.minPasswordLength === 8 ? 'selected' : '' %>>8 characters</option>
+                                    <option value="10" <%= settings.security?.minPasswordLength === 10 ? 'selected' : '' %>>10 characters</option>
+                                    <option value="12" <%= settings.security?.minPasswordLength === 12 ? 'selected' : '' %>>12 characters</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="requireSpecialChars">Require Special Characters</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="requireSpecialChars" name="requireSpecialChars" 
+                                           <%= settings.security?.requireSpecialChars ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Passwords must include special characters (!@#$%)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="requireNumbers">Require Numbers</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="requireNumbers" name="requireNumbers" 
+                                           <%= settings.security?.requireNumbers ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Passwords must include numbers</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="requireUppercase">Require Uppercase Letters</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="requireUppercase" name="requireUppercase" 
+                                           <%= settings.security?.requireUppercase ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Passwords must include uppercase letters</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="passwordExpiry">Password Expiry (days)</label>
+                                <select id="passwordExpiry" name="passwordExpiry" required>
+                                    <option value="0" <%= settings.security?.passwordExpiry === 0 ? 'selected' : '' %>>Never</option>
+                                    <option value="30" <%= settings.security?.passwordExpiry === 30 ? 'selected' : '' %>>30 days</option>
+                                    <option value="60" <%= settings.security?.passwordExpiry === 60 ? 'selected' : '' %>>60 days</option>
+                                    <option value="90" <%= settings.security?.passwordExpiry === 90 ? 'selected' : '' %>>90 days</option>
+                                    <option value="180" <%= settings.security?.passwordExpiry === 180 ? 'selected' : '' %>>180 days</option>
+                                </select>
+                                <small class="help-text">Force password change after this duration</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="preventPasswordReuse">Prevent Password Reuse</label>
+                                <select id="preventPasswordReuse" name="preventPasswordReuse" required>
+                                    <option value="0" <%= settings.security?.preventPasswordReuse === 0 ? 'selected' : '' %>>Allow Reuse</option>
+                                    <option value="3" <%= settings.security?.preventPasswordReuse === 3 ? 'selected' : '' %>>Last 3 passwords</option>
+                                    <option value="5" <%= settings.security?.preventPasswordReuse === 5 ? 'selected' : '' %>>Last 5 passwords</option>
+                                    <option value="10" <%= settings.security?.preventPasswordReuse === 10 ? 'selected' : '' %>>Last 10 passwords</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Lockout -->
+                    <div class="form-section">
+                        <h3>🚫 Account Lockout Policy</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="maxLoginAttempts">Max Login Attempts</label>
+                                <select id="maxLoginAttempts" name="maxLoginAttempts" required>
+                                    <option value="3" <%= settings.security?.maxLoginAttempts === 3 ? 'selected' : '' %>>3 attempts</option>
+                                    <option value="5" <%= settings.security?.maxLoginAttempts === 5 ? 'selected' : '' %>>5 attempts</option>
+                                    <option value="7" <%= settings.security?.maxLoginAttempts === 7 ? 'selected' : '' %>>7 attempts</option>
+                                    <option value="10" <%= settings.security?.maxLoginAttempts === 10 ? 'selected' : '' %>>10 attempts</option>
+                                </select>
+                                <small class="help-text">Lock account after this many failed attempts</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lockoutDuration">Lockout Duration (minutes)</label>
+                                <select id="lockoutDuration" name="lockoutDuration" required>
+                                    <option value="5" <%= settings.security?.lockoutDuration === 5 ? 'selected' : '' %>>5 minutes</option>
+                                    <option value="15" <%= settings.security?.lockoutDuration === 15 ? 'selected' : '' %>>15 minutes</option>
+                                    <option value="30" <%= settings.security?.lockoutDuration === 30 ? 'selected' : '' %>>30 minutes</option>
+                                    <option value="60" <%= settings.security?.lockoutDuration === 60 ? 'selected' : '' %>>1 hour</option>
+                                    <option value="240" <%= settings.security?.lockoutDuration === 240 ? 'selected' : '' %>>4 hours</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="autoUnlock">Auto Unlock Accounts</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="autoUnlock" name="autoUnlock" 
+                                           <%= settings.security?.autoUnlock !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Automatically unlock accounts after lockout duration</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="notifyLockout">Notify on Lockout</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="notifyLockout" name="notifyLockout" 
+                                           <%= settings.security?.notifyLockout !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Send notification when account is locked</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Access Control -->
+                    <div class="form-section">
+                        <h3>👮 Access Control</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="requireAuth">Require Authentication</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="requireAuth" name="requireAuth" 
+                                           <%= settings.security?.requireAuth !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Require login for all system access</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="adminOnlySettings">Admin-Only Settings</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="adminOnlySettings" name="adminOnlySettings" 
+                                           <%= settings.security?.adminOnlySettings !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Restrict settings access to admin users only</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="staffPermissions">Staff Permissions</label>
+                                <div class="permission-grid">
+                                    <div class="permission-item">
+                                        <label>
+                                            <input type="checkbox" name="staffCanAddItems" 
+                                                   <%= settings.security?.staffPermissions?.canAddItems ? 'checked' : '' %>>
+                                            Add Items
+                                        </label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <label>
+                                            <input type="checkbox" name="staffCanEditItems" 
+                                                   <%= settings.security?.staffPermissions?.canEditItems ? 'checked' : '' %>>
+                                            Edit Items
+                                        </label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <label>
+                                            <input type="checkbox" name="staffCanDeleteItems" 
+                                                   <%= settings.security?.staffPermissions?.canDeleteItems ? 'checked' : '' %>>
+                                            Delete Items
+                                        </label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <label>
+                                            <input type="checkbox" name="staffCanAddCustomers" 
+                                                   <%= settings.security?.staffPermissions?.canAddCustomers !== false ? 'checked' : '' %>>
+                                            Add Customers
+                                        </label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <label>
+                                            <input type="checkbox" name="staffCanEditCustomers" 
+                                                   <%= settings.security?.staffPermissions?.canEditCustomers ? 'checked' : '' %>>
+                                            Edit Customers
+                                        </label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <label>
+                                            <input type="checkbox" name="staffCanViewReports" 
+                                                   <%= settings.security?.staffPermissions?.canViewReports !== false ? 'checked' : '' %>>
+                                            View Reports
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Protection -->
+                    <div class="form-section">
+                        <h3>🛡️ Data Protection</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="enableAuditLog">Enable Audit Logging</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="enableAuditLog" name="enableAuditLog" 
+                                           <%= settings.security?.enableAuditLog !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Log all user actions and system changes</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="auditLogRetention">Audit Log Retention (days)</label>
+                                <select id="auditLogRetention" name="auditLogRetention" required>
+                                    <option value="30" <%= settings.security?.auditLogRetention === 30 ? 'selected' : '' %>>30 days</option>
+                                    <option value="90" <%= settings.security?.auditLogRetention === 90 ? 'selected' : '' %>>90 days</option>
+                                    <option value="180" <%= settings.security?.auditLogRetention === 180 ? 'selected' : '' %>>180 days</option>
+                                    <option value="365" <%= settings.security?.auditLogRetention === 365 ? 'selected' : '' %>>1 year</option>
+                                    <option value="0" <%= settings.security?.auditLogRetention === 0 ? 'selected' : '' %>>Forever</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="encryptData">Encrypt Sensitive Data</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="encryptData" name="encryptData" 
+                                           <%= settings.security?.encryptData !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Encrypt customer and financial data</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="enableBackupEncryption">Encrypt Backups</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="enableBackupEncryption" name="enableBackupEncryption" 
+                                           <%= settings.security?.enableBackupEncryption ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Encrypt backup files</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dataRetentionPeriod">Data Retention Period (years)</label>
+                                <select id="dataRetentionPeriod" name="dataRetentionPeriod" required>
+                                    <option value="1" <%= settings.security?.dataRetentionPeriod === 1 ? 'selected' : '' %>>1 year</option>
+                                    <option value="3" <%= settings.security?.dataRetentionPeriod === 3 ? 'selected' : '' %>>3 years</option>
+                                    <option value="5" <%= settings.security?.dataRetentionPeriod === 5 ? 'selected' : '' %>>5 years</option>
+                                    <option value="7" <%= settings.security?.dataRetentionPeriod === 7 ? 'selected' : '' %>>7 years</option>
+                                    <option value="0" <%= settings.security?.dataRetentionPeriod === 0 ? 'selected' : '' %>>Forever</option>
+                                </select>
+                                <small class="help-text">Automatically archive old data after this period</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Alerts -->
+                    <div class="form-section">
+                        <h3>⚠️ Security Alerts</h3>
+                        
+                        <div class="security-status">
+                            <div class="status-item">
+                                <span class="status-icon">🔐</span>
+                                <div class="status-info">
+                                    <strong>Password Strength:</strong>
+                                    <span class="status-value good">Good</span>
+                                </div>
+                            </div>
+                            
+                            <div class="status-item">
+                                <span class="status-icon">🛡️</span>
+                                <div class="status-info">
+                                    <strong>Data Encryption:</strong>
+                                    <span class="status-value good">Enabled</span>
+                                </div>
+                            </div>
+                            
+                            <div class="status-item">
+                                <span class="status-icon">📝</span>
+                                <div class="status-info">
+                                    <strong>Audit Logging:</strong>
+                                    <span class="status-value good">Active</span>
+                                </div>
+                            </div>
+                            
+                            <div class="status-item">
+                                <span class="status-icon">🔒</span>
+                                <div class="status-info">
+                                    <strong>Session Security:</strong>
+                                    <span class="status-value warning">Medium</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Save Security Settings</button>
+                        <a href="/settings" class="btn btn-secondary">Cancel</a>
+                        <button type="button" onclick="resetSecurityDefaults()" class="btn btn-warning">🔄 Reset to Defaults</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Reset to security defaults
+        function resetSecurityDefaults() {
+            if (confirm('Are you sure you want to reset all security settings to their default values?')) {
+                // Reset form values to secure defaults
+                document.getElementById('sessionTimeout').value = 60;
+                document.getElementById('multipleLogins').checked = true;
+                document.getElementById('rememberMe').checked = true;
+                document.getElementById('rememberMeDuration').value = 30;
+                
+                document.getElementById('minPasswordLength').value = 8;
+                document.getElementById('requireSpecialChars').checked = true;
+                document.getElementById('requireNumbers').checked = true;
+                document.getElementById('requireUppercase').checked = true;
+                document.getElementById('passwordExpiry').value = 90;
+                document.getElementById('preventPasswordReuse').value = 5;
+                
+                document.getElementById('maxLoginAttempts').value = 5;
+                document.getElementById('lockoutDuration').value = 15;
+                document.getElementById('autoUnlock').checked = true;
+                document.getElementById('notifyLockout').checked = true;
+                
+                document.getElementById('requireAuth').checked = true;
+                document.getElementById('adminOnlySettings').checked = true;
+                
+                document.getElementById('enableAuditLog').checked = true;
+                document.getElementById('auditLogRetention').value = 365;
+                document.getElementById('encryptData').checked = true;
+                document.getElementById('enableBackupEncryption').checked = true;
+                document.getElementById('dataRetentionPeriod').value = 7;
+            }
+        }
+
+        // Password strength indicator
+        function updatePasswordStrength() {
+            const minLength = parseInt(document.getElementById('minPasswordLength').value);
+            const requireSpecial = document.getElementById('requireSpecialChars').checked;
+            const requireNumbers = document.getElementById('requireNumbers').checked;
+            const requireUpper = document.getElementById('requireUppercase').checked;
+            
+            let strength = 0;
+            if (minLength >= 8) strength++;
+            if (requireSpecial) strength++;
+            if (requireNumbers) strength++;
+            if (requireUpper) strength++;
+            
+            const strengthElement = document.querySelector('.status-value');
+            if (strength >= 3) {
+                strengthElement.textContent = 'Strong';
+                strengthElement.className = 'status-value good';
+            } else if (strength >= 2) {
+                strengthElement.textContent = 'Medium';
+                strengthElement.className = 'status-value warning';
+            } else {
+                strengthElement.textContent = 'Weak';
+                strengthElement.className = 'status-value danger';
+            }
+        }
+
+        // Add event listeners for password strength
+        ['minPasswordLength', 'requireSpecialChars', 'requireNumbers', 'requireUppercase'].forEach(id => {
+            document.getElementById(id).addEventListener('change', updatePasswordStrength);
+        });
+
+        // Initialize password strength
+        updatePasswordStrength();
+    </script>
+
+    <style>
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .permission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .permission-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .security-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #dee2e6;
+        }
+
+        .status-icon {
+            font-size: 1.5em;
+        }
+
+        .status-info {
+            flex: 1;
+        }
+
+        .status-value {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-value.good {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-value.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-value.danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .invoice-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-family: Arial, sans-serif;
+        }
+        
+        .invoice-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 3px solid #007bff;
+        }
+        
+        .company-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .company-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .invoice-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .invoice-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+        
+        .bill-to, .bill-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        
+        .items-section {
+            padding: 0 20px;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .items-table th {
+            background: #007bff;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .items-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .items-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .totals-section {
+            margin: 20px;
+            max-width: 300px;
+            margin-left: auto;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .total-row.final {
+            font-weight: bold;
+            font-size: 18px;
+            background: #007bff;
+            color: white;
+            padding: 12px 15px;
+            margin-top: 10px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .actions {
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        @media print {
+            .actions, .main-header, nav {
+                display: none !important;
+            }
+            
+            .invoice-container {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Bill Details</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/bills">📄 Bills</a>
+            <span class="separator">></span>
+            <span class="current">📄 Bill #<%= bill.billNumber %></span>
+        </div>
+    </nav>
+
+    <!-- Alert Messages -->
+    <% if (typeof query !== 'undefined' && query.success) { %>
+        <div class="alert alert-success" style="margin: 20px auto; max-width: 800px;">
+            <%= query.success %>
+        </div>
+    <% } %>
+
+    <!-- Invoice Container -->
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="company-info">
+                <div class="company-name"><%= company.name %></div>
+                <div class="company-details">
+                    <%= company.address.line1 %><br>
+                    <%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %><br>
+                    Phone: <%= company.contact.phone %> | Email: <%= company.contact.email %><br>
+                    <% if (company.gst.gstin) { %>GSTIN: <%= company.gst.gstin %><% } %>
+                </div>
+            </div>
+            
+            <div class="invoice-title">Tax Invoice</div>
+        </div>
+
+        <!-- Invoice Info -->
+        <div class="invoice-info">
+            <div class="bill-to">
+                <div class="section-title">Bill To:</div>
+                <strong><%= bill.customerName %></strong><br>
+                Phone: <%= bill.customerPhone %><br>
+                <% if (bill.customerGstin) { %>
+                    GSTIN: <%= bill.customerGstin %>
+                <% } else { %>
+                    <em>Unregistered Customer</em>
+                <% } %>
+            </div>
+            
+            <div class="bill-details">
+                <div class="section-title">Bill Details:</div>
+                <strong>Bill No:</strong> #<%= bill.billNumber %><br>
+                <strong>Date:</strong> <%= new Date(bill.billDate).toLocaleDateString('en-IN') %><br>
+                <strong>Payment:</strong> <%= bill.paymentMethod %><br>
+                <strong>Created By:</strong> <%= user.name %>
+            </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="items-section">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%">S.No</th>
+                        <th style="width: 35%">Description</th>
+                        <th style="width: 12%">HSN</th>
+                        <th style="width: 10%">Qty</th>
+                        <th style="width: 12%">Rate</th>
+                        <th style="width: 12%">Amount</th>
+                        <th style="width: 11%">GST</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let itemCounter = 1; %>
+                    <% bill.items.forEach(item => { %>
+                        <tr>
+                            <td><%= itemCounter++ %></td>
+                            <td><%= item.itemName %></td>
+                            <td><%= item.hsnCode %></td>
+                            <td class="text-right"><%= item.quantity %></td>
+                            <td class="text-right">₹<%= item.rate.toFixed(2) %></td>
+                            <td class="text-right">₹<%= item.amount.toFixed(2) %></td>
+                            <td class="text-right"><%= item.gstRate %>%</td>
+                        </tr>
+                    <% }); %>
+                    
+                    <% if (bill.extraCharges && bill.extraCharges.length > 0) { %>
+                        <% bill.extraCharges.forEach(charge => { %>
+                            <tr>
+                                <td><%= itemCounter++ %></td>
+                                <td><%= charge.description %></td>
+                                <td>9967</td>
+                                <td class="text-right">1</td>
+                                <td class="text-right">₹<%= charge.amount.toFixed(2) %></td>
+                                <td class="text-right">₹<%= charge.amount.toFixed(2) %></td>
+                                <td class="text-right"><%= charge.gstRate || 0 %>%</td>
+                            </tr>
+                        <% }); %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span>₹<%= bill.subtotal.toFixed(2) %></span>
+            </div>
+            <% if (bill.cgstAmount > 0) { %>
+                <div class="total-row">
+                    <span>CGST:</span>
+                    <span>₹<%= bill.cgstAmount.toFixed(2) %></span>
+                </div>
+                <div class="total-row">
+                    <span>SGST:</span>
+                    <span>₹<%= bill.sgstAmount.toFixed(2) %></span>
+                </div>
+            <% } %>
+            <div class="total-row final">
+                <span>Total Amount:</span>
+                <span>₹<%= bill.finalTotal.toFixed(2) %></span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <strong>Thank you for your business!</strong><br>
+            This is a computer generated invoice and does not require signature.
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+        <a href="/bills" class="btn btn-secondary">← Back to Bills</a>
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Print Invoice</button>
+        <a href="/bills/new" class="btn btn-success">➕ New Bill</a>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

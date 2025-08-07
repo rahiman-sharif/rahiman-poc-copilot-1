@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p><%= isEdit ? 'Edit Item' : 'Add New Item' %></p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/items">📦 Items</a>
+            <span class="separator">></span>
+            <span class="current"><%= isEdit ? '✏️ Edit Item' : '➕ Add New Item' %></span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="form-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2><%= isEdit ? '✏️ Edit Item' : '➕ Add New Item' %></h2>
+                    <p><%= isEdit ? 'Update item information and stock details' : 'Add a new item to your inventory' %></p>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Form -->
+            <form action="<%= isEdit ? `/items/${item.id}` : '/items' %>" method="POST" class="item-form" id="itemForm">
+                <div class="form-card">
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <h3>📋 Basic Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name">Item Name *</label>
+                                <input type="text" id="name" name="name" required 
+                                       value="<%= item ? item.name : '' %>" 
+                                       placeholder="e.g., Steel Rod 8mm">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="categoryId">Category *</label>
+                                <select id="categoryId" name="categoryId" required>
+                                    <option value="">Select Category</option>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category.id %>" 
+                                                <% if (item && item.categoryId === category.id) { %>selected<% } %>>
+                                            <%= category.name %>
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="brand">Brand</label>
+                                <input type="text" id="brand" name="brand" 
+                                       value="<%= item ? item.brand : '' %>" 
+                                       placeholder="e.g., TATA Steel, UltraTech">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="unit">Unit of Measure *</label>
+                                <select id="unit" name="unit" required>
+                                    <option value="">Select Unit</option>
+                                    <option value="kg" <% if (item && item.unit === 'kg') { %>selected<% } %>>Kilogram (kg)</option>
+                                    <option value="pcs" <% if (item && item.unit === 'pcs') { %>selected<% } %>>Pieces (pcs)</option>
+                                    <option value="bag" <% if (item && item.unit === 'bag') { %>selected<% } %>>Bag</option>
+                                    <option value="bundle" <% if (item && item.unit === 'bundle') { %>selected<% } %>>Bundle</option>
+                                    <option value="sqft" <% if (item && item.unit === 'sqft') { %>selected<% } %>>Square Feet (sqft)</option>
+                                    <option value="L" <% if (item && item.unit === 'L') { %>selected<% } %>>Liter (L)</option>
+                                    <option value="service" <% if (item && item.unit === 'service') { %>selected<% } %>>Service</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Tax Information -->
+                    <div class="form-section">
+                        <h3>💰 Pricing & Tax Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="price">Price (₹) *</label>
+                                <input type="number" id="price" name="price" step="0.01" min="0" required 
+                                       value="<%= item ? item.price : '' %>" 
+                                       placeholder="0.00">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="hsnCode">HSN Code</label>
+                                <input type="text" id="hsnCode" name="hsnCode" 
+                                       value="<%= item ? item.hsnCode : '' %>" 
+                                       placeholder="e.g., 7213, 2523">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="isTaxable" name="isTaxable" value="true" 
+                                           <% if (item && item.isTaxable) { %>checked<% } %>>
+                                    Taxable Item
+                                </label>
+                            </div>
+
+                            <div class="form-group" id="gstGroup" <% if (!item || !item.isTaxable) { %>style="display: none;"<% } %>>
+                                <label for="gstRate">GST Rate (%) *</label>
+                                <select id="gstRate" name="gstRate">
+                                    <option value="0" <% if (item && item.gstRate === 0) { %>selected<% } %>>0%</option>
+                                    <option value="5" <% if (item && item.gstRate === 5) { %>selected<% } %>>5%</option>
+                                    <option value="12" <% if (item && item.gstRate === 12) { %>selected<% } %>>12%</option>
+                                    <option value="18" <% if (item && item.gstRate === 18) { %>selected<% } %>>18%</option>
+                                    <option value="28" <% if (item && item.gstRate === 28) { %>selected<% } %>>28%</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item Properties -->
+                    <div class="form-section">
+                        <h3>⚙️ Item Properties</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="isServiceItem" name="isServiceItem" value="true" 
+                                           <% if (item && item.isServiceItem) { %>checked<% } %>>
+                                    Service Item (No Stock Tracking)
+                                </label>
+                                <small class="form-help">Check for items like Loading, Transport charges</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="priceEditableAtBilling" name="priceEditableAtBilling" value="true" 
+                                           <% if (item && item.priceEditableAtBilling) { %>checked<% } %>>
+                                    Price Editable at Billing
+                                </label>
+                                <small class="form-help">Allow price changes during billing</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="barcode">Barcode (Optional)</label>
+                                <input type="text" id="barcode" name="barcode" 
+                                       value="<%= item ? item.barcode : '' %>" 
+                                       placeholder="Barcode for future use">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Information -->
+                    <div class="form-section" id="stockSection" <% if (item && item.isServiceItem) { %>style="display: none;"<% } %>>
+                        <h3>📦 Stock Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="stockQuantity">Initial Stock Quantity</label>
+                                <input type="number" id="stockQuantity" name="stockQuantity" min="0" 
+                                       value="<%= item && item.stock ? item.stock.quantity : '' %>" 
+                                       placeholder="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="minLevel">Minimum Stock Level</label>
+                                <input type="number" id="minLevel" name="minLevel" min="0" 
+                                       value="<%= item && item.stock ? item.stock.minLevel : '' %>" 
+                                       placeholder="0">
+                                <small class="form-help">Alert when stock falls below this level</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="form-section">
+                        <h3>📝 Additional Information</h3>
+                        <div class="form-group">
+                            <label for="bundleInfo">Bundle/Weight Information</label>
+                            <textarea id="bundleInfo" name="bundleInfo" rows="3" 
+                                      placeholder="e.g., Each bundle = 533 kg, Standard size: 6ft x 4ft"><%= item ? item.bundleInfo : '' %></textarea>
+                            <small class="form-help">Useful for steel bundles, cement bags, etc.</small>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <a href="/items" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <%= isEdit ? '💾 Update Item' : '➕ Add Item' %>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Handle GST rate visibility
+        document.getElementById('isTaxable').addEventListener('change', function() {
+            const gstGroup = document.getElementById('gstGroup');
+            const gstRate = document.getElementById('gstRate');
+            
+            if (this.checked) {
+                gstGroup.style.display = 'block';
+                gstRate.required = true;
+                if (!gstRate.value) {
+                    gstRate.value = '18'; // Default to 18%
+                }
+            } else {
+                gstGroup.style.display = 'none';
+                gstRate.required = false;
+                gstRate.value = '0';
+            }
+        });
+
+        // Handle service item checkbox
+        document.getElementById('isServiceItem').addEventListener('change', function() {
+            const stockSection = document.getElementById('stockSection');
+            const stockQuantity = document.getElementById('stockQuantity');
+            const minLevel = document.getElementById('minLevel');
+            
+            if (this.checked) {
+                stockSection.style.display = 'none';
+                stockQuantity.value = '0';
+                minLevel.value = '0';
+                
+                // Automatically set unit to service if not already set
+                const unitSelect = document.getElementById('unit');
+                if (!unitSelect.value) {
+                    unitSelect.value = 'service';
+                }
+            } else {
+                stockSection.style.display = 'block';
+            }
+        });
+
+        // Form validation
+        document.getElementById('itemForm').addEventListener('submit', function(e) {
+            const name = document.getElementById('name').value.trim();
+            const categoryId = document.getElementById('categoryId').value;
+            const price = document.getElementById('price').value;
+            const unit = document.getElementById('unit').value;
+            const isTaxable = document.getElementById('isTaxable').checked;
+            const gstRate = document.getElementById('gstRate').value;
+
+            // Basic validation
+            if (!name) {
+                alert('Please enter item name');
+                e.preventDefault();
+                return;
+            }
+
+            if (!categoryId) {
+                alert('Please select a category');
+                e.preventDefault();
+                return;
+            }
+
+            if (!price || parseFloat(price) < 0) {
+                alert('Please enter a valid price');
+                e.preventDefault();
+                return;
+            }
+
+            if (!unit) {
+                alert('Please select unit of measure');
+                e.preventDefault();
+                return;
+            }
+
+            if (isTaxable && !gstRate) {
+                alert('Please select GST rate for taxable items');
+                e.preventDefault();
+                return;
+            }
+        });
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Auto-focus on item name
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('name').focus();
+        });
+    </script>
+</body>
+</html>

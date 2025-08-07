@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Stock Movements</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/stock">📦 Stock Management</a>
+            <span class="separator">></span>
+            <span class="current">📊 Stock Movements</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>📊 Stock Movements</h2>
+                    <p>Track all stock changes and transactions</p>
+                </div>
+                <div class="header-right">
+                    <a href="/stock" class="btn btn-secondary">
+                        <span class="btn-icon">←</span>
+                        Back to Stock
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Movements Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>📋 Stock Movement History</h3>
+                    <div class="table-filters">
+                        <input type="text" id="searchMovements" placeholder="🔍 Search movements..." class="search-input">
+                        <select id="typeFilter" class="filter-select">
+                            <option value="">All Types</option>
+                            <option value="sale">Sales</option>
+                            <option value="adjustment">Adjustments</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="movementsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Reference</th>
+                            <th>Details</th>
+                            <th>User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% movements.forEach(movement => { %>
+                            <tr class="movement-row" data-type="<%= movement.type %>" data-item="<%= movement.itemName.toLowerCase() %>">
+                                <td>
+                                    <div class="date-info">
+                                        <strong><%= new Date(movement.date).toLocaleDateString('en-IN') %></strong>
+                                        <small><%= new Date(movement.date).toLocaleTimeString('en-IN') %></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="type-badge type-<%= movement.type %>">
+                                        <% if (movement.type === 'sale') { %>
+                                            🛒 Sale
+                                        <% } else { %>
+                                            🔧 Adjustment
+                                        <% } %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong><%= movement.itemName %></strong>
+                                </td>
+                                <td>
+                                    <% if (movement.type === 'sale') { %>
+                                        <span class="quantity-negative">-<%= movement.quantity %></span>
+                                    <% } else { %>
+                                        <% if (movement.adjustmentType === 'add') { %>
+                                            <span class="quantity-positive">+<%= movement.quantity %></span>
+                                        <% } else if (movement.adjustmentType === 'subtract') { %>
+                                            <span class="quantity-negative">-<%= movement.quantity %></span>
+                                        <% } else { %>
+                                            <span class="quantity-set">Set to <%= movement.newStock %></span>
+                                        <% } %>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (movement.type === 'sale') { %>
+                                        <a href="/bills/<%= movement.reference.split('#')[1] ? 'bill_' + movement.reference.split('#')[1].padStart(3, '0') : '#' %>" class="reference-link">
+                                            <%= movement.reference %>
+                                        </a>
+                                    <% } else { %>
+                                        <%= movement.reference %>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (movement.type === 'adjustment') { %>
+                                        <div class="adjustment-details">
+                                            <small>
+                                                <%= movement.oldStock %> → <%= movement.newStock %>
+                                                <br>Reason: <%= movement.reason %>
+                                            </small>
+                                        </div>
+                                    <% } else { %>
+                                        <small>Stock sold</small>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <small><%= movement.user || 'System' %></small>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+                
+                <% if (movements.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <h3>No Stock Movements</h3>
+                        <p>Stock movements will appear here when items are sold or adjusted.</p>
+                        <a href="/bills/new" class="btn btn-primary">Create First Bill</a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Search functionality
+        document.getElementById('searchMovements').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.movement-row');
+            
+            rows.forEach(row => {
+                const itemName = row.dataset.item;
+                const text = row.textContent.toLowerCase();
+                if (itemName.includes(searchTerm) || text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Type filter
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            const selectedType = this.value;
+            const rows = document.querySelectorAll('.movement-row');
+            
+            rows.forEach(row => {
+                const rowType = row.dataset.type;
+                if (!selectedType || rowType === selectedType) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

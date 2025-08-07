@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Rules - Vikram Steels</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Business Rules</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/settings">⚙️ Settings</a>
+            <span class="separator">></span>
+            <span class="current">📋 Business Rules</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>📋 Business Rules</h2>
+                    <p>Configure business logic, validation rules and workflow settings</p>
+                </div>
+                <div class="header-right">
+                    <a href="/settings" class="btn btn-secondary">← Back to Settings</a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-danger">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Business Rules Form -->
+            <div class="form-container">
+                <form action="/settings/business" method="POST" class="settings-form">
+                    <!-- Inventory Rules -->
+                    <div class="form-section">
+                        <h3>📦 Inventory Rules</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="allowNegativeStock">Allow Negative Stock</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="allowNegativeStock" name="allowNegativeStock" 
+                                           <%= settings.business?.allowNegativeStock ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Allow selling items with negative stock</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="autoUpdateStock">Auto Update Stock</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="autoUpdateStock" name="autoUpdateStock" 
+                                           <%= settings.business?.autoUpdateStock !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Automatically update stock on sales</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="lowStockThreshold">Low Stock Threshold (%)</label>
+                                <input type="number" id="lowStockThreshold" name="lowStockThreshold" 
+                                       value="<%= settings.business?.lowStockThreshold || 10 %>" 
+                                       min="0" max="100" required>
+                                <small class="help-text">Alert when stock falls below this percentage</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="criticalStockThreshold">Critical Stock Threshold (%)</label>
+                                <input type="number" id="criticalStockThreshold" name="criticalStockThreshold" 
+                                       value="<%= settings.business?.criticalStockThreshold || 5 %>" 
+                                       min="0" max="100" required>
+                                <small class="help-text">Critical alert threshold</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Rules -->
+                    <div class="form-section">
+                        <h3>💰 Pricing Rules</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="allowZeroPrice">Allow Zero Price</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="allowZeroPrice" name="allowZeroPrice" 
+                                           <%= settings.business?.allowZeroPrice ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Allow items with zero price (Free items)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="allowDiscount">Allow Discounts</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="allowDiscount" name="allowDiscount" 
+                                           <%= settings.business?.allowDiscount !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Allow discounts on items</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="maxDiscountPercent">Maximum Discount (%)</label>
+                                <input type="number" id="maxDiscountPercent" name="maxDiscountPercent" 
+                                       value="<%= settings.business?.maxDiscountPercent || 50 %>" 
+                                       min="0" max="100" required>
+                                <small class="help-text">Maximum allowed discount percentage</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="requireDiscountReason">Require Discount Reason</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="requireDiscountReason" name="requireDiscountReason" 
+                                           <%= settings.business?.requireDiscountReason ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Require reason for discounts above 10%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Rules -->
+                    <div class="form-section">
+                        <h3>👥 Customer Rules</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="requireCustomerInfo">Require Customer Info</label>
+                                <select id="requireCustomerInfo" name="requireCustomerInfo" required>
+                                    <option value="none" <%= settings.business?.requireCustomerInfo === 'none' ? 'selected' : '' %>>Not Required</option>
+                                    <option value="basic" <%= settings.business?.requireCustomerInfo === 'basic' ? 'selected' : '' %>>Basic Info (Name, Phone)</option>
+                                    <option value="detailed" <%= settings.business?.requireCustomerInfo === 'detailed' ? 'selected' : '' %>>Detailed Info (+ Address)</option>
+                                    <option value="gst" <%= settings.business?.requireCustomerInfo === 'gst' ? 'selected' : '' %>>GST Required for Business</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="duplicateCustomerCheck">Duplicate Customer Check</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="duplicateCustomerCheck" name="duplicateCustomerCheck" 
+                                           <%= settings.business?.duplicateCustomerCheck !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Check for duplicate customers by phone/email</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="defaultCreditLimit">Default Credit Limit (₹)</label>
+                                <input type="number" id="defaultCreditLimit" name="defaultCreditLimit" 
+                                       value="<%= settings.business?.defaultCreditLimit || 0 %>" 
+                                       min="0" step="1000">
+                                <small class="help-text">Default credit limit for new customers</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="creditDaysLimit">Credit Days Limit</label>
+                                <input type="number" id="creditDaysLimit" name="creditDaysLimit" 
+                                       value="<%= settings.business?.creditDaysLimit || 30 %>" 
+                                       min="0" max="365" required>
+                                <small class="help-text">Maximum credit days allowed</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bill/Invoice Rules -->
+                    <div class="form-section">
+                        <h3>🧾 Bill/Invoice Rules</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="allowBillEdit">Allow Bill Editing</label>
+                                <select id="allowBillEdit" name="allowBillEdit" required>
+                                    <option value="never" <%= settings.business?.allowBillEdit === 'never' ? 'selected' : '' %>>Never</option>
+                                    <option value="same_day" <%= settings.business?.allowBillEdit === 'same_day' ? 'selected' : '' %>>Same Day Only</option>
+                                    <option value="admin_only" <%= settings.business?.allowBillEdit === 'admin_only' ? 'selected' : '' %>>Admin Only</option>
+                                    <option value="always" <%= settings.business?.allowBillEdit === 'always' ? 'selected' : '' %>>Always</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="allowBillDelete">Allow Bill Deletion</label>
+                                <select id="allowBillDelete" name="allowBillDelete" required>
+                                    <option value="never" <%= settings.business?.allowBillDelete === 'never' ? 'selected' : '' %>>Never</option>
+                                    <option value="same_day" <%= settings.business?.allowBillDelete === 'same_day' ? 'selected' : '' %>>Same Day Only</option>
+                                    <option value="admin_only" <%= settings.business?.allowBillDelete === 'admin_only' ? 'selected' : '' %>>Admin Only</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="minimumBillAmount">Minimum Bill Amount (₹)</label>
+                                <input type="number" id="minimumBillAmount" name="minimumBillAmount" 
+                                       value="<%= settings.business?.minimumBillAmount || 0 %>" 
+                                       min="0" step="0.01">
+                                <small class="help-text">Minimum amount for creating a bill</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="requireBillRemarks">Require Bill Remarks</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="requireBillRemarks" name="requireBillRemarks" 
+                                           <%= settings.business?.requireBillRemarks ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Require remarks for high-value bills</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weight & Measurement Rules -->
+                    <div class="form-section">
+                        <h3>⚖️ Weight & Measurement Rules</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="allowPartialQuantities">Allow Partial Quantities</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="allowPartialQuantities" name="allowPartialQuantities" 
+                                           <%= settings.business?.allowPartialQuantities !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Allow decimal quantities (e.g., 1.5 kg)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="weightPrecision">Weight Precision (Decimal Places)</label>
+                                <select id="weightPrecision" name="weightPrecision" required>
+                                    <option value="0" <%= settings.business?.weightPrecision === 0 ? 'selected' : '' %>>0 (Whole numbers)</option>
+                                    <option value="1" <%= settings.business?.weightPrecision === 1 ? 'selected' : '' %>>1 (0.1 kg)</option>
+                                    <option value="2" <%= settings.business?.weightPrecision === 2 ? 'selected' : '' %>>2 (0.01 kg)</option>
+                                    <option value="3" <%= settings.business?.weightPrecision === 3 ? 'selected' : '' %>>3 (0.001 kg)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bundleConversion">Enable Bundle Conversion</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="bundleConversion" name="bundleConversion" 
+                                           <%= settings.business?.bundleConversion !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Enable bundle to weight conversion for steel items</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="defaultBundleWeight">Default Bundle Weight (kg)</label>
+                                <input type="number" id="defaultBundleWeight" name="defaultBundleWeight" 
+                                       value="<%= settings.business?.defaultBundleWeight || 533 %>" 
+                                       min="0" step="0.1" required>
+                                <small class="help-text">Default weight per bundle for steel items</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notification Rules -->
+                    <div class="form-section">
+                        <h3>🔔 Notification Rules</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="enableStockAlerts">Enable Stock Alerts</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="enableStockAlerts" name="enableStockAlerts" 
+                                           <%= settings.business?.enableStockAlerts !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Show alerts when stock is low</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="enablePaymentReminders">Enable Payment Reminders</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="enablePaymentReminders" name="enablePaymentReminders" 
+                                           <%= settings.business?.enablePaymentReminders !== false ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Show reminders for overdue payments</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dailyReportEmail">Daily Report Email</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="dailyReportEmail" name="dailyReportEmail" 
+                                           <%= settings.business?.dailyReportEmail ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <span>Send daily sales report via email</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reportEmail">Report Email Address</label>
+                                <input type="email" id="reportEmail" name="reportEmail" 
+                                       value="<%= settings.business?.reportEmail || '' %>" 
+                                       placeholder="admin@vikramsteels.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Save Business Rules</button>
+                        <a href="/settings" class="btn btn-secondary">Cancel</a>
+                        <button type="button" onclick="resetToDefaults()" class="btn btn-warning">🔄 Reset to Defaults</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Reset to defaults function
+        function resetToDefaults() {
+            if (confirm('Are you sure you want to reset all business rules to their default values?')) {
+                // Reset form values to defaults
+                document.getElementById('allowNegativeStock').checked = false;
+                document.getElementById('autoUpdateStock').checked = true;
+                document.getElementById('lowStockThreshold').value = 10;
+                document.getElementById('criticalStockThreshold').value = 5;
+                
+                document.getElementById('allowZeroPrice').checked = false;
+                document.getElementById('allowDiscount').checked = true;
+                document.getElementById('maxDiscountPercent').value = 50;
+                document.getElementById('requireDiscountReason').checked = false;
+                
+                document.getElementById('requireCustomerInfo').value = 'basic';
+                document.getElementById('duplicateCustomerCheck').checked = true;
+                document.getElementById('defaultCreditLimit').value = 0;
+                document.getElementById('creditDaysLimit').value = 30;
+                
+                document.getElementById('allowBillEdit').value = 'admin_only';
+                document.getElementById('allowBillDelete').value = 'admin_only';
+                document.getElementById('minimumBillAmount').value = 0;
+                document.getElementById('requireBillRemarks').checked = false;
+                
+                document.getElementById('allowPartialQuantities').checked = true;
+                document.getElementById('weightPrecision').value = 2;
+                document.getElementById('bundleConversion').checked = true;
+                document.getElementById('defaultBundleWeight').value = 533;
+                
+                document.getElementById('enableStockAlerts').checked = true;
+                document.getElementById('enablePaymentReminders').checked = true;
+                document.getElementById('dailyReportEmail').checked = false;
+                document.getElementById('reportEmail').value = '';
+            }
+        }
+
+        // Validate credit limit threshold
+        document.getElementById('criticalStockThreshold').addEventListener('input', function() {
+            const criticalThreshold = parseInt(this.value);
+            const lowThreshold = parseInt(document.getElementById('lowStockThreshold').value);
+            
+            if (criticalThreshold >= lowThreshold) {
+                this.setCustomValidity('Critical threshold must be less than low stock threshold');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // Validate discount percentage
+        document.getElementById('maxDiscountPercent').addEventListener('input', function() {
+            const discount = parseInt(this.value);
+            
+            if (discount > 100) {
+                this.setCustomValidity('Discount cannot exceed 100%');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+
+    <style>
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+            margin-top: 30px;
+            padding: 20px 0;
+            border-top: 2px solid #e9ecef;
+        }
+    </style>
+</body>
+</html>

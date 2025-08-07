@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Billing Management System</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+            <div class="welcome-section">
+                <h2>🎉 Hello <%= user.name %>!</h2>
+                <p>Welcome to Vikram Steels Billing Management System</p>
+                <p class="status-text">✅ System is ready for use</p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-info">
+                        <h3>Bills Today</h3>
+                        <p class="stat-number"><%= stats.billsToday %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3>Items</h3>
+                        <p class="stat-number"><%= stats.itemsCount %></p>
+                        <% if (stats.lowStockCount > 0) { %>
+                            <small style="color: #e74c3c;"><%= stats.lowStockCount %> low stock</small>
+                        <% } else { %>
+                            <small>All items in stock</small>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3>Customers</h3>
+                        <p class="stat-number"><%= stats.customersCount %></p>
+                        <small>Active customers</small>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <h3>Revenue Today</h3>
+                        <p class="stat-number">₹<%= stats.revenueToday.toLocaleString() %></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Actions -->
+            <div class="actions-section">
+                <h3>🚀 Quick Actions</h3>
+                <div class="actions-grid">
+                    <a href="/bills/new" class="action-card">
+                        <div class="action-icon">📝</div>
+                        <h4>New Bill</h4>
+                        <p>Create a new invoice</p>
+                    </a>
+                    
+                    <a href="/items" class="action-card">
+                        <div class="action-icon">📦</div>
+                        <h4>Manage Items</h4>
+                        <p>Add, edit, or view items</p>
+                    </a>
+                    
+                    <a href="/customers" class="action-card">
+                        <div class="action-icon">👥</div>
+                        <h4>Customers</h4>
+                        <p>Manage customer database</p>
+                    </a>
+                    
+                    <a href="/bills" class="action-card">
+                        <div class="action-icon">📄</div>
+                        <h4>View Bills</h4>
+                        <p>Manage invoices & transactions</p>
+                    </a>
+                    
+                    <a href="/reports" class="action-card">
+                        <div class="action-icon">📊</div>
+                        <h4>Reports & Analytics</h4>
+                        <p>Business insights & GST reports</p>
+                    </a>
+                    
+                    <% if (user.role === 'admin') { %>
+                    <a href="/stock" class="action-card">
+                        <div class="action-icon">📈</div>
+                        <h4>Stock Management</h4>
+                        <p>Monitor & adjust inventory</p>
+                    </a>
+                    
+                    <a href="/users" class="action-card">
+                        <div class="action-icon">👥</div>
+                        <h4>User Management</h4>
+                        <p>Add, edit & manage system users</p>
+                    </a>
+                    
+                    <a href="/data" class="action-card">
+                        <div class="action-icon">💾</div>
+                        <h4>Data Management</h4>
+                        <p>Backup, restore & export data</p>
+                    </a>
+                    <% } %>
+                </div>
+            </div>          
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 Vikram Steels Billing System. Built for offline use.</p>
+    </footer>
+</body>
+</html>

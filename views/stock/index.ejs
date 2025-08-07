@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Stock Management</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <span class="current">📦 Stock Management</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>📦 Stock Management</h2>
+                    <p>Monitor and manage inventory levels</p>
+                </div>
+                <div class="header-right">
+                    <a href="/stock/movements" class="btn btn-secondary">
+                        <span class="btn-icon">📊</span>
+                        Stock Movements
+                    </a>
+                    <a href="/items" class="btn btn-primary">
+                        <span class="btn-icon">➕</span>
+                        Manage Items
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Stock Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-content">
+                        <div class="stat-value"><%= stockStats.totalItems %></div>
+                        <div class="stat-label">Total Items</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card alert-warning">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <div class="stat-value"><%= stockStats.lowStockItems %></div>
+                        <div class="stat-label">Low Stock Items</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card alert-danger">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-content">
+                        <div class="stat-value"><%= stockStats.outOfStockItems %></div>
+                        <div class="stat-label">Out of Stock</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <div class="stat-value">₹<%= stockStats.totalStockValue.toLocaleString('en-IN') %></div>
+                        <div class="stat-label">Stock Value</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>📋 Current Stock Levels</h3>
+                    <div class="table-filters">
+                        <input type="text" id="searchStock" placeholder="🔍 Search items..." class="search-input">
+                        <select id="statusFilter" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="in-stock">In Stock</option>
+                            <option value="low-stock">Low Stock</option>
+                            <option value="out-of-stock">Out of Stock</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="stockTable">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Current Stock</th>
+                            <th>Min Level</th>
+                            <th>Unit</th>
+                            <th>Bundle Info</th>
+                            <th>Stock Value</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% stockItems.forEach(item => { %>
+                            <tr class="stock-row" data-status="<%= item.stockStatus %>" data-name="<%= item.name.toLowerCase() %>">
+                                <td>
+                                    <div class="item-info">
+                                        <strong><%= item.name %></strong>
+                                        <small><%= item.brand %></small>
+                                    </div>
+                                </td>
+                                <td><%= item.categoryId %></td>
+                                <td>
+                                    <div class="stock-info">
+                                        <span class="stock-quantity"><%= item.stock.quantity %> <%= item.unit %></span>
+                                        <% if (item.bundleQuantity > 0) { %>
+                                            <small>(<%= item.totalBundles %> bundles)</small>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td><%= item.stock.minLevel %> <%= item.unit %></td>
+                                <td><%= item.unit %></td>
+                                <td>
+                                    <small class="bundle-info"><%= item.bundleInfo || 'N/A' %></small>
+                                </td>
+                                <td>₹<%= item.stockValue.toLocaleString('en-IN') %></td>
+                                <td>
+                                    <span class="status-badge status-<%= item.stockStatus %>">
+                                        <% if (item.stockStatus === 'out-of-stock') { %>
+                                            ❌ Out of Stock
+                                        <% } else if (item.stockStatus === 'low-stock') { %>
+                                            ⚠️ Low Stock
+                                        <% } else { %>
+                                            ✅ In Stock
+                                        <% } %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/stock/adjust/<%= item.id %>" class="btn btn-sm btn-primary" title="Adjust Stock">
+                                            🔧 Adjust
+                                        </a>
+                                        <a href="/items/<%= item.id %>" class="btn btn-sm btn-secondary" title="View Item">
+                                            👁️ View
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+                
+                <% if (stockItems.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <h3>No Items Found</h3>
+                        <p>Add some items to start tracking stock.</p>
+                        <a href="/items/new" class="btn btn-primary">Add First Item</a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Search functionality
+        document.getElementById('searchStock').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.stock-row');
+            
+            rows.forEach(row => {
+                const itemName = row.dataset.name;
+                if (itemName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Status filter
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            const selectedStatus = this.value;
+            const rows = document.querySelectorAll('.stock-row');
+            
+            rows.forEach(row => {
+                const rowStatus = row.dataset.status;
+                if (!selectedStatus || rowStatus === selectedStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Auto-refresh stock data every 30 seconds
+        setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                window.location.reload();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

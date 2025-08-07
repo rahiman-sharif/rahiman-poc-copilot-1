@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .gst-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .period-selector {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .gst-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .gst-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .gst-card.cgst {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .gst-card.sgst {
+            background: linear-gradient(135deg, #fd746c 0%, #ff9068 100%);
+        }
+        
+        .gst-card.total {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .gst-breakdown-table {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .gst-rate-header {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .return-format {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .company-info {
+            text-align: left;
+            margin: 20px 0;
+        }
+        
+        .company-info strong {
+            color: var(--primary-color);
+        }
+        
+        @media print {
+            .period-selector, .breadcrumb, .main-header, .page-header {
+                display: none;
+            }
+            
+            body {
+                font-size: 12px;
+            }
+            
+            .gst-breakdown-table, .gst-header {
+                box-shadow: none;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>GST Report</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/reports">📊 Reports</a>
+            <span class="separator">></span>
+            <span class="current">📋 GST Report</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>📋 GST Report</h2>
+                    <p>GST collection and compliance report</p>
+                </div>
+                <div class="header-right">
+                    <button onclick="window.print()" class="btn btn-primary">
+                        🖨️ Print Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Period Selector -->
+            <div class="period-selector">
+                <h3>📅 Select Period</h3>
+                <form method="GET" action="/reports/gst" style="display: flex; gap: 15px; align-items: end;">
+                    <div class="form-group">
+                        <label for="month">Month:</label>
+                        <select id="month" name="month" class="filter-select">
+                            <% monthOptions.forEach(option => { %>
+                                <option value="<%= option.value %>" <%= option.selected ? 'selected' : '' %>>
+                                    <%= option.name %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="year">Year:</label>
+                        <select id="year" name="year" class="filter-select">
+                            <% for(let year = new Date().getFullYear(); year >= 2020; year--) { %>
+                                <option value="<%= year %>" <%= year === reportYear ? 'selected' : '' %>>
+                                    <%= year %>
+                                </option>
+                            <% } %>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
+                </form>
+            </div>
+
+            <!-- GST Header -->
+            <div class="gst-header">
+                <h1>🏢 <%= company.name || 'Vikram Steels' %></h1>
+                <div class="company-info">
+                    <% if (company.address) { %>
+                        <p><%= company.address.line1 %><% if (company.address.line2) { %>, <%= company.address.line2 %><% } %></p>
+                        <p><%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %></p>
+                    <% } %>
+                    <% if (company.contact) { %>
+                        <p><strong>Phone:</strong> <%= company.contact.phone %> | <strong>Email:</strong> <%= company.contact.email %></p>
+                    <% } %>
+                    <% if (company.gst && company.gst.gstin) { %>
+                        <p><strong>GSTIN:</strong> <%= company.gst.gstin %></p>
+                    <% } %>
+                </div>
+                
+                <h2>GST RETURN FOR <%= monthOptions.find(m => m.value === reportMonth).name.toUpperCase() %> <%= reportYear %></h2>
+                <p>Generated on: <%= new Date().toLocaleDateString('en-IN') %></p>
+            </div>
+
+            <!-- GST Summary Cards -->
+            <div class="gst-summary-grid">
+                <div class="gst-card">
+                    <div style="font-size: 0.9em; opacity: 0.9;">Taxable Value</div>
+                    <div style="font-size: 2em; font-weight: bold; margin: 10px 0;">
+                        ₹<%= totals.taxableValue.toLocaleString() %>
+                    </div>
+                    <div style="font-size: 0.8em;">Total Sales</div>
+                </div>
+                
+                <div class="gst-card cgst">
+                    <div style="font-size: 0.9em; opacity: 0.9;">CGST Collected</div>
+                    <div style="font-size: 2em; font-weight: bold; margin: 10px 0;">
+                        ₹<%= totals.cgstAmount.toLocaleString() %>
+                    </div>
+                    <div style="font-size: 0.8em;">Central GST</div>
+                </div>
+                
+                <div class="gst-card sgst">
+                    <div style="font-size: 0.9em; opacity: 0.9;">SGST Collected</div>
+                    <div style="font-size: 2em; font-weight: bold; margin: 10px 0;">
+                        ₹<%= totals.sgstAmount.toLocaleString() %>
+                    </div>
+                    <div style="font-size: 0.8em;">State GST</div>
+                </div>
+                
+                <div class="gst-card total">
+                    <div style="font-size: 0.9em; opacity: 0.9;">Total GST</div>
+                    <div style="font-size: 2em; font-weight: bold; margin: 10px 0;">
+                        ₹<%= totals.totalGst.toLocaleString() %>
+                    </div>
+                    <div style="font-size: 0.8em;"><%= totals.billCount %> bills</div>
+                </div>
+            </div>
+
+            <!-- GST Breakdown by Rate -->
+            <div class="gst-breakdown-table">
+                <h3>📊 GST Breakdown by Rate</h3>
+                <% if (gstSummary.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>No GST Data Found</h3>
+                        <p>No bills with GST found for the selected period.</p>
+                    </div>
+                <% } else { %>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>GST Rate</th>
+                                <th>Taxable Value</th>
+                                <th>CGST Amount</th>
+                                <th>SGST Amount</th>
+                                <th>Total GST</th>
+                                <th>Total Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% gstSummary.forEach(rate => { %>
+                                <tr>
+                                    <td>
+                                        <strong><%= rate.gstRate %>%</strong>
+                                        <% if (rate.gstRate === 0) { %>
+                                            <small style="display: block; color: #666;">Exempt/Zero-rated</small>
+                                        <% } %>
+                                    </td>
+                                    <td>₹<%= rate.taxableValue.toLocaleString() %></td>
+                                    <td>₹<%= rate.cgstAmount.toLocaleString() %></td>
+                                    <td>₹<%= rate.sgstAmount.toLocaleString() %></td>
+                                    <td><strong>₹<%= rate.totalGst.toLocaleString() %></strong></td>
+                                    <td><strong>₹<%= (rate.taxableValue + rate.totalGst).toLocaleString() %></strong></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #f8f9fa; font-weight: bold;">
+                                <td>TOTAL</td>
+                                <td>₹<%= totals.taxableValue.toLocaleString() %></td>
+                                <td>₹<%= totals.cgstAmount.toLocaleString() %></td>
+                                <td>₹<%= totals.sgstAmount.toLocaleString() %></td>
+                                <td>₹<%= totals.totalGst.toLocaleString() %></td>
+                                <td>₹<%= (totals.taxableValue + totals.totalGst).toLocaleString() %></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                <% } %>
+            </div>
+
+            <!-- Bill Details -->
+            <% if (monthlyBills.length > 0) { %>
+                <div class="gst-breakdown-table">
+                    <h3>📄 Bill Details</h3>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Bill #</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>GSTIN</th>
+                                <th>Taxable Value</th>
+                                <th>CGST</th>
+                                <th>SGST</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% monthlyBills.forEach(bill => { %>
+                                <tr>
+                                    <td><strong>#<%= bill.billNumber %></strong></td>
+                                    <td><%= new Date(bill.createdAt || bill.billDate).toLocaleDateString('en-IN') %></td>
+                                    <td><%= bill.customerName || 'Cash Customer' %></td>
+                                    <td>
+                                        <% if (bill.customerGstin) { %>
+                                            <%= bill.customerGstin %>
+                                        <% } else { %>
+                                            <span style="color: #666; font-style: italic;">Unregistered</span>
+                                        <% } %>
+                                    </td>
+                                    <td>₹<%= (bill.subtotal || 0).toLocaleString() %></td>
+                                    <td>₹<%= (bill.cgstAmount || 0).toLocaleString() %></td>
+                                    <td>₹<%= (bill.sgstAmount || 0).toLocaleString() %></td>
+                                    <td><strong>₹<%= (bill.finalTotal || bill.grandTotal || 0).toLocaleString() %></strong></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+
+            <!-- GST Return Format -->
+            <div class="gst-breakdown-table">
+                <h3>📋 GSTR-1 Format Summary</h3>
+                <div class="return-format">
+                    <pre>
+=== GSTR-1 RETURN SUMMARY ===
+Period: <%= monthOptions.find(m => m.value === reportMonth).name %> <%= reportYear %>
+GSTIN: <%= company.gst && company.gst.gstin ? company.gst.gstin : 'Not Registered' %>
+
+OUTWARD SUPPLIES:
+<% gstSummary.forEach(rate => { %>
+GST Rate <%= rate.gstRate %>%:
+  Taxable Value    : ₹<%= rate.taxableValue.toFixed(2) %>
+  CGST Amount      : ₹<%= rate.cgstAmount.toFixed(2) %>
+  SGST Amount      : ₹<%= rate.sgstAmount.toFixed(2) %>
+  Total GST        : ₹<%= rate.totalGst.toFixed(2) %>
+  Gross Value      : ₹<%= (rate.taxableValue + rate.totalGst).toFixed(2) %>
+<% }) %>
+
+TOTAL SUMMARY:
+  Total Taxable Value : ₹<%= totals.taxableValue.toFixed(2) %>
+  Total CGST         : ₹<%= totals.cgstAmount.toFixed(2) %>
+  Total SGST         : ₹<%= totals.sgstAmount.toFixed(2) %>
+  Total GST          : ₹<%= totals.totalGst.toFixed(2) %>
+  Gross Turnover     : ₹<%= (totals.taxableValue + totals.totalGst).toFixed(2) %>
+  
+Number of Invoices   : <%= totals.billCount %>
+</pre>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="/reports" class="btn btn-secondary">← Back to Reports</a>
+                <button onclick="exportGSTData()" class="btn btn-primary">📊 Export GST Data</button>
+                <button onclick="window.print()" class="btn btn-primary">🖨️ Print Return</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        function exportGSTData() {
+            // Create CSV content
+            let csv = 'GST Rate,Taxable Value,CGST Amount,SGST Amount,Total GST,Total Value\n';
+            
+            <% gstSummary.forEach(rate => { %>
+                csv += '<%= rate.gstRate %>,<%= rate.taxableValue %>,<%= rate.cgstAmount %>,<%= rate.sgstAmount %>,<%= rate.totalGst %>,<%= rate.taxableValue + rate.totalGst %>\n';
+            <% }) %>
+            
+            // Create and download file
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gst_report_<%= reportMonth %>_<%= reportYear %>.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

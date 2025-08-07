@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p><%= isEdit ? 'Edit Customer' : 'Add New Customer' %></p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/customers">👥 Customer Management</a>
+            <span class="separator">></span>
+            <span class="current"><%= isEdit ? '✏️ Edit Customer' : '👤➕ Add Customer' %></span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="form-main">
+        <div class="form-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2><%= isEdit ? '✏️ Edit Customer' : '👤➕ Add New Customer' %></h2>
+                    <p><%= isEdit ? 'Update customer information' : 'Enter customer details to create a new record' %></p>
+                </div>
+                <div class="header-right">
+                    <a href="/customers" class="btn btn-secondary">
+                        <span class="btn-icon">←</span>
+                        Back to Customers
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Customer Form -->
+            <form method="POST" action="<%= isEdit ? `/customers/${customer.id}` : '/customers' %>" class="customer-form">
+                <div class="form-sections">
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <h3>👤 Basic Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name">Customer Name *</label>
+                                <input type="text" id="name" name="name" 
+                                       value="<%= customer ? customer.name : '' %>" 
+                                       placeholder="Enter customer name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="type">Customer Type *</label>
+                                <select id="type" name="type" required>
+                                    <option value="">Select type</option>
+                                    <option value="Individual" <%= customer && customer.type === 'Individual' ? 'selected' : '' %>>Individual</option>
+                                    <option value="Business" <%= customer && customer.type === 'Business' ? 'selected' : '' %>>Business</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="form-section">
+                        <h3>📞 Contact Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="phone">Phone Number *</label>
+                                <input type="tel" id="phone" name="phone" 
+                                       value="<%= customer ? customer.contact.phone : '' %>" 
+                                       placeholder="+91-XXXXX-XXXXX" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" 
+                                       value="<%= customer ? customer.contact.email : '' %>" 
+                                       placeholder="customer@example.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address Information -->
+                    <div class="form-section">
+                        <h3>🏠 Address Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="addressLine1">Address Line 1 *</label>
+                                <input type="text" id="addressLine1" name="addressLine1" 
+                                       value="<%= customer ? customer.contact.address.line1 : '' %>" 
+                                       placeholder="House/Plot number, Street name" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="addressLine2">Address Line 2</label>
+                                <input type="text" id="addressLine2" name="addressLine2" 
+                                       value="<%= customer ? customer.contact.address.line2 : '' %>" 
+                                       placeholder="Area, Landmark">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="city">City *</label>
+                                <input type="text" id="city" name="city" 
+                                       value="<%= customer ? customer.contact.address.city : '' %>" 
+                                       placeholder="Enter city" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="state">State *</label>
+                                <input type="text" id="state" name="state" 
+                                       value="<%= customer ? customer.contact.address.state : '' %>" 
+                                       placeholder="Enter state" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="pincode">PIN Code *</label>
+                                <input type="text" id="pincode" name="pincode" 
+                                       value="<%= customer ? customer.contact.address.pincode : '' %>" 
+                                       placeholder="123456" pattern="[0-9]{6}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Information -->
+                    <div class="form-section">
+                        <h3>🏢 Business Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="gstin">GSTIN</label>
+                                <input type="text" id="gstin" name="gstin" 
+                                       value="<%= customer ? customer.gst.gstin : '' %>" 
+                                       placeholder="22AAAAA0000A1Z5" 
+                                       pattern="[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}">
+                                <small class="form-help">Leave empty for unregistered customers</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" onclick="window.location.href='/customers'" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-icon"><%= isEdit ? '💾' : '👤➕' %></span>
+                        <%= isEdit ? 'Update Customer' : 'Add Customer' %>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // GSTIN validation
+        document.getElementById('gstin').addEventListener('input', function() {
+            const gstin = this.value.toUpperCase();
+            this.value = gstin;
+            
+            // Validate GSTIN format
+            const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+            if (gstin && !gstinRegex.test(gstin)) {
+                this.setCustomValidity('Please enter a valid GSTIN');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // Phone number formatting
+        document.getElementById('phone').addEventListener('input', function() {
+            let phone = this.value.replace(/\D/g, '');
+            if (phone.length > 10) {
+                phone = phone.substring(0, 10);
+            }
+            if (phone.length === 10) {
+                this.value = `+91-${phone.substring(0, 5)}-${phone.substring(5)}`;
+            } else {
+                this.value = phone;
+            }
+        });
+
+        // PIN code validation
+        document.getElementById('pincode').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').substring(0, 6);
+        });
+    </script>
+</body>
+</html>

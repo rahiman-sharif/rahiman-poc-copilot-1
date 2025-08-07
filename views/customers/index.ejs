@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Customer Management</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <span class="current">👥 Customer Management</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>👥 Customer Management</h2>
+                    <p>Manage your customer database and information</p>
+                </div>
+                <div class="header-right">
+                    <% if (user.role === 'admin') { %>
+                        <a href="/customers/new" class="btn btn-primary">
+                            <span class="btn-icon">👤➕</span>
+                            Add New Customer
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3>Total Customers</h3>
+                        <p class="stat-number"><%= totalCustomers %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-info">
+                        <h3>Business</h3>
+                        <p class="stat-number"><%= businessCustomers %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">👤</div>
+                    <div class="stat-info">
+                        <h3>Individual</h3>
+                        <p class="stat-number"><%= individualCustomers %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">�</div>
+                    <div class="stat-info">
+                        <h3>Total Bills</h3>
+                        <p class="stat-number"><%= totalPurchases.toLocaleString() %></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="search-section">
+                <div class="search-controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="🔍 Search customers..." class="search-input">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="typeFilter" class="filter-select">
+                            <option value="">All Types</option>
+                            <option value="Business">Business</option>
+                            <option value="Individual">Individual</option>
+                        </select>
+                        <select id="paymentFilter" class="filter-select">
+                            <option value="">All Customers</option>
+                            <option value="Business">Business</option>
+                            <option value="Individual">Individual</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Table -->
+            <div class="items-table-container">
+                <% if (customers.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <h3>No Customers Found</h3>
+                        <p>Start by adding your first customer to the database.</p>
+                        <% if (user.role === 'admin') { %>
+                            <a href="/customers/new" class="btn btn-primary">Add First Customer</a>
+                        <% } %>
+                    </div>
+                <% } else { %>
+                    <table class="items-table" id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>Customer Name</th>
+                                <th>Type</th>
+                                <th>Contact</th>
+                                <th>Location</th>
+                                <th>GST Status</th>
+                                <th>Total Bills</th>
+                                <% if (user.role === 'admin') { %>
+                                    <th>Actions</th>
+                                <% } %>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% customers.forEach(customer => { %>
+                                <tr class="item-row" 
+                                    data-type="<%= customer.type %>" 
+                                    data-payment="<%= customer.paymentTerms.includes('Cash') ? 'Cash' : 'Credit' %>">
+                                    <td>
+                                        <div class="item-info">
+                                            <strong><%= customer.name %></strong>
+                                            <small class="customer-id">ID: <%= customer.id %></small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <% if (customer.type === 'Business') { %>
+                                            <span class="category-badge business">🏢 Business</span>
+                                        <% } else { %>
+                                            <span class="category-badge individual">👤 Individual</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="contact-info">
+                                            <strong><%= customer.contact.phone %></strong>
+                                            <% if (customer.contact.email) { %>
+                                                <small><%= customer.contact.email %></small>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="address-info">
+                                            <strong><%= customer.contact.address.city %></strong>
+                                            <small><%= customer.contact.address.state %></small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <% if (customer.gst.isRegistered) { %>
+                                            <span class="gst-status registered">✅ GST Registered</span>
+                                            <small class="gstin"><%= customer.gst.gstin %></small>
+                                        <% } else { %>
+                                            <span class="gst-status unregistered">❌ Unregistered</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="total-bills">₹<%= customer.totalPurchases.toLocaleString() %></span>
+                                    </td>
+                                    <% if (user.role === 'admin') { %>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="/customers/<%= customer.id %>/edit" class="btn btn-sm btn-secondary" title="Edit Customer">
+                                                    ✏️
+                                                </a>
+                                                <button onclick="deleteCustomer('<%= customer.id %>', '<%= customer.name %>')" 
+                                                        class="btn btn-sm btn-danger" title="Delete Customer">
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </td>
+                                    <% } %>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>🗑️ Delete Customer</h3>
+            <p>Are you sure you want to delete <strong id="deleteCustomerName"></strong>?</p>
+            <p class="warning-text">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterCustomers();
+        });
+
+        // Filter functionality
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            filterCustomers();
+        });
+
+        document.getElementById('paymentFilter').addEventListener('change', function() {
+            filterCustomers();
+        });
+
+        function filterCustomers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const paymentFilter = document.getElementById('paymentFilter').value;
+            const rows = document.querySelectorAll('.item-row');
+
+            rows.forEach(row => {
+                const customerName = row.querySelector('.item-info strong').textContent.toLowerCase();
+                const type = row.dataset.type;
+                const payment = row.dataset.payment;
+
+                const matchesSearch = customerName.includes(searchTerm);
+                const matchesType = !typeFilter || type === typeFilter;
+                const matchesPayment = !paymentFilter || payment === paymentFilter;
+
+                if (matchesSearch && matchesType && matchesPayment) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Delete customer functionality
+        function deleteCustomer(customerId, customerName) {
+            document.getElementById('deleteCustomerName').textContent = customerName;
+            document.getElementById('deleteForm').action = `/customers/${customerId}/delete`;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('deleteModal')) {
+                closeDeleteModal();
+            }
+        });
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

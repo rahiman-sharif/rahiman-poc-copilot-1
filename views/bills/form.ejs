@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .billing-form {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .invoice-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .customer-section, .bill-info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .customer-toggle {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .items-section {
+            margin: 30px 0;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .items-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .items-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .item-row input, .item-row select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .add-item-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .remove-item-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .totals-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .totals-grid {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .total-row {
+            display: contents;
+        }
+        
+        .total-label {
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        .total-amount {
+            text-align: right;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .final-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .charges-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 8px;
+        }
+        
+        .charge-row {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .charge-row select,
+        .charge-row input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .charge-row select:focus,
+        .charge-row input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Payment Details Styling */
+        .payment-detail-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .payment-detail-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .payment-detail-section input,
+        .payment-detail-section select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .payment-detail-section input:focus,
+        .payment-detail-section select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        #paymentMethod {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>New Bill</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/bills">📝 Billing System</a>
+            <span class="separator">></span>
+            <span class="current">📝➕ New Bill</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="form-main">
+        <div class="form-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>📝 Create New Bill</h2>
+                    <p>Generate GST invoice for customer purchase</p>
+                </div>
+                <div class="header-right">
+                    <a href="/bills" class="btn btn-secondary">
+                        <span class="btn-icon">←</span>
+                        Back to Bills
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Billing Form -->
+            <form method="POST" action="/bills" class="billing-form" id="billingForm">
+                <!-- Invoice Header -->
+                <div class="invoice-header">
+                    <!-- Customer Section -->
+                    <div class="customer-section">
+                        <h3>👤 Customer Information</h3>
+                        
+                        <!-- Customer Type Toggle -->
+                        <div class="customer-toggle">
+                            <button type="button" class="toggle-btn active" id="existingCustomerBtn">
+                                Existing Customer
+                            </button>
+                            <button type="button" class="toggle-btn" id="newCustomerBtn">
+                                New Customer
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" name="customerType" id="customerType" value="existing">
+                        
+                        <!-- Existing Customer Selection -->
+                        <div id="existingCustomerSection">
+                            <label for="customerId">Select Customer</label>
+                            <select name="customerId" id="customerId">
+                                <option value="">Choose existing customer</option>
+                                <% customers.forEach(customer => { %>
+                                    <option value="<%= customer.id %>" 
+                                            data-name="<%= customer.name %>" 
+                                            data-phone="<%= customer.contact.phone %>" 
+                                            data-gstin="<%= customer.gst.gstin %>">
+                                        <%= customer.name %> - <%= customer.contact.phone %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        
+                        <!-- New Customer Form -->
+                        <div id="newCustomerSection" style="display: none;">
+                            <label for="customerName">Customer Name *</label>
+                            <input type="text" name="customerName" id="customerName" placeholder="Enter customer name">
+                            
+                            <label for="customerPhone">Phone Number *</label>
+                            <input type="tel" name="customerPhone" id="customerPhone" placeholder="+91-XXXXX-XXXXX">
+                            
+                            <label for="customerGstin">GSTIN (Optional)</label>
+                            <input type="text" name="customerGstin" id="customerGstin" placeholder="22AAAAA0000A1Z5">
+                        </div>
+                        
+                        <!-- Selected Customer Display -->
+                        <div id="selectedCustomerDisplay" style="display: none; background: #e3f2fd; padding: 15px; border-radius: 4px;">
+                            <strong id="displayCustomerName"></strong><br>
+                            <small id="displayCustomerPhone"></small><br>
+                            <small id="displayCustomerGstin"></small>
+                        </div>
+                    </div>
+                    
+                    <!-- Bill Information -->
+                    <div class="bill-info-section">
+                        <h3>📄 Bill Information</h3>
+                        <div>
+                            <label>Bill Number</label>
+                            <input type="text" value="<%= billNumber %>" readonly style="background: #f8f9fa;">
+                        </div>
+                        <div>
+                            <label>Date</label>
+                            <input type="date" value="<%= new Date().toISOString().split('T')[0] %>" readonly style="background: #f8f9fa;">
+                        </div>
+                        <div>
+                            <label>Payment Method</label>
+                            <select id="paymentMethod" name="paymentMethod" onchange="togglePaymentFields()">
+                                <option value="Cash">💵 Cash</option>
+                                <option value="UPI">📱 UPI/GPay</option>
+                                <option value="Bank Transfer">🏦 Bank Transfer</option>
+                                <option value="Cheque">💰 Cheque</option>
+                                <option value="Card">💳 Card</option>
+                                <option value="Credit">📝 Credit</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Payment Details Section (Dynamic) -->
+                        <div id="paymentDetails" style="display: none;">
+                            <!-- UPI Details -->
+                            <div id="upiDetails" class="payment-detail-section" style="display: none;">
+                                <label>Transaction ID (Optional)</label>
+                                <input type="text" id="upiTransactionId" name="upiTransactionId" placeholder="Enter UPI Transaction ID">
+                            </div>
+                            
+                            <!-- Bank Transfer Details -->
+                            <div id="bankDetails" class="payment-detail-section" style="display: none;">
+                                <label>Reference Number (Optional)</label>
+                                <input type="text" id="bankReference" name="bankReference" placeholder="Enter Reference Number">
+                                <label>Bank Name (Optional)</label>
+                                <input type="text" id="bankName" name="bankName" placeholder="Enter Bank Name">
+                            </div>
+                            
+                            <!-- Cheque Details -->
+                            <div id="chequeDetails" class="payment-detail-section" style="display: none;">
+                                <label>Cheque Number (Optional)</label>
+                                <input type="text" id="chequeNumber" name="chequeNumber" placeholder="Enter Cheque Number">
+                                <label>Bank Name (Optional)</label>
+                                <input type="text" id="chequeBankName" name="chequeBankName" placeholder="Enter Bank Name">
+                                <label>Cheque Date (Optional)</label>
+                                <input type="date" id="chequeDate" name="chequeDate">
+                            </div>
+                            
+                            <!-- Card Details -->
+                            <div id="cardDetails" class="payment-detail-section" style="display: none;">
+                                <label>Last 4 Digits (Optional)</label>
+                                <input type="text" id="cardLast4" name="cardLast4" placeholder="XXXX" maxlength="4" pattern="[0-9]{4}">
+                                <label>Card Type (Optional)</label>
+                                <select id="cardType" name="cardType">
+                                    <option value="">Select Card Type</option>
+                                    <option value="Debit">Debit Card</option>
+                                    <option value="Credit">Credit Card</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Credit Details -->
+                            <div id="creditDetails" class="payment-detail-section" style="display: none;">
+                                <label>Due Date (Optional)</label>
+                                <input type="date" id="creditDueDate" name="creditDueDate">
+                                <label>Credit Terms (Optional)</label>
+                                <input type="text" id="creditTerms" name="creditTerms" placeholder="e.g., 30 days, Net 15">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Section -->
+                <div class="items-section">
+                    <h3>📦 Items</h3>
+                    <table class="items-table" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Material</th>
+                                <th>HSN</th>
+                                <th>Size/Weight</th>
+                                <th>Weight</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            <!-- Items will be added dynamically -->
+                        </tbody>
+                    </table>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" class="add-item-btn" onclick="addItemRow()">
+                            ➕ Add Item
+                        </button>
+                        <button type="button" class="add-item-btn" onclick="refreshStockData()" style="background-color: #28a745;">
+                            🔄 Refresh Stock
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Extra Charges Section -->
+                <div class="charges-section">
+                    <h3>🚛 Additional Charges (Editable)</h3>
+                    <div id="chargesContainer">
+                        <!-- Charges will be added dynamically -->
+                    </div>
+                    <button type="button" class="add-item-btn" onclick="addChargeRow()">
+                        ➕ Add Charge
+                    </button>
+                </div>
+
+                <!-- Totals Section -->
+                <div class="totals-section">
+                    <div class="totals-grid">
+                        <div class="total-row">
+                            <div class="total-label">Subtotal:</div>
+                            <div class="total-amount" id="subtotalAmount">₹0.00</div>
+                        </div>
+                        <div class="total-row">
+                            <div class="total-label">CGST:</div>
+                            <div class="total-amount" id="cgstAmount">₹0.00</div>
+                        </div>
+                        <div class="total-row">
+                            <div class="total-label">SGST:</div>
+                            <div class="total-amount" id="sgstAmount">₹0.00</div>
+                        </div>
+                        <div class="total-row">
+                            <div class="total-label final-total">Total:</div>
+                            <div class="total-amount final-total" id="finalTotal">₹0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden Fields for Form Submission -->
+                <input type="hidden" name="billItems" id="billItems">
+                <input type="hidden" name="extraCharges" id="extraCharges">
+                <input type="hidden" name="subtotal" id="subtotalValue">
+                <input type="hidden" name="cgstAmount" id="cgstValue">
+                <input type="hidden" name="sgstAmount" id="sgstValue">
+                <input type="hidden" name="finalTotal" id="finalTotalValue">
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" onclick="window.location.href='/bills'" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-icon">💾</span>
+                        Save Bill
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Available items data (initial load)
+        let availableItems = <%- JSON.stringify(items) %>;
+        
+        // Fresh stock data
+        let freshStockData = {};
+        
+        // Function to fetch fresh stock data
+        async function fetchFreshStock() {
+            try {
+                const response = await fetch('/bills/api/fresh-stock');
+                if (response.ok) {
+                    freshStockData = await response.json();
+                    // Update availableItems with fresh stock data
+                    availableItems = availableItems.map(item => ({
+                        ...item,
+                        stock: freshStockData[item.id] || item.stock
+                    }));
+                    console.log('Fresh stock data loaded');
+                } else {
+                    console.error('Failed to fetch fresh stock data');
+                }
+            } catch (error) {
+                console.error('Error fetching fresh stock:', error);
+            }
+        }
+        
+        // Load fresh stock data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchFreshStock();
+        });
+        
+        // Manual refresh stock data function
+        async function refreshStockData() {
+            await fetchFreshStock();
+            alert('Stock data refreshed! Current stock levels are now up to date.');
+        }
+        
+        // Payment method toggle function
+        function togglePaymentFields() {
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const paymentDetails = document.getElementById('paymentDetails');
+            
+            // Hide all payment detail sections
+            const detailSections = document.querySelectorAll('.payment-detail-section');
+            detailSections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show relevant section based on payment method
+            if (paymentMethod === 'Cash') {
+                paymentDetails.style.display = 'none';
+            } else {
+                paymentDetails.style.display = 'block';
+                
+                switch (paymentMethod) {
+                    case 'UPI':
+                        document.getElementById('upiDetails').style.display = 'block';
+                        break;
+                    case 'Bank Transfer':
+                        document.getElementById('bankDetails').style.display = 'block';
+                        break;
+                    case 'Cheque':
+                        document.getElementById('chequeDetails').style.display = 'block';
+                        break;
+                    case 'Card':
+                        document.getElementById('cardDetails').style.display = 'block';
+                        break;
+                    case 'Credit':
+                        document.getElementById('creditDetails').style.display = 'block';
+                        break;
+                }
+            }
+        }
+        
+        let itemCounter = 1;
+        let chargeCounter = 1;
+
+        // Customer type toggle
+        document.getElementById('existingCustomerBtn').addEventListener('click', function() {
+            setCustomerType('existing');
+        });
+
+        document.getElementById('newCustomerBtn').addEventListener('click', function() {
+            setCustomerType('new');
+        });
+
+        function setCustomerType(type) {
+            document.getElementById('customerType').value = type;
+            
+            // Toggle buttons
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            if (type === 'existing') {
+                document.getElementById('existingCustomerBtn').classList.add('active');
+                document.getElementById('existingCustomerSection').style.display = 'block';
+                document.getElementById('newCustomerSection').style.display = 'none';
+            } else {
+                document.getElementById('newCustomerBtn').classList.add('active');
+                document.getElementById('existingCustomerSection').style.display = 'none';
+                document.getElementById('newCustomerSection').style.display = 'block';
+            }
+            updateCustomerDisplay();
+        }
+
+        // Customer selection handler with validation feedback
+        document.getElementById('customerId').addEventListener('change', function() {
+            updateCustomerDisplay();
+            
+            // Add visual feedback
+            if (this.value) {
+                this.style.borderColor = '#28a745';
+                this.style.backgroundColor = '#f8fff9';
+            } else {
+                this.style.borderColor = '#ddd';
+                this.style.backgroundColor = 'white';
+            }
+        });
+
+        // Add validation feedback for new customer fields
+        document.getElementById('customerName').addEventListener('input', function() {
+            if (this.value.trim().length >= 2) {
+                this.style.borderColor = '#28a745';
+                this.style.backgroundColor = '#f8fff9';
+            } else {
+                this.style.borderColor = '#dc3545';
+                this.style.backgroundColor = '#fff5f5';
+            }
+        });
+
+        document.getElementById('customerPhone').addEventListener('input', function() {
+            if (this.value.trim().length >= 10) {
+                this.style.borderColor = '#28a745';
+                this.style.backgroundColor = '#f8fff9';
+            } else {
+                this.style.borderColor = '#dc3545';
+                this.style.backgroundColor = '#fff5f5';
+            }
+        });
+
+        function updateCustomerDisplay() {
+            const customerType = document.getElementById('customerType').value;
+            const display = document.getElementById('selectedCustomerDisplay');
+            
+            if (customerType === 'existing') {
+                const select = document.getElementById('customerId');
+                const option = select.options[select.selectedIndex];
+                
+                if (option.value) {
+                    document.getElementById('displayCustomerName').textContent = option.dataset.name;
+                    document.getElementById('displayCustomerPhone').textContent = option.dataset.phone;
+                    document.getElementById('displayCustomerGstin').textContent = option.dataset.gstin ? `GST: ${option.dataset.gstin}` : 'No GST';
+                    display.style.display = 'block';
+                } else {
+                    display.style.display = 'none';
+                }
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        // Add item row
+        async function addItemRow() {
+            // Fetch fresh stock data before adding row
+            await fetchFreshStock();
+            
+            const tbody = document.getElementById('itemsTableBody');
+            const row = document.createElement('tr');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <td>${itemCounter}</td>
+                <td>
+                    <select onchange="selectItem(this)">
+                        <option value="">Select Item</option>
+                        ${availableItems.filter(item => !item.isServiceItem).map(item => 
+                            `<option value="${item.id}" 
+                                     data-name="${item.name}" 
+                                     data-price="${item.price}" 
+                                     data-unit="${item.unit}" 
+                                     data-hsn="${item.hsnCode}" 
+                                     data-gst="${item.gstRate}"
+                                     data-service="${item.isServiceItem}"
+                                     data-bundle="${item.bundleInfo}"
+                                     data-stock="${item.stock.quantity}"
+                                     data-min-level="${item.stock.minLevel}">
+                                ${item.name} (${item.unit}) - Stock: ${item.stock.quantity} ${item.unit}${item.stock.quantity <= item.stock.minLevel ? ' ⚠️' : ''}
+                            </option>`
+                        ).join('')}
+                    </select>
+                </td>
+                <td><input type="text" readonly></td>
+                <td><input type="text" readonly placeholder="Bundle info"></td>
+                <td><input type="number" step="0.01" min="0" placeholder="0" onchange="calculateRowTotal(this)" oninput="validateStockInput(this)"></td>
+                <td><input type="number" step="0.01" min="0" placeholder="0" onchange="calculateRowTotal(this)"></td>
+                <td><input type="text" readonly class="row-total">₹0.00</td>
+                <td><button type="button" class="remove-item-btn" onclick="removeItemRow(this)">❌</button></td>
+            `;
+            tbody.appendChild(row);
+            itemCounter++;
+        }
+
+        // Select item handler
+        function selectItem(select) {
+            const option = select.options[select.selectedIndex];
+            const row = select.closest('tr');
+            
+            if (option.value) {
+                const availableStock = parseFloat(option.dataset.stock);
+                const minLevel = parseFloat(option.dataset.minLevel);
+                
+                // Fill HSN code
+                row.cells[2].querySelector('input').value = option.dataset.hsn;
+                // Fill Size/Weight (Bundle info with stock info)
+                const bundleInfo = option.dataset.bundle || '';
+                const stockInfo = `Stock: ${availableStock} ${option.dataset.unit}`;
+                row.cells[3].querySelector('input').value = bundleInfo ? `${bundleInfo} | ${stockInfo}` : stockInfo;
+                // Set default price
+                row.cells[5].querySelector('input').value = option.dataset.price;
+                
+                // Set stock validation on quantity input
+                const quantityInput = row.cells[4].querySelector('input');
+                quantityInput.max = availableStock;
+                
+                // Add stock warning if low
+                if (availableStock <= minLevel) {
+                    quantityInput.style.borderColor = '#ff6b6b';
+                    quantityInput.style.backgroundColor = '#fff5f5';
+                    quantityInput.title = `Low stock: ${availableStock} ${option.dataset.unit} available`;
+                } else if (availableStock === 0) {
+                    quantityInput.style.borderColor = '#dc3545';
+                    quantityInput.style.backgroundColor = '#ffe6e6';
+                    quantityInput.disabled = true;
+                    quantityInput.placeholder = 'NO STOCK';
+                    quantityInput.title = 'No stock available';
+                    quantityInput.max = 0;
+                    quantityInput.value = '';
+                    
+                    // Completely remove validation attributes to prevent browser messages
+                    quantityInput.removeAttribute('min');
+                    quantityInput.removeAttribute('max');
+                    quantityInput.removeAttribute('required');
+                    quantityInput.setAttribute('readonly', true);
+                    quantityInput.setCustomValidity('');
+                    
+                    // Add a visual indicator instead
+                    let stockMsg = row.querySelector('.no-stock-msg');
+                    if (!stockMsg) {
+                        stockMsg = document.createElement('small');
+                        stockMsg.className = 'no-stock-msg';
+                        stockMsg.style.color = '#dc3545';
+                        stockMsg.style.fontWeight = 'bold';
+                        stockMsg.style.display = 'block';
+                        stockMsg.textContent = '❌ No stock available';
+                        quantityInput.parentNode.appendChild(stockMsg);
+                    }
+                } else {
+                    quantityInput.style.borderColor = '#ddd';
+                    quantityInput.style.backgroundColor = 'white';
+                    quantityInput.disabled = false;
+                    quantityInput.placeholder = '0';
+                    quantityInput.title = `Available stock: ${availableStock} ${option.dataset.unit}`;
+                    quantityInput.removeAttribute('readonly');
+                    quantityInput.setAttribute('min', '0');
+                    quantityInput.setCustomValidity('');
+                    
+                    // Remove any existing no-stock message
+                    const stockMsg = row.querySelector('.no-stock-msg');
+                    if (stockMsg) {
+                        stockMsg.remove();
+                    }
+                }
+                
+                // Calculate total
+                calculateRowTotal(quantityInput);
+            } else {
+                // Clear fields
+                row.cells[2].querySelector('input').value = '';
+                row.cells[3].querySelector('input').value = '';
+                row.cells[5].querySelector('input').value = '';
+                row.cells[6].querySelector('input').value = '₹0.00';
+                
+                // Reset quantity input
+                const quantityInput = row.cells[4].querySelector('input');
+                quantityInput.removeAttribute('max');
+                quantityInput.setAttribute('min', '0');
+                quantityInput.style.borderColor = '#ddd';
+                quantityInput.style.backgroundColor = 'white';
+                quantityInput.disabled = false;
+                quantityInput.placeholder = '0';
+                quantityInput.removeAttribute('readonly');
+                quantityInput.setCustomValidity('');
+                
+                // Remove any existing no-stock message
+                const stockMsg = row.querySelector('.no-stock-msg');
+                if (stockMsg) {
+                    stockMsg.remove();
+                }
+            }
+        }
+
+        // Calculate row total
+        function calculateRowTotal(input) {
+            const row = input.closest('tr');
+            const quantity = parseFloat(row.cells[4].querySelector('input').value) || 0;
+            const rate = parseFloat(row.cells[5].querySelector('input').value) || 0;
+            const maxStock = parseFloat(input.max) || Infinity;
+            
+            // Stock validation
+            if (quantity > maxStock) {
+                input.style.borderColor = '#dc3545';
+                input.style.backgroundColor = '#ffe6e6';
+                
+                // Special handling for zero stock
+                if (maxStock === 0) {
+                    input.title = 'No stock available';
+                    // Show error message
+                    let errorMsg = row.querySelector('.stock-error');
+                    if (!errorMsg) {
+                        errorMsg = document.createElement('small');
+                        errorMsg.className = 'stock-error';
+                        errorMsg.style.color = '#dc3545';
+                        errorMsg.style.display = 'block';
+                        errorMsg.style.fontWeight = 'bold';
+                        input.parentNode.appendChild(errorMsg);
+                    }
+                    errorMsg.textContent = `❌ No stock available`;
+                } else {
+                    input.title = `Insufficient stock! Available: ${maxStock}`;
+                    // Show error message
+                    let errorMsg = row.querySelector('.stock-error');
+                    if (!errorMsg) {
+                        errorMsg = document.createElement('small');
+                        errorMsg.className = 'stock-error';
+                        errorMsg.style.color = '#dc3545';
+                        errorMsg.style.display = 'block';
+                        input.parentNode.appendChild(errorMsg);
+                    }
+                    errorMsg.textContent = `⚠️ Insufficient stock! Available: ${maxStock}`;
+                }
+                return; // Don't calculate total if insufficient stock
+            } else {
+                // Clear error styling
+                input.style.borderColor = '#ddd';
+                input.style.backgroundColor = 'white';
+                const errorMsg = row.querySelector('.stock-error');
+                if (errorMsg) {
+                    errorMsg.remove();
+                }
+            }
+            
+            const total = quantity * rate;
+            row.cells[6].querySelector('input').value = `₹${total.toFixed(2)}`;
+            calculateGrandTotal();
+        }
+
+        // Remove item row
+        function removeItemRow(button) {
+            button.closest('tr').remove();
+            calculateGrandTotal();
+        }
+
+        // Add charge row
+        async function addChargeRow() {
+            // Fetch fresh stock data before adding row
+            await fetchFreshStock();
+            
+            const container = document.getElementById('chargesContainer');
+            const row = document.createElement('div');
+            row.className = 'charge-row';
+            row.innerHTML = `
+                <select onchange="selectCharge(this)">
+                    <option value="">Select Service/Charge</option>
+                    ${availableItems.filter(item => item.isServiceItem).map(item => 
+                        `<option value="${item.id}" 
+                                 data-name="${item.name}" 
+                                 data-price="${item.price}">
+                            ${item.name}
+                        </option>`
+                    ).join('')}
+                    <option value="custom">Custom Charge</option>
+                </select>
+                <input type="text" placeholder="Description" required>
+                <input type="number" step="0.01" min="0" placeholder="Amount" onchange="calculateGrandTotal()" required>
+                <select onchange="calculateGrandTotal()">
+                    <option value="0">No GST</option>
+                    <option value="5">5% GST</option>
+                    <option value="12">12% GST</option>
+                    <option value="18">18% GST</option>
+                </select>
+                <button type="button" class="remove-item-btn" onclick="removeChargeRow(this)">❌</button>
+            `;
+            container.appendChild(row);
+            chargeCounter++;
+        }
+
+        // Select charge handler
+        function selectCharge(select) {
+            const option = select.options[select.selectedIndex];
+            const row = select.closest('.charge-row');
+            const descInput = row.querySelector('input[type="text"]');
+            const amountInput = row.querySelector('input[type="number"]');
+            
+            if (option.value && option.value !== 'custom') {
+                // Fill description and default price
+                descInput.value = option.dataset.name;
+                amountInput.value = option.dataset.price;
+                calculateGrandTotal();
+            } else if (option.value === 'custom') {
+                // Clear for custom entry
+                descInput.value = '';
+                amountInput.value = '';
+                descInput.placeholder = 'Enter custom charge description';
+            } else {
+                // Clear fields
+                descInput.value = '';
+                amountInput.value = '';
+                descInput.placeholder = 'Description';
+            }
+        }
+
+        // Remove charge row
+        function removeChargeRow(button) {
+            button.closest('.charge-row').remove();
+            calculateGrandTotal();
+        }
+
+        // Calculate grand total
+        function calculateGrandTotal() {
+            let subtotal = 0;
+            let totalCgst = 0;
+            let totalSgst = 0;
+
+            // Calculate items total
+            document.querySelectorAll('.item-row').forEach(row => {
+                const select = row.cells[1].querySelector('select');
+                const option = select.options[select.selectedIndex];
+                const quantity = parseFloat(row.cells[4].querySelector('input').value) || 0;
+                const rate = parseFloat(row.cells[5].querySelector('input').value) || 0;
+                const amount = quantity * rate;
+                
+                subtotal += amount;
+                
+                if (option.value && amount > 0) {
+                    const gstRate = parseFloat(option.dataset.gst) || 0;
+                    const gstAmount = (amount * gstRate) / 100;
+                    totalCgst += gstAmount / 2;
+                    totalSgst += gstAmount / 2;
+                }
+            });
+
+            // Calculate charges total
+            document.querySelectorAll('.charge-row').forEach(row => {
+                const amountInput = row.querySelector('input[type="number"]');
+                const gstSelect = row.querySelectorAll('select')[1]; // Second select is GST
+                
+                const amount = parseFloat(amountInput?.value) || 0;
+                const gstRate = parseFloat(gstSelect?.value) || 0;
+                
+                subtotal += amount;
+                
+                if (amount > 0 && gstRate > 0) {
+                    const gstAmount = (amount * gstRate) / 100;
+                    totalCgst += gstAmount / 2;
+                    totalSgst += gstAmount / 2;
+                }
+            });
+
+            const finalTotal = subtotal + totalCgst + totalSgst;
+
+            // Update display
+            document.getElementById('subtotalAmount').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('cgstAmount').textContent = `₹${totalCgst.toFixed(2)}`;
+            document.getElementById('sgstAmount').textContent = `₹${totalSgst.toFixed(2)}`;
+            document.getElementById('finalTotal').textContent = `₹${finalTotal.toFixed(2)}`;
+
+            // Update hidden fields
+            document.getElementById('subtotalValue').value = subtotal.toFixed(2);
+            document.getElementById('cgstValue').value = totalCgst.toFixed(2);
+            document.getElementById('sgstValue').value = totalSgst.toFixed(2);
+            document.getElementById('finalTotalValue').value = finalTotal.toFixed(2);
+        }
+
+        // Form submission
+        document.getElementById('billingForm').addEventListener('submit', function(e) {
+            // Clear validation errors on disabled/readonly inputs before submission
+            document.querySelectorAll('input[disabled], input[readonly]').forEach(input => {
+                input.setCustomValidity('');
+            });
+            
+            // Collect items data
+            const items = [];
+            document.querySelectorAll('.item-row').forEach(row => {
+                const select = row.cells[1].querySelector('select');
+                const option = select.options[select.selectedIndex];
+                
+                if (option.value) {
+                    const quantity = parseFloat(row.cells[4].querySelector('input').value) || 0;
+                    const rate = parseFloat(row.cells[5].querySelector('input').value) || 0;
+                    
+                    if (quantity > 0 && rate > 0) {
+                        items.push({
+                            itemId: option.value,
+                            itemName: option.dataset.name,
+                            hsnCode: option.dataset.hsn,
+                            quantity: quantity,
+                            rate: rate,
+                            amount: quantity * rate,
+                            gstRate: parseFloat(option.dataset.gst) || 0,
+                            isServiceItem: option.dataset.service === 'true'
+                        });
+                    }
+                }
+            });
+
+            // Collect charges data
+            const charges = [];
+            document.querySelectorAll('.charge-row').forEach(row => {
+                const serviceSelect = row.children[0]; // Service dropdown
+                const descInput = row.children[1]; // Description input
+                const amountInput = row.children[2]; // Amount input
+                const gstSelect = row.children[3]; // GST dropdown
+                
+                const description = descInput.value.trim();
+                const amount = parseFloat(amountInput.value) || 0;
+                const gstRate = parseFloat(gstSelect.value) || 0;
+                
+                if (description && amount > 0) {
+                    charges.push({
+                        description: description,
+                        amount: amount,
+                        gstRate: gstRate
+                    });
+                }
+            });
+
+            // Validation
+            const customerType = document.getElementById('customerType').value;
+            
+            // Check if customer is selected or filled
+            let customerValid = false;
+            if (customerType === 'existing') {
+                const customerId = document.getElementById('customerId').value;
+                if (!customerId) {
+                    e.preventDefault();
+                    alert('❌ Please select a customer from the list.');
+                    document.getElementById('customerId').focus();
+                    return;
+                }
+                customerValid = true;
+            } else if (customerType === 'new') {
+                const customerName = document.getElementById('customerName').value.trim();
+                const customerPhone = document.getElementById('customerPhone').value.trim();
+                
+                if (!customerName) {
+                    e.preventDefault();
+                    alert('❌ Please enter customer name.');
+                    document.getElementById('customerName').focus();
+                    return;
+                }
+                if (customerName.length < 2) {
+                    e.preventDefault();
+                    alert('❌ Customer name must be at least 2 characters long.');
+                    document.getElementById('customerName').focus();
+                    return;
+                }
+                if (!customerPhone) {
+                    e.preventDefault();
+                    alert('❌ Please enter customer phone number.');
+                    document.getElementById('customerPhone').focus();
+                    return;
+                }
+                if (customerPhone.length < 10) {
+                    e.preventDefault();
+                    alert('❌ Please enter a valid phone number (minimum 10 digits).');
+                    document.getElementById('customerPhone').focus();
+                    return;
+                }
+                customerValid = true;
+            } else {
+                e.preventDefault();
+                alert('❌ Please select customer type (Existing or New Customer).');
+                return;
+            }
+            
+            // Check if items are added
+            if (items.length === 0) {
+                e.preventDefault();
+                alert('❌ Please add at least one item to the bill.');
+                return;
+            }
+
+            // Check if all items have valid quantities
+            let hasInvalidItems = false;
+            items.forEach(item => {
+                if (item.quantity <= 0) {
+                    hasInvalidItems = true;
+                }
+            });
+            
+            if (hasInvalidItems) {
+                e.preventDefault();
+                alert('❌ All items must have quantity greater than 0.');
+                return;
+            }
+
+            // Check if total is greater than 0
+            const finalTotalValue = parseFloat(document.getElementById('finalTotalValue').value) || 0;
+            if (finalTotalValue <= 0) {
+                e.preventDefault();
+                alert('❌ Bill total must be greater than ₹0. Please check item quantities and rates.');
+                return;
+            }
+
+            // Set hidden fields
+            document.getElementById('billItems').value = JSON.stringify(items);
+            document.getElementById('extraCharges').value = JSON.stringify(charges);
+        });
+
+        // Initialize with one item row
+        addItemRow();
+        addChargeRow(); // Add default Loading charge
+        
+        // Set default charge properly
+        setTimeout(() => {
+            const firstChargeRow = document.querySelector('.charge-row');
+            if (firstChargeRow) {
+                // Select the Loading Charges option by finding the correct option
+                const serviceSelect = firstChargeRow.children[0];
+                const loadingOption = Array.from(serviceSelect.options).find(option => 
+                    option.text.includes('Loading') || option.dataset.name?.includes('Loading')
+                );
+                
+                if (loadingOption) {
+                    serviceSelect.value = loadingOption.value;
+                    // Trigger the change event to populate other fields
+                    serviceSelect.dispatchEvent(new Event('change'));
+                } else {
+                    // Fallback: set custom values
+                    firstChargeRow.children[1].value = 'Loading Charges'; // Description
+                    firstChargeRow.children[2].value = '500'; // Amount
+                    firstChargeRow.children[3].value = '0'; // GST (No GST for loading)
+                }
+                
+                // Calculate totals
+                calculateGrandTotal();
+            }
+        }, 100); // Small delay to ensure DOM is ready
+
+        // Custom validation for stock input
+        function validateStockInput(input) {
+            const maxStock = parseFloat(input.max) || Infinity;
+            const currentValue = parseFloat(input.value) || 0;
+            
+            // Override HTML5 validation message
+            if (maxStock === 0 || input.disabled || input.hasAttribute('readonly')) {
+                input.setCustomValidity('No stock available');
+                return false;
+            } else if (currentValue > maxStock) {
+                input.setCustomValidity(`Only ${maxStock} units available in stock`);
+                return false;
+            } else {
+                input.setCustomValidity(''); // Clear custom validation
+                return true;
+            }
+        }
+    </script>
+</body>
+</html>

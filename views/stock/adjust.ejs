@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Stock Adjustment</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <a href="/stock">📦 Stock Management</a>
+            <span class="separator">></span>
+            <span class="current">🔧 Adjust Stock</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="form-main">
+        <div class="form-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>🔧 Adjust Stock</h2>
+                    <p>Modify stock levels for <%= item.name %></p>
+                </div>
+                <div class="header-right">
+                    <a href="/stock" class="btn btn-secondary">
+                        <span class="btn-icon">←</span>
+                        Back to Stock
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Current Item Info -->
+            <div class="info-card">
+                <div class="info-header">
+                    <h3>📦 Current Item Details</h3>
+                </div>
+                <div class="info-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Item Name:</label>
+                            <strong><%= item.name %></strong>
+                        </div>
+                        <div class="info-item">
+                            <label>Brand:</label>
+                            <span><%= item.brand %></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Current Stock:</label>
+                            <span class="stock-highlight"><%= item.stock.quantity %> <%= item.unit %></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Minimum Level:</label>
+                            <span><%= item.stock.minLevel %> <%= item.unit %></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Unit:</label>
+                            <span><%= item.unit %></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Bundle Info:</label>
+                            <span><%= item.bundleInfo || 'N/A' %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Adjustment Form -->
+            <form method="POST" action="/stock/adjust/<%= item.id %>" class="adjustment-form">
+                <div class="form-sections">
+                    <!-- Adjustment Type -->
+                    <div class="form-section">
+                        <h3>🔧 Adjustment Details</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="adjustmentType">Adjustment Type *</label>
+                                <select id="adjustmentType" name="adjustmentType" required>
+                                    <option value="">Select adjustment type</option>
+                                    <option value="add">➕ Add Stock</option>
+                                    <option value="subtract">➖ Subtract Stock</option>
+                                    <option value="set">🎯 Set Exact Stock</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="quantity">Quantity *</label>
+                                <input type="number" id="quantity" name="quantity" 
+                                       placeholder="Enter quantity" 
+                                       step="0.01" min="0" required>
+                                <small class="form-help">Amount in <%= item.unit %></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reason -->
+                    <div class="form-section">
+                        <h3>📝 Reason for Adjustment</h3>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="reason">Reason *</label>
+                                <select id="reason" name="reason" required>
+                                    <option value="">Select reason</option>
+                                    <option value="New stock received">📦 New stock received</option>
+                                    <option value="Damaged goods">💔 Damaged goods</option>
+                                    <option value="Stock correction">🔄 Stock correction</option>
+                                    <option value="Returned goods">↩️ Returned goods</option>
+                                    <option value="Theft/Loss">🚨 Theft/Loss</option>
+                                    <option value="Expired items">⏰ Expired items</option>
+                                    <option value="Physical count adjustment">📊 Physical count adjustment</option>
+                                    <option value="Other">❓ Other reason</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group full-width" id="customReasonGroup" style="display: none;">
+                                <label for="customReason">Custom Reason</label>
+                                <input type="text" id="customReason" name="customReason" 
+                                       placeholder="Enter custom reason">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="form-section" id="previewSection" style="display: none;">
+                        <h3>👁️ Adjustment Preview</h3>
+                        <div class="preview-card">
+                            <div class="preview-row">
+                                <span>Current Stock:</span>
+                                <span id="currentStock"><%= item.stock.quantity %> <%= item.unit %></span>
+                            </div>
+                            <div class="preview-row">
+                                <span>Adjustment:</span>
+                                <span id="adjustmentPreview">-</span>
+                            </div>
+                            <div class="preview-row final">
+                                <span>New Stock:</span>
+                                <span id="newStock">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" onclick="window.location.href='/stock'" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                        <span class="btn-icon">💾</span>
+                        Adjust Stock
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        const currentStock = <%= item.stock.quantity %>;
+        const unit = '<%= item.unit %>';
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Show custom reason field when "Other" is selected
+        document.getElementById('reason').addEventListener('change', function() {
+            const customReasonGroup = document.getElementById('customReasonGroup');
+            const customReasonInput = document.getElementById('customReason');
+            
+            if (this.value === 'Other') {
+                customReasonGroup.style.display = 'block';
+                customReasonInput.required = true;
+            } else {
+                customReasonGroup.style.display = 'none';
+                customReasonInput.required = false;
+                customReasonInput.value = '';
+            }
+            
+            updatePreview();
+        });
+
+        // Update preview when form changes
+        document.getElementById('adjustmentType').addEventListener('change', updatePreview);
+        document.getElementById('quantity').addEventListener('input', updatePreview);
+
+        function updatePreview() {
+            const adjustmentType = document.getElementById('adjustmentType').value;
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const reason = document.getElementById('reason').value;
+            
+            const previewSection = document.getElementById('previewSection');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (adjustmentType && quantity > 0 && reason) {
+                let newStock = currentStock;
+                let adjustmentText = '';
+                
+                if (adjustmentType === 'add') {
+                    newStock = currentStock + quantity;
+                    adjustmentText = `+${quantity} ${unit}`;
+                } else if (adjustmentType === 'subtract') {
+                    newStock = Math.max(0, currentStock - quantity);
+                    adjustmentText = `-${quantity} ${unit}`;
+                } else if (adjustmentType === 'set') {
+                    newStock = quantity;
+                    adjustmentText = `Set to ${quantity} ${unit}`;
+                }
+                
+                document.getElementById('adjustmentPreview').textContent = adjustmentText;
+                document.getElementById('newStock').textContent = `${newStock} ${unit}`;
+                
+                previewSection.style.display = 'block';
+                submitBtn.disabled = false;
+            } else {
+                previewSection.style.display = 'none';
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Form validation
+        document.querySelector('.adjustment-form').addEventListener('submit', function(e) {
+            const adjustmentType = document.getElementById('adjustmentType').value;
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const reason = document.getElementById('reason').value;
+            const customReason = document.getElementById('customReason').value;
+            
+            if (!adjustmentType || !quantity || !reason) {
+                e.preventDefault();
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            if (reason === 'Other' && !customReason.trim()) {
+                e.preventDefault();
+                alert('Please provide a custom reason');
+                return;
+            }
+            
+            if (adjustmentType === 'subtract' && quantity > currentStock) {
+                if (!confirm(`This will reduce stock below zero (${currentStock - quantity}). Continue?`)) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+            
+            // Update reason if custom
+            if (reason === 'Other') {
+                document.getElementById('reason').value = customReason;
+            }
+        });
+    </script>
+</body>
+</html>

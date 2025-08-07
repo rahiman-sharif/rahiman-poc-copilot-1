@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Vikram Steels</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .form-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info strong {
+            color: #495057;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #6c757d;
+            font-size: 12px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+            color: #212529;
+        }
+        
+        .password-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .password-section h4 {
+            color: #856404;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .password-strength {
+            margin-top: 5px;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .strength-weak {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .strength-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .strength-strong {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+        
+        .input-error {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .form-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h1>✏️ Edit User</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/users">User Management</a>
+            <span>Welcome, <%= user.username %></span>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+        <% } %>
+        
+        <% if (error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <div class="form-container">
+            <div class="form-header">
+                <div class="form-icon">✏️</div>
+                <h2>Edit User</h2>
+                <p>Update user account information</p>
+            </div>
+
+            <div class="user-info">
+                <strong>User ID:</strong> <%= editUser.id %> | 
+                <strong>Created:</strong> <%= new Date(editUser.createdAt).toLocaleDateString() %> |
+                <strong>Last Login:</strong> <%= editUser.lastLogin ? new Date(editUser.lastLogin).toLocaleDateString() : 'Never' %>
+            </div>
+
+            <form id="editUserForm" method="POST" action="/users/<%= editUser.id %>/edit">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Username <span class="required">*</span></label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required 
+                            minlength="3"
+                            maxlength="20"
+                            pattern="[a-zA-Z0-9_]+"
+                            value="<%= editUser.username %>"
+                        >
+                        <small>3-20 characters, letters, numbers, and underscores only</small>
+                        <div class="error-message" id="usernameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fullName">Full Name <span class="required">*</span></label>
+                        <input 
+                            type="text" 
+                            id="fullName" 
+                            name="fullName" 
+                            required 
+                            minlength="2"
+                            maxlength="50"
+                            value="<%= editUser.fullName %>"
+                        >
+                        <small>Enter the user's full name</small>
+                        <div class="error-message" id="fullNameError"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="role">Role <span class="required">*</span></label>
+                        <select id="role" name="role" required>
+                            <option value="admin" <%= editUser.role === 'admin' ? 'selected' : '' %>>Administrator</option>
+                            <option value="staff" <%= editUser.role === 'staff' ? 'selected' : '' %>>Staff</option>
+                        </select>
+                        <small>Administrator: Full access | Staff: Limited access</small>
+                        <div class="error-message" id="roleError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status <span class="required">*</span></label>
+                        <select id="status" name="status" required>
+                            <option value="active" <%= editUser.status === 'active' ? 'selected' : '' %>>Active</option>
+                            <option value="inactive" <%= editUser.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                        </select>
+                        <small>Active users can log in to the system</small>
+                        <div class="error-message" id="statusError"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email (Optional)</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        value="<%= editUser.email || '' %>"
+                    >
+                    <small>Email address for notifications and recovery</small>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+
+                <div class="password-section">
+                    <h4>🔒 Change Password</h4>
+                    <p style="color: #856404; margin-bottom: 15px;">Leave password fields empty to keep current password</p>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="changePassword" onchange="togglePasswordFields()">
+                        <label for="changePassword">Change Password</label>
+                    </div>
+
+                    <div id="passwordFields" style="display: none; margin-top: 20px;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="password">New Password</label>
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    minlength="6"
+                                    disabled
+                                >
+                                <small>Minimum 6 characters, include letters and numbers</small>
+                                <div class="password-strength" id="passwordStrength"></div>
+                                <div class="error-message" id="passwordError"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input 
+                                    type="password" 
+                                    id="confirmPassword" 
+                                    name="confirmPassword" 
+                                    minlength="6"
+                                    disabled
+                                >
+                                <small>Re-enter the new password to confirm</small>
+                                <div class="error-message" id="confirmPasswordError"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/users" class="btn btn-secondary">
+                        ← Cancel
+                    </a>
+                    <div>
+                        <a href="/users/<%= editUser.id %>/reset-password" class="btn btn-warning" 
+                           onclick="return confirm('Generate a new random password for this user?')">
+                            🔑 Reset Password
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            💾 Update User
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordFields() {
+            const checkbox = document.getElementById('changePassword');
+            const passwordFields = document.getElementById('passwordFields');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            if (checkbox.checked) {
+                passwordFields.style.display = 'block';
+                passwordInput.disabled = false;
+                confirmPasswordInput.disabled = false;
+                passwordInput.required = true;
+                confirmPasswordInput.required = true;
+            } else {
+                passwordFields.style.display = 'none';
+                passwordInput.disabled = true;
+                confirmPasswordInput.disabled = true;
+                passwordInput.required = false;
+                confirmPasswordInput.required = false;
+                passwordInput.value = '';
+                confirmPasswordInput.value = '';
+                document.getElementById('passwordStrength').style.display = 'none';
+            }
+        }
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            
+            if (password.length === 0) {
+                strengthDiv.style.display = 'none';
+                return;
+            }
+            
+            let strength = 0;
+            const checks = [
+                password.length >= 6,
+                /[a-z]/.test(password),
+                /[A-Z]/.test(password),
+                /\d/.test(password),
+                /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            ];
+            
+            strength = checks.filter(Boolean).length;
+            
+            strengthDiv.style.display = 'block';
+            
+            if (strength < 3) {
+                strengthDiv.className = 'password-strength strength-weak';
+                strengthDiv.textContent = 'Weak password - Add more characters, numbers, or symbols';
+            } else if (strength < 4) {
+                strengthDiv.className = 'password-strength strength-medium';
+                strengthDiv.textContent = 'Medium strength - Consider adding symbols or mixed case';
+            } else {
+                strengthDiv.className = 'password-strength strength-strong';
+                strengthDiv.textContent = 'Strong password!';
+            }
+        });
+
+        // Password confirmation checker
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            const errorDiv = document.getElementById('confirmPasswordError');
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.classList.add('input-error');
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.style.display = 'block';
+            } else {
+                this.classList.remove('input-error');
+                errorDiv.style.display = 'none';
+            }
+        });
+
+        // Username validation
+        document.getElementById('username').addEventListener('input', function() {
+            const username = this.value;
+            const errorDiv = document.getElementById('usernameError');
+            
+            if (username && !/^[a-zA-Z0-9_]+$/.test(username)) {
+                this.classList.add('input-error');
+                errorDiv.textContent = 'Username can only contain letters, numbers, and underscores';
+                errorDiv.style.display = 'block';
+            } else {
+                this.classList.remove('input-error');
+                errorDiv.style.display = 'none';
+            }
+        });
+
+        // Form submission validation
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            const changePassword = document.getElementById('changePassword').checked;
+            
+            if (changePassword) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    document.getElementById('confirmPassword').classList.add('input-error');
+                    document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+                    document.getElementById('confirmPasswordError').style.display = 'block';
+                    document.getElementById('confirmPassword').focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                document.getElementById('editUserForm').submit();
+            }
+        });
+
+        // Focus first input on load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>

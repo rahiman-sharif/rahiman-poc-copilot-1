@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 Vikram Steels</h1>
+                <p>Billing System</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">></span>
+            <span class="current">📝 Billing System</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="items-main">
+        <div class="items-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-left">
+                    <h2>📝 Billing System</h2>
+                    <p>Create bills and manage transactions</p>
+                </div>
+                <div class="header-right">
+                    <a href="/bills/new" class="btn btn-primary">
+                        <span class="btn-icon">📝➕</span>
+                        New Bill
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <% if (typeof query !== 'undefined' && query.success) { %>
+                <div class="alert alert-success">
+                    <%= query.success %>
+                </div>
+            <% } %>
+            <% if (typeof query !== 'undefined' && query.error) { %>
+                <div class="alert alert-error">
+                    <%= query.error %>
+                </div>
+            <% } %>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-info">
+                        <h3>Total Bills</h3>
+                        <p class="stat-number"><%= totalBills %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-info">
+                        <h3>Today's Bills</h3>
+                        <p class="stat-number"><%= todaysBills %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <h3>Total Revenue</h3>
+                        <p class="stat-number">₹<%= totalAmount.toLocaleString() %></p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">💵</div>
+                    <div class="stat-info">
+                        <h3>Today's Revenue</h3>
+                        <p class="stat-number">₹<%= todaysAmount.toLocaleString() %></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="🔍 Search bills..." class="search-input">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="dateFilter" class="filter-select">
+                            <option value="">All Dates</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bills Table -->
+            <div class="items-table-container">
+                <% if (bills.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>No Bills Found</h3>
+                        <p>Start by creating your first bill.</p>
+                        <a href="/bills/new" class="btn btn-primary">Create First Bill</a>
+                    </div>
+                <% } else { %>
+                    <table class="items-table" id="billsTable">
+                        <thead>
+                            <tr>
+                                <th>Bill #</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Amount</th>
+                                <th>GST</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% bills.forEach(bill => { %>
+                                <tr class="item-row" data-date="<%= bill.billDate %>">
+                                    <td>
+                                        <strong>#<%= bill.billNumber %></strong>
+                                        <small class="bill-id"><%= bill.id %></small>
+                                    </td>
+                                    <td>
+                                        <div class="date-info">
+                                            <strong><%= new Date(bill.billDate).toLocaleDateString() %></strong>
+                                            <small><%= new Date(bill.billDate).toLocaleTimeString() %></small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="customer-info">
+                                            <strong><%= bill.customerName %></strong>
+                                            <small><%= bill.customerPhone %></small>
+                                            <% if (bill.customerGstin) { %>
+                                                <small class="gstin">GST: <%= bill.customerGstin %></small>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="items-summary">
+                                            <strong><%= bill.items.length %> items</strong>
+                                            <% if (bill.extraCharges && bill.extraCharges.length > 0) { %>
+                                                <small>+ <%= bill.extraCharges.length %> charges</small>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="amount">₹<%= bill.subtotal.toLocaleString() %></span>
+                                    </td>
+                                    <td>
+                                        <div class="gst-info">
+                                            <% if (bill.totalGst > 0) { %>
+                                                <strong>₹<%= bill.totalGst.toLocaleString() %></strong>
+                                                <small>CGST: ₹<%= bill.cgstAmount.toLocaleString() %></small>
+                                                <small>SGST: ₹<%= bill.sgstAmount.toLocaleString() %></small>
+                                            <% } else { %>
+                                                <span class="no-gst">₹0</span>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong class="final-total">₹<%= bill.finalTotal.toLocaleString() %></strong>
+                                        <small class="payment-method"><%= bill.paymentMethod || 'Cash' %></small>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/bills/<%= bill.id %>" class="btn btn-sm btn-secondary" title="View Bill">
+                                                👁️
+                                            </a>
+                                            <a href="/bills/<%= bill.id %>/print" class="btn btn-sm btn-info" title="Print Bill" target="_blank">
+                                                🖨️
+                                            </a>
+                                            <% if (user.role === 'admin') { %>
+                                                <button onclick="deleteBill('<%= bill.id %>', '<%= bill.billNumber %>')" 
+                                                        class="btn btn-sm btn-danger" title="Delete Bill">
+                                                    🗑️
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>🗑️ Delete Bill</h3>
+            <p>Are you sure you want to delete Bill #<strong id="deleteBillNumber"></strong>?</p>
+            <p class="warning-text">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterBills();
+        });
+
+        // Date filter functionality
+        document.getElementById('dateFilter').addEventListener('change', function() {
+            filterBills();
+        });
+
+        function filterBills() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const dateFilter = document.getElementById('dateFilter').value;
+            const rows = document.querySelectorAll('.item-row');
+
+            rows.forEach(row => {
+                const billNumber = row.querySelector('strong').textContent.toLowerCase();
+                const customerName = row.querySelector('.customer-info strong').textContent.toLowerCase();
+                const billDate = new Date(row.dataset.date);
+                
+                const matchesSearch = billNumber.includes(searchTerm) || customerName.includes(searchTerm);
+                const matchesDate = checkDateFilter(billDate, dateFilter);
+
+                if (matchesSearch && matchesDate) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function checkDateFilter(billDate, filter) {
+            if (!filter) return true;
+            
+            const today = new Date();
+            const billDateOnly = new Date(billDate.getFullYear(), billDate.getMonth(), billDate.getDate());
+            const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+            switch (filter) {
+                case 'today':
+                    return billDateOnly.getTime() === todayOnly.getTime();
+                case 'week':
+                    const weekAgo = new Date(today);
+                    weekAgo.setDate(today.getDate() - 7);
+                    return billDate >= weekAgo;
+                case 'month':
+                    const monthAgo = new Date(today);
+                    monthAgo.setMonth(today.getMonth() - 1);
+                    return billDate >= monthAgo;
+                default:
+                    return true;
+            }
+        }
+
+        // Delete bill functionality
+        function deleteBill(billId, billNumber) {
+            document.getElementById('deleteBillNumber').textContent = billNumber;
+            document.getElementById('deleteForm').action = `/bills/${billId}/delete`;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('deleteModal')) {
+                closeDeleteModal();
+            }
+        });
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
