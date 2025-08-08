@@ -34,7 +34,7 @@ router.get('/', requireAuth, (req, res) => {
         const pendingBills = bills.filter(bill => bill.status === 'pending').length;
 
         res.render('billing/index', {
-            title: 'Billing & Invoices - Vikram Steels',
+            title: `Billing & Invoices - ${res.locals.companyName}`,
             user: req.session.user,
             bills: billsWithCustomers,
             totalBills: bills.length,
@@ -60,7 +60,7 @@ router.get('/new', requireAuth, (req, res) => {
         const nextBillNumber = dataManager.getAll('nextBillNumber') || 1;
         
         res.render('billing/form', {
-            title: 'Create New Bill - Vikram Steels',
+            title: `Create New Bill - ${res.locals.companyName}`,
             user: req.session.user,
             customers: customers,
             items: items,
@@ -95,7 +95,7 @@ router.get('/:id', requireAuth, (req, res) => {
         const customer = customers.find(cust => cust.id === bill.customerId);
 
         res.render('billing/view', {
-            title: `Bill ${bill.billNumber} - Vikram Steels`,
+            title: `Bill ${bill.billNumber} - ${res.locals.companyName}`,
             user: req.session.user,
             bill: bill,
             customer: customer,

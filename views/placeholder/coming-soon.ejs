@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature In Development - <%= company.name || 'Company Name' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 <%= company.name || 'Company Name' %></h1>
+                <p>Feature In Development</p>
+            </div>
+            
+            <div class="user-section">
+                <% if (user) { %>
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.fullName || user.username %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+                <% } else { %>
+                <div class="user-info">
+                    <span class="user-name">Guest User</span>
+                </div>
+                <a href="/login" class="logout-btn" style="text-decoration: none;">Login</a>
+                <% } %>
+            </div>
+        </div>
+    </header>
+
+<div class="container">
+    <div class="placeholder-container">
+        <div class="placeholder-content">
+            <div class="placeholder-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            
+            <h1>Feature In Development</h1>
+            <p class="lead">This feature is currently being developed and will be available soon.</p>
+            
+            <div class="feature-info">
+                <div class="info-item">
+                    <i class="fas fa-code"></i>
+                    <span>Route: <code><%= routePath %></code></span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Status: In Progress</span>
+                </div>
+            </div>
+
+            <div class="placeholder-actions">
+                <a href="/dashboard" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Return to Dashboard
+                </a>
+                <button onclick="history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Go Back
+                </button>
+            </div>
+
+            <div class="contact-info">
+                <p><i class="fas fa-envelope"></i> For urgent access, contact your system administrator</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.placeholder-container {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.placeholder-content {
+    max-width: 500px;
+    width: 100%;
+}
+
+.placeholder-icon {
+    margin-bottom: 30px;
+}
+
+.placeholder-icon i {
+    font-size: 80px;
+    color: #6c757d;
+    opacity: 0.6;
+}
+
+.placeholder-content h1 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 32px;
+}
+
+.lead {
+    font-size: 18px;
+    color: #6c757d;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.feature-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-item i {
+    color: #007bff;
+    width: 20px;
+}
+
+.info-item code {
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
+.placeholder-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.contact-info {
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.contact-info i {
+    color: #007bff;
+    margin-right: 5px;
+}
+
+@media (max-width: 768px) {
+    .placeholder-icon i {
+        font-size: 60px;
+    }
+    
+    .placeholder-content h1 {
+        font-size: 24px;
+    }
+    
+    .placeholder-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .placeholder-actions .btn {
+        width: 200px;
+    }
+}
+</style>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p>&copy; 2024 <%= company.name || 'Company Name' %>. Feature Coming Soon</p>
+    </footer>
+</body>
+</html>

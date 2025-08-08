@@ -1,0 +1,115 @@
+{
+  "bills": [
+    {
+      "id": "bill_001",
+      "billNumber": 1,
+      "customerId": "cust_004",
+      "customerName": "Rahiman Sharif",
+      "customerPhone": "+91-98765-44444",
+      "customerGstin": "",
+      "billDate": "2025-08-08T02:46:45.038Z",
+      "items": [
+        {
+          "itemId": "item_020",
+          "itemName": "Bundle 8mm - 10 pieces",
+          "hsnCode": "7213",
+          "quantity": 2,
+          "rate": 4700,
+          "amount": 9400,
+          "gstRate": 18,
+          "isServiceItem": false
+        }
+      ],
+      "extraCharges": [
+        {
+          "description": "Loading Charges",
+          "amount": 500,
+          "gstRate": 0
+        }
+      ],
+      "subtotal": 9900,
+      "cgstAmount": 846,
+      "sgstAmount": 846,
+      "totalGst": 1692,
+      "finalTotal": 11592,
+      "paymentMethod": "Cash",
+      "paymentDetails": {
+        "method": "Cash"
+      },
+      "createdBy": "user_001",
+      "createdAt": "2025-08-08T02:46:45.038Z"
+    },
+    {
+      "id": "bill_002",
+      "billNumber": 2,
+      "customerId": "cust_001",
+      "customerName": "ABC Construction Ltd",
+      "customerPhone": "+91-98765-11111",
+      "customerGstin": "03ABCDE1234F1Z1",
+      "billDate": "2025-08-08T04:36:03.683Z",
+      "items": [
+        {
+          "itemId": "item_021",
+          "itemName": "Tester1223",
+          "hsnCode": "",
+          "quantity": 1,
+          "rate": 100,
+          "amount": 100,
+          "gstRate": 0,
+          "stockReduced": true
+        }
+      ],
+      "extraCharges": [],
+      "subtotal": 100,
+      "cgstAmount": 0,
+      "sgstAmount": 0,
+      "totalGst": 0,
+      "finalTotal": 100,
+      "paymentMethod": "Cash",
+      "paymentDetails": {
+        "method": "Cash"
+      },
+      "createdBy": "user_super",
+      "createdAt": "2025-08-08T04:36:03.683Z",
+      "convertedFromQuotation": "quotation_1754627750280_2",
+      "convertedFromQuotationNumber": "QT-0002"
+    },
+    {
+      "id": "bill_003",
+      "billNumber": 3,
+      "customerId": "cust_002",
+      "customerName": "Rajesh Building Materials",
+      "customerPhone": "+91-98765-22222",
+      "customerGstin": "03BCDEF2345G2Z2",
+      "billDate": "2025-08-08T04:36:30.839Z",
+      "items": [
+        {
+          "itemId": "item_019",
+          "itemName": "Bundle 6mm - 20 pieces",
+          "hsnCode": "7213",
+          "quantity": 1,
+          "rate": 2500,
+          "amount": 2500,
+          "gstRate": 18,
+          "stockReduced": true
+        }
+      ],
+      "extraCharges": [],
+      "subtotal": 2500,
+      "cgstAmount": 225,
+      "sgstAmount": 225,
+      "totalGst": 450,
+      "finalTotal": 2950,
+      "paymentMethod": "Cash",
+      "paymentDetails": {
+        "method": "Cash"
+      },
+      "createdBy": "user_super",
+      "createdAt": "2025-08-08T04:36:30.839Z",
+      "convertedFromQuotation": "quotation_1754624018904_1",
+      "convertedFromQuotationNumber": "QT-0001"
+    }
+  ],
+  "nextBillNumber": 4,
+  "lastUpdated": "2025-08-08T02:42:38.767Z"
+}

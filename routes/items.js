@@ -81,7 +81,7 @@ router.get('/', requireAuth, (req, res) => {
         console.log(`=== USING DATAMANAGER FOR CONSISTENCY ===\n`);
 
         res.render('items/index', {
-            title: 'Items Management - Vikram Steels',
+            title: `Items Management - ${res.locals.companyName}`,
             user: req.session.user,
             items: itemsWithCategories,
             categories: categories,
@@ -107,7 +107,7 @@ router.get('/new', requireAuth, requireAdmin, (req, res) => {
         const categories = dataManager.findBy('categories', { isActive: true });
         
         res.render('items/form', {
-            title: 'Add New Item - Vikram Steels',
+            title: `Add New Item - ${res.locals.companyName}`,
             user: req.session.user,
             categories: categories,
             item: null, // New item
@@ -176,7 +176,7 @@ router.get('/:id', requireAuth, (req, res) => {
         };
 
         res.render('items/view', {
-            title: `${item.name} - Item Details - Vikram Steels`,
+            title: `${item.name} - Item Details - ${res.locals.companyName}`,
             user: req.session.user,
             item: itemWithCategory,
             query: req.query
@@ -204,7 +204,7 @@ router.get('/:id/edit', requireAuth, requireAdmin, (req, res) => {
         }
 
         res.render('items/form', {
-            title: 'Edit Item - Vikram Steels',
+            title: `Edit Item - ${res.locals.companyName}`,
             user: req.session.user,
             categories: categories,
             item: item,
@@ -223,10 +223,87 @@ router.get('/:id/edit', requireAuth, requireAdmin, (req, res) => {
 router.post('/', requireAuth, requireAdmin, (req, res) => {
     try {
         const {
-            name, categoryId, price, unit, isTaxable, gstRate, hsnCode,
+            name, categoryId, newCategoryName, price, unit, newUnitName, isTaxable, gstRate, newGstRate, hsnCode,
             brand, isServiceItem, priceEditableAtBilling, bundleInfo,
             stockQuantity, minLevel, barcode
         } = req.body;
+
+        // Debug logging to see exactly what was received
+        console.log('🔍 Form submission debug:', {
+            unit, newUnitName,
+            gstRate, newGstRate,
+            isTaxable
+        });
+
+        let finalCategoryId = categoryId;
+        let finalUnit = unit;
+        let finalGstRate = (gstRate !== '__new__') ? (parseFloat(gstRate) || 0) : 0;
+
+        // Handle new category creation
+        if (categoryId === '__new__') {
+            if (!newCategoryName || !newCategoryName.trim()) {
+                return res.redirect('/items/new?error=New category name is required');
+            }
+
+            const categoryName = newCategoryName.trim();
+            
+            // Check if category with same name already exists
+            const existingCategories = dataManager.getAll('categories');
+            const existingCategory = existingCategories.find(cat => 
+                cat.name.toLowerCase() === categoryName.toLowerCase()
+            );
+
+            if (existingCategory) {
+                // Use existing category instead of creating duplicate
+                finalCategoryId = existingCategory.id;
+                console.log(`📁 Using existing category: ${categoryName} (${existingCategory.id})`);
+            } else {
+                // Create new category with proper ID generation
+                const existingIds = existingCategories.map(cat => {
+                    const match = cat.id.match(/^cat_(\d+)$/);
+                    return match ? parseInt(match[1]) : 0;
+                });
+                const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+                const nextCategoryId = `cat_${String(maxId + 1).padStart(3, '0')}`;
+                
+                const newCategory = {
+                    id: nextCategoryId,
+                    name: categoryName,
+                    description: `Auto-created category: ${categoryName}`,
+                    isActive: true,
+                    createdAt: new Date().toISOString(),
+                    createdBy: req.session.user ? req.session.user.id : 'system'
+                };
+
+                // Add category to database
+                const categoryAdded = dataManager.add('categories', newCategory);
+                if (categoryAdded) {
+                    finalCategoryId = nextCategoryId;
+                    console.log(`✅ New category created: ${categoryName} (${nextCategoryId})`);
+                } else {
+                    console.error(`❌ Failed to create category: ${categoryName}`);
+                    return res.redirect('/items/new?error=Failed to create new category');
+                }
+            }
+        }
+
+        // Handle custom unit
+        if (unit === '__new__') {
+            if (!newUnitName || !newUnitName.trim()) {
+                return res.redirect('/items/new?error=New unit name is required');
+            }
+            finalUnit = newUnitName.trim();
+            console.log(`✅ Custom unit specified: ${finalUnit}`);
+        }
+
+        // Handle custom GST rate
+        if (gstRate === '__new__') {
+            if (!newGstRate || isNaN(parseFloat(newGstRate)) || parseFloat(newGstRate) < 0 || parseFloat(newGstRate) > 100) {
+                return res.redirect('/items/new?error=Valid GST rate (0-100%) is required');
+            }
+            finalGstRate = parseFloat(newGstRate);
+            console.log(`✅ Custom GST rate specified: ${finalGstRate}%`);
+        }
 
         // Generate new item ID
         const existingItems = dataManager.getAll('items');
@@ -235,11 +312,11 @@ router.post('/', requireAuth, requireAdmin, (req, res) => {
         const newItem = {
             id: nextId,
             name: name.trim(),
-            categoryId,
+            categoryId: finalCategoryId,
             price: parseFloat(price),
-            unit: unit.trim(),
+            unit: finalUnit.trim(),
             isTaxable: isTaxable === 'true',
-            gstRate: isTaxable === 'true' ? parseInt(gstRate) : 0,
+            gstRate: isTaxable === 'true' ? finalGstRate : 0,
             hsnCode: hsnCode ? hsnCode.trim() : '',
             brand: brand ? brand.trim() : '',
             isServiceItem: isServiceItem === 'true',
@@ -257,7 +334,19 @@ router.post('/', requireAuth, requireAdmin, (req, res) => {
 
         dataManager.add('items', newItem);
 
-        res.redirect('/items?success=Item added successfully');
+        // Success message includes category creation info if applicable
+        let successMessage = 'Item added successfully';
+        if (categoryId === '__new__') {
+            successMessage += ` (New category "${newCategoryName.trim()}" created)`;
+        }
+        if (unit === '__new__') {
+            successMessage += ` (Custom unit "${finalUnit}" added)`;
+        }
+        if (gstRate === '__new__') {
+            successMessage += ` (Custom GST rate ${finalGstRate}% added)`;
+        }
+
+        res.redirect(`/items?success=${encodeURIComponent(successMessage)}`);
     } catch (error) {
         console.error('Error creating item:', error);
         res.redirect('/items/new?error=Error creating item');
@@ -332,39 +421,96 @@ router.post('/:id/delete', requireAuth, requireAdmin, (req, res) => {
 router.post('/:id', requireAuth, requireAdmin, (req, res) => {
     try {
         const {
-            name, categoryId, price, unit, isTaxable, gstRate, hsnCode,
+            name, categoryId, newCategoryName, price, unit, newUnitName, isTaxable, gstRate, newGstRate, hsnCode,
             brand, isServiceItem, priceEditableAtBilling, bundleInfo,
             stockQuantity, minLevel, barcode
         } = req.body;
 
-        const updatedItem = {
-            name: name.trim(),
-            categoryId,
-            price: parseFloat(price),
-            unit: unit.trim(),
-            isTaxable: isTaxable === 'true',
-            gstRate: isTaxable === 'true' ? parseInt(gstRate) : 0,
-            hsnCode: hsnCode ? hsnCode.trim() : '',
-            brand: brand ? brand.trim() : '',
-            isServiceItem: isServiceItem === 'true',
-            priceEditableAtBilling: priceEditableAtBilling === 'true',
-            bundleInfo: bundleInfo ? bundleInfo.trim() : '',
-            barcode: barcode ? barcode.trim() : '',
-            stock: {
-                quantity: isServiceItem === 'true' ? 0 : parseInt(stockQuantity) || 0,
-                minLevel: isServiceItem === 'true' ? 0 : parseInt(minLevel) || 0
-            },
-            updatedAt: new Date().toISOString()
-        };
+        // Debug logging to see exactly what was received in update
+        console.log('🔍 Update form submission debug:', {
+            unit, newUnitName,
+            gstRate, newGstRate,
+            isTaxable
+        });
+
+        let finalCategoryId = categoryId;
+        let finalUnit = unit;
+        let finalGstRate = (gstRate !== '__new__') ? (parseFloat(gstRate) || 0) : 0;
+
+        // Handle new category creation
+        if (categoryId === '__new__') {
+            if (!newCategoryName || !newCategoryName.trim()) {
+                return res.redirect(`/items/${req.params.id}/edit?error=New category name is required`);
+            }
+
+            const categoryName = newCategoryName.trim();
+            
+            // Check if category with same name already exists
+            const existingCategories = dataManager.getAll('categories');
+            const existingCategory = existingCategories.find(cat => 
+                cat.name.toLowerCase() === categoryName.toLowerCase()
+            );
+
+            if (existingCategory) {
+                // Use existing category instead of creating duplicate
+                finalCategoryId = existingCategory.id;
+                console.log(`📁 Using existing category: ${categoryName} (${existingCategory.id})`);
+            } else {
+                // Create new category with proper ID generation
+                const existingIds = existingCategories.map(cat => {
+                    const match = cat.id.match(/^cat_(\d+)$/);
+                    return match ? parseInt(match[1]) : 0;
+                });
+                const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+                const nextCategoryId = `cat_${String(maxId + 1).padStart(3, '0')}`;
+                
+                const newCategory = {
+                    id: nextCategoryId,
+                    name: categoryName,
+                    description: `Auto-created category: ${categoryName}`,
+                    isActive: true,
+                    createdAt: new Date().toISOString(),
+                    createdBy: req.session.user ? req.session.user.id : 'system'
+                };
+
+                // Add category to database
+                const categoryAdded = dataManager.add('categories', newCategory);
+                if (categoryAdded) {
+                    finalCategoryId = nextCategoryId;
+                    console.log(`✅ New category created: ${categoryName} (${nextCategoryId})`);
+                } else {
+                    console.error(`❌ Failed to create category: ${categoryName}`);
+                    return res.redirect(`/items/${req.params.id}/edit?error=Failed to create new category`);
+                }
+            }
+        }
+
+        // Handle custom unit
+        if (unit === '__new__') {
+            if (!newUnitName || !newUnitName.trim()) {
+                return res.redirect(`/items/${req.params.id}/edit?error=New unit name is required`);
+            }
+            finalUnit = newUnitName.trim();
+            console.log(`✅ Custom unit specified: ${finalUnit}`);
+        }
+
+        // Handle custom GST rate
+        if (gstRate === '__new__') {
+            if (!newGstRate || isNaN(parseFloat(newGstRate)) || parseFloat(newGstRate) < 0 || parseFloat(newGstRate) > 100) {
+                return res.redirect(`/items/${req.params.id}/edit?error=Valid GST rate (0-100%) is required`);
+            }
+            finalGstRate = parseFloat(newGstRate);
+            console.log(`✅ Custom GST rate specified: ${finalGstRate}%`);
+        }
 
         // Update the item using dataManager
         const updateData = {
             name: name.trim(),
-            categoryId: categoryId,
+            categoryId: finalCategoryId,
             price: parseFloat(price),
-            unit: unit,
+            unit: finalUnit.trim(),
             isTaxable: isTaxable === 'true',
-            gstRate: isTaxable === 'true' ? parseInt(gstRate) : 0,
+            gstRate: isTaxable === 'true' ? finalGstRate : 0,
             hsnCode: hsnCode ? hsnCode.trim() : '',
             brand: brand ? brand.trim() : '',
             isServiceItem: isServiceItem === 'true',
@@ -372,14 +518,28 @@ router.post('/:id', requireAuth, requireAdmin, (req, res) => {
             bundleInfo: bundleInfo ? bundleInfo.trim() : '',
             barcode: barcode ? barcode.trim() : '',
             'stock.quantity': isServiceItem === 'true' ? 0 : parseInt(stockQuantity) || 0,
-            'stock.minLevel': isServiceItem === 'true' ? 0 : parseInt(minLevel) || 0
+            'stock.minLevel': isServiceItem === 'true' ? 0 : parseInt(minLevel) || 0,
+            updatedAt: new Date().toISOString()
         };
 
         const success = dataManager.updateById('items', req.params.id, updateData);
 
         if (success) {
             console.log(`✅ Item ${req.params.id} updated successfully`);
-            res.redirect('/items?success=Item updated successfully&t=' + Date.now());
+            
+            // Success message includes category creation info if applicable
+            let successMessage = 'Item updated successfully';
+            if (categoryId === '__new__') {
+                successMessage += ` (New category "${newCategoryName.trim()}" created)`;
+            }
+            if (unit === '__new__') {
+                successMessage += ` (Custom unit "${finalUnit}" added)`;
+            }
+            if (gstRate === '__new__') {
+                successMessage += ` (Custom GST rate ${finalGstRate}% added)`;
+            }
+            
+            res.redirect(`/items?success=${encodeURIComponent(successMessage)}&t=` + Date.now());
         } else {
             console.log(`❌ Failed to update item ${req.params.id}`);
             res.redirect('/items?error=Item not found&t=' + Date.now());

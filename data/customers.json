@@ -10,8 +10,8 @@
         "address": {
           "line1": "Plot No. 123, Industrial Area",
           "line2": "Phase-1, Sector 25",
-          "city": "Chandigarh",
-          "state": "Punjab",
+          "city": " Madurai",
+          "state": "Tamil Nadu",
           "pincode": "160019",
           "country": "India"
         }
@@ -26,7 +26,7 @@
       "creditLimit": 500000,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-07T16:01:31.872Z"
+      "createdAt": "2025-08-08T05:25:13.249Z"
     },
     {
       "id": "cust_002",
@@ -38,8 +38,8 @@
         "address": {
           "line1": "Shop No. 45, Building Market",
           "line2": "Main Road, Sector 22",
-          "city": "Chandigarh",
-          "state": "Punjab",
+          "city": " Madurai",
+          "state": "Tamil Nadu",
           "pincode": "160022",
           "country": "India"
         }
@@ -54,7 +54,9 @@
       "creditLimit": 0,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-07T16:01:31.872Z"
+      "createdAt": "2025-08-08T05:25:13.249Z",
+      "totalPurchases": 3450,
+      "updatedAt": "2025-08-08T05:28:04.445Z"
     },
     {
       "id": "cust_003",
@@ -66,8 +68,8 @@
         "address": {
           "line1": "Workshop No. 12, Steel Complex",
           "line2": "Industrial Area, Phase-2",
-          "city": "Chandigarh",
-          "state": "Punjab",
+          "city": " Madurai",
+          "state": "Tamil Nadu",
           "pincode": "160002",
           "country": "India"
         }
@@ -82,7 +84,7 @@
       "creditLimit": 200000,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-07T16:01:31.872Z"
+      "createdAt": "2025-08-08T05:25:13.249Z"
     },
     {
       "id": "cust_004",
@@ -94,8 +96,8 @@
         "address": {
           "line1": "House No. 256, Green Valley",
           "line2": "Sector 12, Modern City",
-          "city": "Chandigarh",
-          "state": "Punjab",
+          "city": " Madurai",
+          "state": "Tamil Nadu",
           "pincode": "160012",
           "country": "India"
         }
@@ -110,7 +112,7 @@
       "creditLimit": 0,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-07T16:01:31.872Z"
+      "createdAt": "2025-08-08T05:25:13.249Z"
     }
   ]
 }

@@ -3,24 +3,38 @@
     {
       "id": "user_001",
       "username": "admin",
-      "password": "$2b$10$grBGyQ68G7zmWlGpiqzDC.u9omp9RvMQ4PL0NjOHZpRk1iLMmbEJi",
+      "password": "$2b$10$wdNq60yq3wqmNOmvvxMR5.lBLo3WrfzdW4jlXgdDZx1Fr3r.XqcKW",
       "role": "admin",
       "fullName": "Administrator",
       "email": "",
       "status": "active",
-      "createdAt": "2025-08-07T16:01:31.726Z",
-      "lastLogin": null
+      "createdAt": "2025-08-08T05:25:13.109Z",
+      "lastLogin": "2025-08-08T05:30:15.498Z",
+      "updatedAt": "2025-08-08T05:30:15.499Z"
     },
     {
       "id": "user_002",
       "username": "staff",
-      "password": "$2b$10$3MWty7FuATHW2AVW3yezcea2tELveMhxmN3i6voZxQrlUby6OJZ7i",
+      "password": "$2b$10$njvI/auyasMDM7HE6uiOvOMIH8sGFIgcUkmNCpVHOAhvhjitAfP5a",
       "role": "staff",
       "fullName": "Staff User",
       "email": "",
       "status": "active",
-      "createdAt": "2025-08-07T16:01:31.818Z",
+      "createdAt": "2025-08-08T05:25:13.182Z",
       "lastLogin": null
+    },
+    {
+      "id": "user_super",
+      "username": "superuser",
+      "password": "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy",
+      "role": "super",
+      "fullName": "Super Administrator",
+      "email": "",
+      "status": "active",
+      "isHidden": true,
+      "createdAt": "2025-08-08T05:25:13.185Z",
+      "lastLogin": "2025-08-08T05:26:04.552Z",
+      "updatedAt": "2025-08-08T05:26:04.554Z"
     }
   ]
 }

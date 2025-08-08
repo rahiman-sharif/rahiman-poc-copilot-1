@@ -65,7 +65,7 @@ router.get('/', requireAuth, (req, res) => {
         });
 
         res.render('stock/index', {
-            title: 'Stock Management - Vikram Steels',
+            title: `Stock Management - ${res.locals.companyName}`,
             user: req.session.user,
             stockStats: stockStats,
             stockItems: stockItems,
@@ -103,7 +103,7 @@ router.get('/adjust/:id', requireAuth, (req, res) => {
         }
 
         res.render('stock/adjust', {
-            title: `Adjust Stock - ${item.name} - Vikram Steels`,
+            title: `Adjust Stock - ${item.name} - ${res.locals.companyName}`,
             user: req.session.user,
             item: item,
             query: req.query
@@ -240,7 +240,7 @@ router.get('/movements', requireAuth, (req, res) => {
             .sort((a, b) => new Date(b.date) - new Date(a.date));
 
         res.render('stock/movements', {
-            title: 'Stock Movements - Vikram Steels',
+            title: `Stock Movements - ${res.locals.companyName}`,
             user: req.session.user,
             movements: allMovements,
             query: req.query

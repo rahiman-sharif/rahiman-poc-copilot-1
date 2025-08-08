@@ -1,8 +1,10 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const dataManager = require('./utils/dataManager');
+const { checkRoutePermission } = require('./middleware/routePermissions');
 
 const app = express();
 const PORT = 3000;
@@ -44,7 +46,22 @@ function initializeFreshSystem() {
             lastLogin: null
         });
         
-        console.log('✅ Default users created');
+        // Super user (hidden)
+        const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
+        dataManager.add('users', {
+            id: 'user_super',
+            username: 'superuser',
+            password: hashedSuperPassword,
+            role: 'super',
+            fullName: 'Super Administrator',
+            email: '',
+            status: 'active',
+            isHidden: true,
+            createdAt: new Date().toISOString(),
+            lastLogin: null
+        });
+        
+        console.log('✅ Default users created (including hidden super user)');
     }
     
     // 2. Create categories
@@ -116,43 +133,29 @@ function initializeFreshSystem() {
         const defaultCompany = {
             company: {
                 id: 'company_001',
-                name: 'Vikram Steels',
+                name: 'Company Name',
                 address: {
-                    line1: 'Shop No. 45, Steel Market',
-                    line2: 'Industrial Area, Phase-2',
-                    city: 'Chandigarh',
-                    state: 'Punjab',
-                    pincode: '160002',
+                    line1: '218/4B, Checkanurani',
+                    line2: 'Madurai High Way, Arul Nagar, Uathupatti, Thirumanglam (T.K)',
+                    city: 'Madurai',
+                    state: 'Tamil Nadu',
+                    pincode: '625020',
                     country: 'India'
                 },
                 contact: {
-                    phone1: '+91-98765-43210',
-                    phone2: '+91-98765-43211',
+                    phone1: '+91-9042412524',
+                    phone2: '+91-9626260336',
                     email: 'info@vikramsteels.com',
                     website: 'www.vikramsteels.com'
                 },
                 gst: {
-                    gstin: '03ABCDE1234F1Z5',
+                    gstin: '33EEOPR7876R1ZZ',
                     panNo: 'ABCDE1234F',
                     registrationDate: '2022-04-01'
                 },
                 invoice: {
                     prefix: 'VS-',
-                    nextNumber: 1,
-                    footerNote: 'Goods once sold will not be taken back',
-                    authorizedSignatory: 'For Vikram Steels - Authorized Signatory'
-                },
-                settings: {
-                    showLogos: true,
-                    showTermsConditions: true,
-                    showBankDetails: true
-                },
-                bank: {
-                    accountName: 'Vikram Steels',
-                    accountNumber: '1234567890123456',
-                    ifscCode: 'SBIN0001234',
-                    bankName: 'State Bank of India',
-                    branch: 'Chandigarh Main'
+                    nextNumber: 1
                 },
                 isActive: true,
                 createdAt: new Date().toISOString(),
@@ -180,8 +183,8 @@ function initializeFreshSystem() {
                     address: {
                         line1: 'Plot No. 123, Industrial Area',
                         line2: 'Phase-1, Sector 25',
-                        city: 'Chandigarh',
-                        state: 'Punjab',
+                        city: ' Madurai',
+                        state: 'Tamil Nadu',
                         pincode: '160019',
                         country: 'India'
                     }
@@ -208,8 +211,8 @@ function initializeFreshSystem() {
                     address: {
                         line1: 'Shop No. 45, Building Market',
                         line2: 'Main Road, Sector 22',
-                        city: 'Chandigarh',
-                        state: 'Punjab',
+                        city: ' Madurai',
+                        state: 'Tamil Nadu',
                         pincode: '160022',
                         country: 'India'
                     }
@@ -236,8 +239,8 @@ function initializeFreshSystem() {
                     address: {
                         line1: 'Workshop No. 12, Steel Complex',
                         line2: 'Industrial Area, Phase-2',
-                        city: 'Chandigarh',
-                        state: 'Punjab',
+                        city: ' Madurai',
+                        state: 'Tamil Nadu',
                         pincode: '160002',
                         country: 'India'
                     }
@@ -264,8 +267,8 @@ function initializeFreshSystem() {
                     address: {
                         line1: 'House No. 256, Green Valley',
                         line2: 'Sector 12, Modern City',
-                        city: 'Chandigarh',
-                        state: 'Punjab',
+                        city: ' Madurai',
+                        state: 'Tamil Nadu',
                         pincode: '160012',
                         country: 'India'
                     }
@@ -310,6 +313,252 @@ function initializeFreshSystem() {
             lastUpdated: new Date().toISOString()
         });
         console.log('✅ Empty quotations file initialized');
+    }
+
+    // 8. Initialize route permissions file
+    try {
+        const routePermissionsPath = path.join(__dirname, 'data', 'route-permissions.json');
+        if (!fs.existsSync(routePermissionsPath)) {
+            console.log('🛣️ Creating default route permissions...');
+            
+            const defaultRoutePermissions = {
+                "permissions": {
+                    "dashboard": {
+                        "/dashboard": {
+                            "enabled": true,
+                            "category": "Dashboard",
+                            "description": "Main Dashboard"
+                        }
+                    },
+                    "inventory": {
+                        "/items": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Items Management"
+                        },
+                        "/items/new": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Add New Item"
+                        },
+                        "/items/:id": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "View Item Details"
+                        },
+                        "/items/:id/edit": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Edit Item"
+                        },
+                        "/items/test/stock/:id": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Test Stock Data"
+                        },
+                        "/stock": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Stock Management"
+                        },
+                        "/stock/adjust/:id": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Stock Adjustments"
+                        },
+                        "/stock/movements": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Stock Movements"
+                        },
+                        "/stock/api/item/:id": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Stock API Endpoints"
+                        },
+                        "/stock/debug/items": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Debug Stock Items"
+                        }
+                    },
+                    "sales": {
+                        "/bills": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Bills Management"
+                        },
+                        "/bills/new": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Create New Bill"
+                        },
+                        "/bills/api/fresh-stock": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Fresh Stock API"
+                        },
+                        "/bills/:id": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "View Bill"
+                        },
+                        "/bills/:id/print": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Print Bill"
+                        },
+                        "/quotations": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Quotations Management"
+                        },
+                        "/quotations/new": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Create New Quotation"
+                        },
+                        "/quotations/:id": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "View Quotation"
+                        },
+                        "/quotations/:id/print": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Print Quotation"
+                        }
+                    },
+                    "customers": {
+                        "/customers": {
+                            "enabled": false,
+                            "category": "Customer Relations",
+                            "description": "Customers Management"
+                        },
+                        "/customers/new": {
+                            "enabled": false,
+                            "category": "Customer Relations",
+                            "description": "Add New Customer"
+                        },
+                        "/customers/:id/edit": {
+                            "enabled": false,
+                            "category": "Customer Relations",
+                            "description": "Edit Customer"
+                        }
+                    },
+                    "reports": {
+                        "/reports": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "Reports Dashboard"
+                        },
+                        "/reports/sales": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "Sales Reports"
+                        },
+                        "/reports/inventory": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "Inventory Reports"
+                        },
+                        "/reports/customers": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "Customer Reports"
+                        },
+                        "/reports/gst": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "GST Reports"
+                        }
+                    },
+                    "administration": {
+                        "/users": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "User Management"
+                        },
+                        "/users/add": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Add New User"
+                        },
+                        "/users/:id/edit": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Edit User"
+                        },
+                        "/users/:id/delete": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Delete User"
+                        },
+                        "/users/:id/toggle-status": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Toggle User Status"
+                        },
+                        "/data": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Data Management"
+                        },
+                        "/data/backup": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Create Backup"
+                        },
+                        "/data/backups": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "View Backups"
+                        },
+                        "/data/restore/:backupName": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Restore Data"
+                        },
+                        "/data/export": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Export Data"
+                        },
+                        "/data/download/:backupName": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Download Backups"
+                        },
+                        "/data/upload-restore": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Upload & Restore"
+                        },
+                        "/settings": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Settings Dashboard"
+                        },
+                        "/settings/company": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Company Settings"
+                        },
+                        "/settings/route-control": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Route Control Center"
+                        }
+                    }
+                },
+                "lastUpdated": new Date().toISOString()
+            };
+            
+            fs.writeFileSync(routePermissionsPath, JSON.stringify(defaultRoutePermissions, null, 2));
+            console.log('✅ Default route permissions file created');
+        }
+    } catch (error) {
+        console.warn('⚠️ Could not initialize route permissions file:', error.message);
     }
     
     console.log('🎉 Fresh system initialization completed!');
@@ -370,6 +619,23 @@ app.use(session({
     cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
 }));
 
+// Middleware to make company data available to all views
+app.use((req, res, next) => {
+    try {
+        const companyData = dataManager.readData('company');
+        res.locals.company = companyData.company || {};
+        res.locals.companyName = (companyData.company && companyData.company.name) || 'Company Name';
+    } catch (error) {
+        console.error('Error loading company data:', error);
+        res.locals.company = {};
+        res.locals.companyName = 'Company Name';
+    }
+    next();
+});
+
+// Route permission middleware (applied to specific routes)
+app.use(checkRoutePermission);
+
 // Set EJS as template engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -383,6 +649,7 @@ const stockRouter = require('./routes/stock');
 const reportsRouter = require('./routes/reports');
 const usersRouter = require('./routes/users');
 const dataRouter = require('./routes/data');
+const settingsRouter = require('./routes/settings');
 
 app.use('/items', (req, res, next) => {
     console.log(`📋 Items route request: ${req.method} ${req.originalUrl}`);
@@ -395,6 +662,7 @@ app.use('/stock', stockRouter);
 app.use('/reports', reportsRouter);
 app.use('/users', usersRouter);
 app.use('/data', dataRouter);
+app.use('/settings', settingsRouter);
 
 // Authentication middleware
 const requireAuth = (req, res, next) => {
@@ -475,14 +743,14 @@ app.get('/dashboard', requireAuth, (req, res) => {
         
         res.render('dashboard', { 
             user: req.session.user,
-            title: 'Vikram Steels - Dashboard',
+            title: `${res.locals.companyName} - Dashboard`,
             stats: dashboardData
         });
     } catch (error) {
         console.error('Dashboard error:', error);
         res.render('dashboard', { 
             user: req.session.user,
-            title: 'Vikram Steels - Dashboard',
+            title: `${res.locals.companyName} - Dashboard`,
             stats: {
                 billsToday: 0,
                 itemsCount: 0,
@@ -502,7 +770,10 @@ app.post('/logout', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`🚀 Vikram Steels Billing System running on http://localhost:${PORT}`);
+    const companyData = dataManager.readData('company');
+    const companyName = (companyData.company && companyData.company.name) || 'Company Name';
+    
+    console.log(`🚀 ${companyName} Billing System running on http://localhost:${PORT}`);
     console.log(`📊 Default login credentials:`);
     console.log(`   Admin: admin / admin123`);
     console.log(`   Staff: staff / staff123`);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Settings - Vikram Steels</title>
+    <title>Invoice Settings - <%= companyName %></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p>Invoice Settings</p>
             </div>
             
@@ -94,16 +94,6 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="showLogo">Show Company Logo</label>
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="showLogo" name="showLogo" 
-                                           <%= settings.invoice?.showLogo ? 'checked' : '' %>>
-                                    <span class="checkmark"></span>
-                                    <span>Display company logo on invoices</span>
-                                </div>
-                            </div>
-                            
                             <div class="form-group">
                                 <label for="showBarcode">Show Barcode</label>
                                 <div class="checkbox-group">
@@ -237,16 +227,6 @@
                         <h3>💳 Payment Information</h3>
                         
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="showBankDetails">Show Bank Details</label>
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="showBankDetails" name="showBankDetails" 
-                                           <%= settings.invoice?.showBankDetails ? 'checked' : '' %>>
-                                    <span class="checkmark"></span>
-                                    <span>Display bank account details</span>
-                                </div>
-                            </div>
-                            
                             <div class="form-group">
                                 <label for="showQRCode">Show Payment QR Code</label>
                                 <div class="checkbox-group">

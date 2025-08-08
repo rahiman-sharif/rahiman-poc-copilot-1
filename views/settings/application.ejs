@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Settings - Vikram Steels</title>
+    <title>Application Settings - <%= companyName %></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p>Application Settings</p>
             </div>
             
@@ -75,7 +75,7 @@
                             <div class="form-group">
                                 <label for="appName">Application Name</label>
                                 <input type="text" id="appName" name="appName" 
-                                       value="<%= settings.application?.name || 'Vikram Steels Billing System' %>" 
+                                       value="<%= settings.application?.name || companyName + ' Billing System' %>" 
                                        required>
                             </div>
                             

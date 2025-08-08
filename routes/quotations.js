@@ -93,7 +93,7 @@ router.get('/', requireAuth, (req, res) => {
         }).length;
 
         res.render('quotations/index', {
-            title: 'Quotations - Vikram Steels',
+            title: `Quotations - ${res.locals.companyName}`,
             user: req.session.user,
             quotations: quotationsWithCustomers,
             customers: [], // Empty array since we don't use customer selection in filters
@@ -116,23 +116,24 @@ router.get('/new', requireAuth, (req, res) => {
     try {
         const customers = dataManager.findBy('customers', { isActive: true });
         const items = dataManager.findBy('items', { isActive: true });
-        const company = {
-            name: 'Vikram Steels',
+        const companyData = dataManager.readData('company');
+        const company = companyData.company || {
+            name: 'Company Name',
             address: {
-                line1: 'Shop No. 45, Steel Market',
-                line2: 'Industrial Area, Phase-2',
-                city: 'Chandigarh',
-                state: 'Punjab',
+                line1: '218/4B, Checkanurani',
+                line2: 'Madurai High Way, Arul Nagar, Uathupatti, Thirumanglam (T.K)',
+                city: 'Madurai',
+                state: 'Tamil Nadu',
                 pincode: '160002',
                 country: 'India'
             },
             contact: {
-                phone1: '+91-98765-43210',
-                phone2: '+91-98765-43211',
+                phone1: '+91-9042412524',
+                phone2: '+91-9626260336',
                 email: 'info@vikramsteels.com'
             },
             gst: {
-                gstin: '03ABCDE1234F1Z5',
+                gstin: '33EEOPR7876R1ZZ',
                 panNo: 'ABCDE1234F'
             }
         };
@@ -140,7 +141,7 @@ router.get('/new', requireAuth, (req, res) => {
         const nextQuotationNumber = dataManager.readData('quotations').nextQuotationNumber || 1;
         
         res.render('quotations/form', {
-            title: 'Create New Quotation - Vikram Steels',
+            title: `Create New Quotation - ${res.locals.companyName}`,
             user: req.session.user,
             customers: customers,
             items: items,
@@ -163,23 +164,24 @@ router.get('/:id', requireAuth, (req, res) => {
     try {
         const quotationsData = dataManager.getQuotationsData();
         const quotation = quotationsData.quotations.find(q => q.id === req.params.id);
-        const company = {
-            name: 'Vikram Steels',
+        const companyData = dataManager.readData('company');
+        const company = companyData.company || {
+            name: 'Company Name',
             address: {
-                line1: 'Shop No. 45, Steel Market',
-                line2: 'Industrial Area, Phase-2',
-                city: 'Chandigarh',
-                state: 'Punjab',
+                line1: '218/4B, Checkanurani',
+                line2: 'Madurai High Way, Arul Nagar, Uathupatti, Thirumanglam (T.K)',
+                city: 'Madurai',
+                state: 'Tamil Nadu',
                 pincode: '160002',
                 country: 'India'
             },
             contact: {
-                phone1: '+91-98765-43210',
-                phone2: '+91-98765-43211',
+                phone1: '+91-9042412524',
+                phone2: '+91-9626260336',
                 email: 'info@vikramsteels.com'
             },
             gst: {
-                gstin: '03ABCDE1234F1Z5',
+                gstin: '33EEOPR7876R1ZZ',
                 panNo: 'ABCDE1234F'
             }
         };
@@ -203,7 +205,7 @@ router.get('/:id', requireAuth, (req, res) => {
         };
 
         res.render('quotations/view', {
-            title: `Quotation ${quotation.quotationNumber} - Vikram Steels`,
+            title: `Quotation ${quotation.quotationNumber} - ${res.locals.companyName}`,
             user: req.session.user,
             quotation: quotation,
             customer: customer,
@@ -595,23 +597,24 @@ router.get('/:id/print', requireAuth, (req, res) => {
         }
 
         // Company information
-        const company = {
-            name: 'Vikram Steels',
+        const companyData = dataManager.readData('company');
+        const company = companyData.company || {
+            name: 'Company Name',
             address: {
-                line1: 'Shop No. 45, Steel Market',
-                line2: 'Industrial Area, Phase-2',
-                city: 'Chandigarh',
-                state: 'Punjab',
+                line1: '218/4B, Checkanurani',
+                line2: 'Madurai High Way, Arul Nagar, Uathupatti, Thirumanglam (T.K)',
+                city: 'Madurai',
+                state: 'Tamil Nadu',
                 pincode: '160002',
                 country: 'India'
             },
             contact: {
-                phone1: '+91-98765-43210',
-                phone2: '+91-98765-43211',
+                phone1: '+91-9042412524',
+                phone2: '+91-9626260336',
                 email: 'info@vikramsteels.com'
             },
             gst: {
-                gstin: '03ABCDE1234F1Z5',
+                gstin: '33EEOPR7876R1ZZ',
                 panNo: 'ABCDE1234F'
             }
         };

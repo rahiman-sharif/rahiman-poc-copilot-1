@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integration Settings - Vikram Steels</title>
+    <title>Integration Settings - <%= companyName %></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p>Integration Settings</p>
             </div>
             
@@ -269,7 +269,7 @@
                             <div class="form-group">
                                 <label for="smsTemplate">Default SMS Template</label>
                                 <textarea id="smsTemplate" name="smsTemplate" rows="3" 
-                                          placeholder="Dear {customer}, your bill #{billNumber} for Rs. {amount} is ready. Thank you! - Vikram Steels"><%= settings.integration?.sms?.template || '' %></textarea>
+                                          placeholder="Dear {customer}, your bill #{billNumber} for Rs. {amount} is ready. Thank you! - <%= companyName %>"><%= settings.integration?.sms?.template || '' %></textarea>
                             </div>
                         </div>
                     </div>

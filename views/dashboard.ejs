@@ -11,7 +11,7 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p>Billing Management System</p>
             </div>
             
@@ -163,7 +163,7 @@
                         </div>
                     </div>
 
-                    <% if (user.role === 'admin') { %>
+                    <% if (user.role === 'admin' || user.role === 'super') { %>
                     <!-- System Administration -->
                     <div class="management-group admin-only">
                         <h4 class="group-title">System Administration</h4>
@@ -176,6 +176,23 @@
                                 </div>
                             </a>                            
                            
+                            <% if (user && user.role === 'super') { %>
+                            <a href="/settings/company" class="mgmt-card">
+                                <span class="mgmt-icon">🏢</span>
+                                <div class="mgmt-info">
+                                    <h5>Company Setup</h5>
+                                    <p>Configure company details</p>
+                                </div>
+                            </a>
+                            
+                            <a href="/settings/route-control" class="mgmt-card route-control-card">
+                                <span class="mgmt-icon">🛣️</span>
+                                <div class="mgmt-info">
+                                    <h5>Route Control Center</h5>
+                                    <p>Manage client demo features</p>
+                                </div>
+                            </a>
+                            <% } %>
                             
                             <a href="/data" class="mgmt-card">
                                 <span class="mgmt-icon">💾</span>
@@ -193,7 +210,7 @@
     </main>
 
     <footer class="main-footer">
-        <p>&copy; 2025 Vikram Steels Billing System. Built for offline use.</p>
+        <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
     </footer>
 </body>
 </html>

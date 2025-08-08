@@ -2276,6 +2276,24 @@ input[type="checkbox"] {
     border-color: #dc3545;
 }
 
+/* Route Control Card Special Styling */
+.route-control-card {
+    border: 2px solid #ffc107;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+
+.route-control-card:hover {
+    border-color: #f39c12;
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.route-control-card .mgmt-icon {
+    background: #f39c12;
+    color: white;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .dashboard-container {

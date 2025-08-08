@@ -39,7 +39,7 @@ router.get('/', requireAuth, (req, res) => {
         }).reduce((sum, bill) => sum + bill.finalTotal, 0);
 
         res.render('bills/index', {
-            title: 'Billing System - Vikram Steels',
+            title: `Billing System - ${res.locals.companyName}`,
             user: req.session.user,
             bills: bills,
             totalBills: totalBills,
@@ -66,7 +66,7 @@ router.get('/new', requireAuth, (req, res) => {
         const nextBillNumber = dataManager.getAll('nextBillNumber');
 
         res.render('bills/form', {
-            title: 'New Bill - Vikram Steels',
+            title: `New Bill - ${res.locals.companyName}`,
             user: req.session.user,
             items: items,
             customers: customers,
@@ -251,7 +251,7 @@ router.get('/:id', requireAuth, (req, res) => {
         };
 
         res.render('bills/view', {
-            title: `Bill #${bill.billNumber} - Vikram Steels`,
+            title: `Bill #${bill.billNumber} - ${res.locals.companyName}`,
             user: req.session.user,
             bill: billWithItemDetails,
             customer: customer,

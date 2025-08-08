@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🏢 <%= company.name || 'Company Name' %></h1>
+                <p>Route Control Center</p>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.fullName || user.username %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+<div class="container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1><i class="fas fa-route"></i> Route Control Center</h1>
+                <p>Manage which features are accessible to users</p>
+            </div>
+            <div class="header-actions">
+                <button onclick="toggleAllRoutes(true)" class="btn btn-success">
+                    <i class="fas fa-check-double"></i> Enable All
+                </button>
+                <button onclick="toggleAllRoutes(false)" class="btn btn-warning">
+                    <i class="fas fa-ban"></i> Disable All
+                </button>
+                <button onclick="savePermissions()" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <a href="/settings">⚙️ Settings</a>
+            <span class="current">Route Control</span>
+        </ol>
+    </nav>
+
+    <% if (success) { %>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <%= success %>
+        </div>
+    <% } %>
+
+    <% if (error) { %>
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i> <%= error %>
+        </div>
+    <% } %>
+
+    <div class="route-control-container">
+        <div class="info-banner">
+            <div class="info-content">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <h4>Super Admin Route Control</h4>
+                    <p>Control which application features are accessible to regular users. You (super admin) will always have access to all routes regardless of these settings.</p>
+                </div>
+            </div>
+        </div>
+
+        <form id="routePermissionsForm">
+            <% 
+            const categories = {};
+            Object.keys(permissions.permissions).forEach(groupKey => {
+                Object.keys(permissions.permissions[groupKey]).forEach(route => {
+                    const routeData = permissions.permissions[groupKey][route];
+                    if (!categories[routeData.category]) {
+                        categories[routeData.category] = [];
+                    }
+                    categories[routeData.category].push({
+                        route: route,
+                        ...routeData,
+                        groupKey: groupKey
+                    });
+                });
+            });
+            %>
+
+            <% 
+            // Define category icons mapping
+            const categoryIcons = {
+                'Dashboard': 'fas fa-tachometer-alt',
+                'Inventory': 'fas fa-boxes',
+                'Sales & Orders': 'fas fa-receipt',
+                'Customer Relations': 'fas fa-users',
+                'Reports & Analytics': 'fas fa-chart-bar',
+                'System Administration': 'fas fa-cogs'
+            };
+            %>
+
+            <% Object.keys(categories).forEach(category => { %>
+                <div class="route-category">
+                    <div class="category-header">
+                        <h3>
+                            <i class="<%= categoryIcons[category] || 'fas fa-folder' %>"></i>
+                            <%= category %>
+                        </h3>
+                        <div class="category-controls">
+                            <label class="toggle-switch">
+                                <input type="checkbox" onchange="toggleCategory('<%= category %>', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Enable All</span>
+                        </div>
+                    </div>
+
+                    <div class="routes-grid">
+                        <% categories[category].forEach(routeItem => { %>
+                            <div class="route-item">
+                                <div class="route-info">
+                                    <div class="route-path">
+                                        <code><%= routeItem.route %></code>
+                                    </div>
+                                    <div class="route-description">
+                                        <%= routeItem.description %>
+                                    </div>
+                                </div>
+                                <div class="route-control">
+                                    <label class="toggle-switch">
+                                        <input 
+                                            type="checkbox" 
+                                            name="routes[<%= routeItem.groupKey %>][<%= routeItem.route %>]"
+                                            data-category="<%= category %>"
+                                            <%= routeItem.enabled ? 'checked' : '' %>
+                                        >
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="route-status <%= routeItem.enabled ? 'enabled' : 'disabled' %>">
+                                        <%= routeItem.enabled ? 'Enabled' : 'Disabled' %>
+                                    </span>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% }); %>
+        </form>
+
+        <!-- Sticky Floating Save Button -->
+        <div class="sticky-save-button">
+            <button onclick="savePermissions()" class="btn btn-primary btn-floating">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </div>
+
+        <div class="save-section">
+            <div class="save-info">
+                <i class="fas fa-shield-alt"></i>
+                <span>Changes take effect immediately after saving</span>
+            </div>
+            <button onclick="savePermissions()" class="btn btn-primary btn-large">
+                <i class="fas fa-save"></i> Save Route Permissions
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.route-control-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.info-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.info-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.info-content i {
+    font-size: 24px;
+    opacity: 0.9;
+}
+
+.info-content h4 {
+    margin: 0 0 5px 0;
+    font-size: 18px;
+}
+
+.info-content p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.route-category {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #e1e5e9;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f2f5;
+}
+
+.category-header h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.routes-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.route-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.route-item:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+}
+
+.route-info {
+    flex: 1;
+}
+
+.route-path {
+    margin-bottom: 5px;
+}
+
+.route-path code {
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+}
+
+.route-description {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.route-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #4CAF50;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.route-status {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.route-status.enabled {
+    color: #28a745;
+}
+
+.route-status.disabled {
+    color: #dc3545;
+}
+
+.save-section {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #e1e5e9;
+    text-align: center;
+}
+
+.save-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: #6c757d;
+}
+
+.btn-large {
+    padding: 12px 30px;
+    font-size: 16px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Sticky Floating Save Button */
+.sticky-save-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+.btn-floating {
+    padding: 15px 25px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-floating:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.btn-floating:active {
+    transform: translateY(-1px);
+}
+
+.btn-floating i {
+    margin-right: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sticky-save-button {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .btn-floating {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}
+</style>
+
+<script>
+function getCategoryIcon(category) {
+    const icons = {
+        'Dashboard': 'fas fa-tachometer-alt',
+        'Inventory': 'fas fa-boxes',
+        'Sales & Orders': 'fas fa-receipt',
+        'Customer Relations': 'fas fa-users',
+        'Reports & Analytics': 'fas fa-chart-bar',
+        'System Administration': 'fas fa-cogs'
+    };
+    return icons[category] || 'fas fa-folder';
+}
+
+function toggleCategory(category, enabled) {
+    const checkboxes = document.querySelectorAll(`input[data-category="${category}"]`);
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = enabled;
+        updateRouteStatus(checkbox);
+    });
+}
+
+function toggleAllRoutes(enabled) {
+    const checkboxes = document.querySelectorAll('input[name^="routes"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = enabled;
+        updateRouteStatus(checkbox);
+    });
+}
+
+function updateRouteStatus(checkbox) {
+    const statusSpan = checkbox.closest('.route-control').querySelector('.route-status');
+    if (checkbox.checked) {
+        statusSpan.textContent = 'Enabled';
+        statusSpan.className = 'route-status enabled';
+    } else {
+        statusSpan.textContent = 'Disabled';
+        statusSpan.className = 'route-status disabled';
+    }
+}
+
+// Add event listeners to all route checkboxes
+document.addEventListener('DOMContentLoaded', function() {
+    const routeCheckboxes = document.querySelectorAll('input[name^="routes"]');
+    routeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateRouteStatus(this);
+        });
+    });
+});
+
+async function savePermissions() {
+    const form = document.getElementById('routePermissionsForm');
+    const formData = new FormData(form);
+    
+    // Convert FormData to JSON structure
+    const permissions = {};
+    
+    for (let [name, value] of formData.entries()) {
+        // name format: routes[groupKey][routePath]
+        const matches = name.match(/routes\[([^\]]+)\]\[([^\]]+)\]/);
+        if (matches) {
+            const groupKey = matches[1];
+            const routePath = matches[2];
+            
+            if (!permissions[groupKey]) {
+                permissions[groupKey] = {};
+            }
+            permissions[groupKey][routePath] = { enabled: true };
+        }
+    }
+    
+    // Also include unchecked routes as disabled
+    const allCheckboxes = document.querySelectorAll('input[name^="routes"]');
+    allCheckboxes.forEach(checkbox => {
+        const matches = checkbox.name.match(/routes\[([^\]]+)\]\[([^\]]+)\]/);
+        if (matches) {
+            const groupKey = matches[1];
+            const routePath = matches[2];
+            
+            if (!permissions[groupKey]) {
+                permissions[groupKey] = {};
+            }
+            if (!permissions[groupKey][routePath]) {
+                permissions[groupKey][routePath] = { enabled: false };
+            }
+        }
+    });
+    
+    try {
+        const response = await fetch('/settings/route-control', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ permissions })
+        });
+        
+        if (response.ok) {
+            // Show success message
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.innerHTML = '<i class="fas fa-check-circle"></i> Route permissions saved successfully!';
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.querySelector('.route-control-container'));
+            
+            // Remove alert after 3 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        } else {
+            throw new Error('Failed to save permissions');
+        }
+    } catch (error) {
+        console.error('Error saving permissions:', error);
+        alert('Error saving permissions. Please try again.');
+    }
+}
+</script>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p>&copy; 2024 <%= company.name || 'Company Name' %>. Route Control Center - Feature Management System</p>
+    </footer>
+</body>
+</html>

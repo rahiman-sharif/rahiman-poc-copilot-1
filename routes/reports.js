@@ -177,7 +177,7 @@ router.get('/', requireAuth, (req, res) => {
         };
         
         res.render('reports/index', {
-            title: 'Reports & Analytics - Vikram Steels',
+            title: `Reports & Analytics - ${res.locals.companyName}`,
             user: req.session.user,
             reports: reportsData,
             query: req.query
@@ -240,7 +240,7 @@ router.get('/sales', requireAuth, (req, res) => {
         });
         
         res.render('reports/sales', {
-            title: 'Sales Report - Vikram Steels',
+            title: `Sales Report - ${res.locals.companyName}`,
             user: req.session.user,
             bills: detailedBills,
             customers,
@@ -329,7 +329,7 @@ router.get('/gst', requireAuth, (req, res) => {
         }
         
         res.render('reports/gst', {
-            title: 'GST Report - Vikram Steels',
+            title: `GST Report - ${res.locals.companyName}`,
             user: req.session.user,
             gstSummary,
             monthlyBills,
@@ -412,7 +412,7 @@ router.get('/inventory', requireAuth, (req, res) => {
         const outOfStockItems = inventoryData.filter(item => item.stockStatus === 'Out of Stock').length;
         
         res.render('reports/inventory', {
-            title: 'Inventory Report - Vikram Steels',
+            title: `Inventory Report - ${res.locals.companyName}`,
             user: req.session.user,
             inventory: inventoryData,
             categories,
@@ -485,7 +485,7 @@ router.get('/customers', requireAuth, (req, res) => {
         const totalRevenue = customerAnalysis.reduce((sum, c) => sum + c.totalRevenue, 0);
         
         res.render('reports/customers', {
-            title: 'Customer Analysis - Vikram Steels',
+            title: `Customer Analysis - ${res.locals.companyName}`,
             user: req.session.user,
             customers: customerAnalysis,
             summary: {

@@ -61,7 +61,7 @@ router.get('/', requireAuth, (req, res) => {
         const totalPurchases = customersWithTotals.reduce((sum, customer) => sum + (customer.totalPurchases || 0), 0);
 
         res.render('customers/index', {
-            title: 'Customer Management - Vikram Steels',
+            title: `Customer Management - ${res.locals.companyName}`,
             user: req.session.user,
             customers: customersWithTotals,
             totalCustomers: customersWithTotals.length,
@@ -83,7 +83,7 @@ router.get('/', requireAuth, (req, res) => {
 router.get('/new', requireAuth, requireAdmin, (req, res) => {
     try {
         res.render('customers/form', {
-            title: 'Add New Customer - Vikram Steels',
+            title: `Add New Customer - ${res.locals.companyName}`,
             user: req.session.user,
             customer: null, // New customer
             isEdit: false
@@ -110,7 +110,7 @@ router.get('/:id/edit', requireAuth, requireAdmin, (req, res) => {
         }
 
         res.render('customers/form', {
-            title: 'Edit Customer - Vikram Steels',
+            title: `Edit Customer - ${res.locals.companyName}`,
             user: req.session.user,
             customer: customer,
             isEdit: true

@@ -1,46 +1,32 @@
 {
   "company": {
     "id": "company_001",
-    "name": "Vikram Steels",
+    "name": "Vikram Steel Ram",
     "address": {
-      "line1": "Shop No. 45, Steel Market",
-      "line2": "Industrial Area, Phase-2",
-      "city": "Chandigarh",
-      "state": "Punjab",
-      "pincode": "160002",
+      "line1": "218/4B, Checkanurani",
+      "line2": "Madurai High Way, Arul Nagar, Uathupatti, Thirumanglam (T.K)",
+      "city": "MaduraiTest",
+      "state": "Tamil Nadu",
+      "pincode": "625020",
       "country": "India"
     },
     "contact": {
-      "phone1": "+91-98765-43210",
-      "phone2": "+91-98765-43211",
+      "phone1": "+91-9042412524",
+      "phone2": "+91-9626260336",
       "email": "info@vikramsteels.com",
-      "website": "www.vikramsteels.com"
+      "website": "http://www.vikramsteels.com"
     },
     "gst": {
-      "gstin": "03ABCDE1234F1Z5",
+      "gstin": "33EEOPR7876R1ZZ",
       "panNo": "ABCDE1234F",
       "registrationDate": "2022-04-01"
     },
     "invoice": {
       "prefix": "VS-",
-      "nextNumber": 1,
-      "footerNote": "Goods once sold will not be taken back",
-      "authorizedSignatory": "For Vikram Steels - Authorized Signatory"
-    },
-    "settings": {
-      "showLogos": true,
-      "showTermsConditions": true,
-      "showBankDetails": true
-    },
-    "bank": {
-      "accountName": "Vikram Steels",
-      "accountNumber": "1234567890123456",
-      "ifscCode": "SBIN0001234",
-      "bankName": "State Bank of India",
-      "branch": "Chandigarh Main"
+      "nextNumber": 1
     },
     "isActive": true,
-    "createdAt": "2025-08-07T16:01:31.867Z",
-    "updatedAt": "2025-08-07T16:01:31.867Z"
+    "createdAt": "2025-08-08T05:25:13.244Z",
+    "updatedAt": "2025-08-08T05:27:48.615Z"
   }
 }

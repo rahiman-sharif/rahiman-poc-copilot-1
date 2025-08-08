@@ -400,7 +400,7 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p>New Quotation</p>
             </div>
             
@@ -586,10 +586,10 @@
                                 <th>S.No</th>
                                 <th>Material</th>
                                 <th>HSN</th>
-                                <th>Size/Weight</th>
-                                <th>Quantity</th>
+                                <th>Bundle/Weight Information</th>
+                                <th>Quantity/Weight</th>
                                 <th>Rate</th>
-                                <th>Amount</th>
+                                <th>Total Amount</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -676,17 +676,20 @@
                 <td>
                     <select onchange="selectItem(this)">
                         <option value="">Select Item</option>
-                        ${availableItems.filter(item => !item.isServiceItem).map(item => 
-                            `<option value="${item.id}" 
+                        ${availableItems.filter(item => !item.isServiceItem).map(item => {
+                            // Generate meaningful bundle info - use bundleInfo if available, otherwise show stock info
+                            const bundleDisplay = item.bundleInfo || 
+                                (!item.isServiceItem ? `Stock: ${item.stock.quantity} ${item.unit}` : '');
+                            return `<option value="${item.id}" 
                                      data-name="${item.name}" 
                                      data-price="${item.price}" 
                                      data-unit="${item.unit}" 
                                      data-hsn="${item.hsnCode}" 
                                      data-gst="${item.gstRate}"
-                                     data-bundle="${item.bundleInfo}">
+                                     data-bundle="${bundleDisplay}">
                                 ${item.name} (${item.unit})
-                            </option>`
-                        ).join('')}
+                            </option>`;
+                        }).join('')}
                     </select>
                 </td>
                 <td><input type="text" readonly></td>

@@ -5,13 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Custom styles for new category functionality */
+        #newCategoryGroup, #newUnitGroup, #newGstGroup {
+            margin-top: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        #newCategoryGroup.show, #newUnitGroup.show, #newGstGroup.show {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #newCategoryName, #newUnitName, #newGstRate {
+            background: white;
+            border: 2px solid #007bff;
+            border-radius: 6px;
+            padding: 10px;
+            font-weight: 500;
+        }
+        
+        #newCategoryName:focus, #newUnitName:focus, #newGstRate:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+            outline: none;
+        }
+        
+        .form-text {
+            margin-top: 8px;
+            color: #6c757d;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .form-text::before {
+            content: "💡";
+            font-size: 14px;
+        }
+        
+        /* Style for the "Add New Category" option */
+        option[value="__new__"] {
+            background: #e7f3ff;
+            color: #0056b3;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p><%= isEdit ? 'Edit Item' : 'Add New Item' %></p>
             </div>
             
@@ -72,7 +133,7 @@
 
                             <div class="form-group">
                                 <label for="categoryId">Category *</label>
-                                <select id="categoryId" name="categoryId" required>
+                                <select id="categoryId" name="categoryId" required onchange="toggleNewCategoryInput()">
                                     <option value="">Select Category</option>
                                     <% categories.forEach(category => { %>
                                         <option value="<%= category.id %>" 
@@ -80,7 +141,19 @@
                                             <%= category.name %>
                                         </option>
                                     <% }) %>
+                                    <option value="__new__">➕ Add New Category</option>
                                 </select>
+                            </div>
+
+                            <!-- New Category Input (Hidden by default) -->
+                            <div class="form-group" id="newCategoryGroup" style="display: none;">
+                                <label for="newCategoryName">New Category Name *</label>
+                                <input type="text" id="newCategoryName" name="newCategoryName" 
+                                       placeholder="e.g., Tiles, Pipes, etc." 
+                                       onchange="updateCategoryValue()">
+                                <small class="form-text text-muted">
+                                    This category will be added to the system automatically
+                                </small>
                             </div>
 
                             <div class="form-group">
@@ -92,7 +165,7 @@
 
                             <div class="form-group">
                                 <label for="unit">Unit of Measure *</label>
-                                <select id="unit" name="unit" required>
+                                <select id="unit" name="unit" required onchange="toggleNewUnitInput()">
                                     <option value="">Select Unit</option>
                                     <option value="kg" <% if (item && item.unit === 'kg') { %>selected<% } %>>Kilogram (kg)</option>
                                     <option value="pcs" <% if (item && item.unit === 'pcs') { %>selected<% } %>>Pieces (pcs)</option>
@@ -101,7 +174,30 @@
                                     <option value="sqft" <% if (item && item.unit === 'sqft') { %>selected<% } %>>Square Feet (sqft)</option>
                                     <option value="L" <% if (item && item.unit === 'L') { %>selected<% } %>>Liter (L)</option>
                                     <option value="service" <% if (item && item.unit === 'service') { %>selected<% } %>>Service</option>
+                                    <option value="ton" <% if (item && item.unit === 'ton') { %>selected<% } %>>Ton</option>
+                                    <option value="meter" <% if (item && item.unit === 'meter') { %>selected<% } %>>Meter</option>
+                                    <option value="feet" <% if (item && item.unit === 'feet') { %>selected<% } %>>Feet</option>
+                                    <% 
+                                    // Check if item has a custom unit (not in predefined list)
+                                    const predefinedUnits = ['kg', 'pcs', 'bag', 'bundle', 'sqft', 'L', 'service', 'ton', 'meter', 'feet'];
+                                    const hasCustomUnit = item && item.unit && !predefinedUnits.includes(item.unit) && item.unit !== '__new__';
+                                    %>
+                                    <% if (hasCustomUnit) { %>
+                                        <option value="<%= item.unit %>" selected><%= item.unit %></option>
+                                    <% } %>
+                                    <option value="__new__">➕ Add New Unit</option>
                                 </select>
+                            </div>
+
+                            <!-- New Unit Input (Hidden by default) -->
+                            <div class="form-group" id="newUnitGroup" style="display: none;">
+                                <label for="newUnitName">New Unit Name *</label>
+                                <input type="text" id="newUnitName" name="newUnitName" 
+                                       placeholder="e.g., box, roll, sheet, etc." 
+                                       onchange="updateUnitValue()">
+                                <small class="form-text text-muted">
+                                    Enter a custom unit of measure
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -134,13 +230,34 @@
 
                             <div class="form-group" id="gstGroup" <% if (!item || !item.isTaxable) { %>style="display: none;"<% } %>>
                                 <label for="gstRate">GST Rate (%) *</label>
-                                <select id="gstRate" name="gstRate">
+                                <select id="gstRate" name="gstRate" onchange="toggleNewGstInput()">
                                     <option value="0" <% if (item && item.gstRate === 0) { %>selected<% } %>>0%</option>
                                     <option value="5" <% if (item && item.gstRate === 5) { %>selected<% } %>>5%</option>
                                     <option value="12" <% if (item && item.gstRate === 12) { %>selected<% } %>>12%</option>
                                     <option value="18" <% if (item && item.gstRate === 18) { %>selected<% } %>>18%</option>
                                     <option value="28" <% if (item && item.gstRate === 28) { %>selected<% } %>>28%</option>
+                                    <% 
+                                    // Check if item has a custom GST rate (not in predefined list)
+                                    const predefinedRates = [0, 5, 12, 18, 28];
+                                    const hasCustomGst = item && item.gstRate != null && !predefinedRates.includes(item.gstRate);
+                                    %>
+                                    <% if (hasCustomGst) { %>
+                                        <option value="<%= item.gstRate %>" selected><%= item.gstRate %>%</option>
+                                    <% } %>
+                                    <option value="__new__">➕ Add Custom Rate</option>
                                 </select>
+                            </div>
+
+                            <!-- New GST Rate Input (Hidden by default) -->
+                            <div class="form-group" id="newGstGroup" style="display: none;">
+                                <label for="newGstRate">Custom GST Rate (%) *</label>
+                                <input type="number" id="newGstRate" name="newGstRate" 
+                                       min="0" max="100" step="0.01"
+                                       placeholder="e.g., 6, 14.5, 22, etc." 
+                                       onchange="updateGstValue()">
+                                <small class="form-text text-muted">
+                                    Enter GST percentage (0-100%, decimals allowed)
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -283,6 +400,26 @@
                 return;
             }
 
+            // Special validation for new category
+            if (categoryId === '__new__') {
+                const newCategoryName = document.getElementById('newCategoryName').value.trim();
+                if (!newCategoryName) {
+                    alert('Please enter a name for the new category');
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+            // Special validation for new unit
+            if (unit === '__new__') {
+                const newUnitName = document.getElementById('newUnitName').value.trim();
+                if (!newUnitName) {
+                    alert('Please enter a name for the new unit');
+                    e.preventDefault();
+                    return;
+                }
+            }
+
             if (!price || parseFloat(price) < 0) {
                 alert('Please enter a valid price');
                 e.preventDefault();
@@ -300,7 +437,101 @@
                 e.preventDefault();
                 return;
             }
+
+            // Special validation for custom GST rate
+            if (isTaxable && gstRate === '__new__') {
+                const newGstRate = document.getElementById('newGstRate').value;
+                if (!newGstRate || parseFloat(newGstRate) < 0 || parseFloat(newGstRate) > 100) {
+                    alert('Please enter a valid GST rate between 0 and 100');
+                    e.preventDefault();
+                    return;
+                }
+            }
         });
+
+        // Category management functions
+        function toggleNewCategoryInput() {
+            const categorySelect = document.getElementById('categoryId');
+            const newCategoryGroup = document.getElementById('newCategoryGroup');
+            const newCategoryName = document.getElementById('newCategoryName');
+            
+            if (categorySelect.value === '__new__') {
+                newCategoryGroup.style.display = 'block';
+                newCategoryName.required = true;
+                newCategoryName.focus();
+            } else {
+                newCategoryGroup.style.display = 'none';
+                newCategoryName.required = false;
+                newCategoryName.value = '';
+            }
+        }
+        
+        function updateCategoryValue() {
+            const categorySelect = document.getElementById('categoryId');
+            const newCategoryName = document.getElementById('newCategoryName');
+            
+            if (categorySelect.value === '__new__' && newCategoryName.value.trim()) {
+                // Update the select option with the new category name for validation
+                const newOption = categorySelect.querySelector('option[value="__new__"]');
+                newOption.textContent = `➕ ${newCategoryName.value.trim()}`;
+            }
+        }
+
+        // Unit management functions
+        function toggleNewUnitInput() {
+            const unitSelect = document.getElementById('unit');
+            const newUnitGroup = document.getElementById('newUnitGroup');
+            const newUnitName = document.getElementById('newUnitName');
+            
+            if (unitSelect.value === '__new__') {
+                newUnitGroup.style.display = 'block';
+                newUnitName.required = true;
+                newUnitName.focus();
+            } else {
+                newUnitGroup.style.display = 'none';
+                newUnitName.required = false;
+                newUnitName.value = '';
+            }
+        }
+        
+        function updateUnitValue() {
+            const unitSelect = document.getElementById('unit');
+            const newUnitName = document.getElementById('newUnitName');
+            
+            if (unitSelect.value === '__new__' && newUnitName.value.trim()) {
+                // Update the select option with the new unit name for validation
+                const newOption = unitSelect.querySelector('option[value="__new__"]');
+                newOption.textContent = `➕ ${newUnitName.value.trim()}`;
+            }
+        }
+
+        // GST Rate management functions
+        function toggleNewGstInput() {
+            const gstSelect = document.getElementById('gstRate');
+            const newGstGroup = document.getElementById('newGstGroup');
+            const newGstRate = document.getElementById('newGstRate');
+            
+            if (gstSelect.value === '__new__') {
+                newGstGroup.style.display = 'block';
+                newGstRate.required = true;
+                newGstRate.focus();
+            } else {
+                newGstGroup.style.display = 'none';
+                newGstRate.required = false;
+                newGstRate.value = '';
+            }
+        }
+        
+        function updateGstValue() {
+            const gstSelect = document.getElementById('gstRate');
+            const newGstRate = document.getElementById('newGstRate');
+            
+            if (gstSelect.value === '__new__' && newGstRate.value.trim()) {
+                // Update the select option with the new GST rate for validation
+                const newOption = gstSelect.querySelector('option[value="__new__"]');
+                newOption.textContent = `➕ ${newGstRate.value.trim()}%`;
+            }
+        }
 
         // Auto-hide alerts
         setTimeout(() => {

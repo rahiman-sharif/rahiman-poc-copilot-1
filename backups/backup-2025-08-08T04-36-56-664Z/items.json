@@ -1,0 +1,449 @@
+{
+  "items": [
+    {
+      "id": "item_001",
+      "name": "Steel Rod 6mm",
+      "categoryId": "cat_001",
+      "price": 74.5,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "SAIL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 8.7 kg per rod",
+      "stock": {
+        "quantity": 400,
+        "minLevel": 20
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_002",
+      "name": "Steel Rod 8mm",
+      "categoryId": "cat_001",
+      "price": 75.5,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "SAIL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 12.4 kg per rod",
+      "stock": {
+        "quantity": 300,
+        "minLevel": 15
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_003",
+      "name": "Steel Rod 10mm",
+      "categoryId": "cat_001",
+      "price": 76,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "TATA Steel",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 19.3 kg per rod",
+      "stock": {
+        "quantity": 250,
+        "minLevel": 10
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_004",
+      "name": "Steel Rod 12mm",
+      "categoryId": "cat_001",
+      "price": 76.2,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "TATA Steel",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 27.8 kg per rod",
+      "stock": {
+        "quantity": 200,
+        "minLevel": 15
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_005",
+      "name": "Steel Rod 16mm",
+      "categoryId": "cat_001",
+      "price": 77.8,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "JSW Steel",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 49.5 kg per rod",
+      "stock": {
+        "quantity": 150,
+        "minLevel": 10
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_006",
+      "name": "Steel Rod 20mm",
+      "categoryId": "cat_001",
+      "price": 78.5,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "JSW Steel",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 77.4 kg per rod",
+      "stock": {
+        "quantity": 100,
+        "minLevel": 8
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_007",
+      "name": "Steel Rod 25mm",
+      "categoryId": "cat_001",
+      "price": 79.2,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "JINDAL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 121 kg per rod",
+      "stock": {
+        "quantity": 80,
+        "minLevel": 5
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_008",
+      "name": "Steel Rod 32mm",
+      "categoryId": "cat_001",
+      "price": 80,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "JINDAL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Each bundle ≈ 198 kg per rod",
+      "stock": {
+        "quantity": 50,
+        "minLevel": 3
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_009",
+      "name": "Ramco Cement OPC 53",
+      "categoryId": "cat_002",
+      "price": 385,
+      "unit": "bag",
+      "isTaxable": true,
+      "gstRate": 28,
+      "hsnCode": "2523",
+      "brand": "Ramco",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "50 kg per bag",
+      "stock": {
+        "quantity": 300,
+        "minLevel": 50
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_010",
+      "name": "Ramco Cement PPC",
+      "categoryId": "cat_002",
+      "price": 375,
+      "unit": "bag",
+      "isTaxable": true,
+      "gstRate": 28,
+      "hsnCode": "2523",
+      "brand": "Ramco",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "50 kg per bag",
+      "stock": {
+        "quantity": 250,
+        "minLevel": 40
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_011",
+      "name": "UltraTech Cement OPC 53",
+      "categoryId": "cat_002",
+      "price": 420,
+      "unit": "bag",
+      "isTaxable": true,
+      "gstRate": 28,
+      "hsnCode": "2523",
+      "brand": "UltraTech",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "50 kg per bag",
+      "stock": {
+        "quantity": 350,
+        "minLevel": 60
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_012",
+      "name": "UltraTech Cement PPC",
+      "categoryId": "cat_002",
+      "price": 410,
+      "unit": "bag",
+      "isTaxable": true,
+      "gstRate": 28,
+      "hsnCode": "2523",
+      "brand": "UltraTech",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "50 kg per bag",
+      "stock": {
+        "quantity": 280,
+        "minLevel": 50
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_013",
+      "name": "Loading Charges",
+      "categoryId": "cat_003",
+      "price": 500,
+      "unit": "service",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "9967",
+      "brand": "",
+      "isServiceItem": true,
+      "priceEditableAtBilling": true,
+      "bundleInfo": "Per truck load",
+      "stock": {
+        "quantity": 0,
+        "minLevel": 0
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_014",
+      "name": "Transport Charges",
+      "categoryId": "cat_003",
+      "price": 1200,
+      "unit": "service",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "9966",
+      "brand": "",
+      "isServiceItem": true,
+      "priceEditableAtBilling": true,
+      "bundleInfo": "Per delivery",
+      "stock": {
+        "quantity": 0,
+        "minLevel": 0
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_015",
+      "name": "Cutting Charges",
+      "categoryId": "cat_003",
+      "price": 50,
+      "unit": "service",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "9965",
+      "brand": "",
+      "isServiceItem": true,
+      "priceEditableAtBilling": true,
+      "bundleInfo": "Per cut/piece",
+      "stock": {
+        "quantity": 0,
+        "minLevel": 0
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_016",
+      "name": "Welding Charges",
+      "categoryId": "cat_003",
+      "price": 200,
+      "unit": "service",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "9963",
+      "brand": "",
+      "isServiceItem": true,
+      "priceEditableAtBilling": true,
+      "bundleInfo": "Per hour",
+      "stock": {
+        "quantity": 0,
+        "minLevel": 0
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_017",
+      "name": "Wire Mesh 8 Gauge",
+      "categoryId": "cat_004",
+      "price": 85,
+      "unit": "sqft",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7314",
+      "brand": "Local",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "Standard size: 6ft x 4ft",
+      "stock": {
+        "quantity": 100,
+        "minLevel": 20
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_018",
+      "name": "Binding Wire",
+      "categoryId": "cat_004",
+      "price": 95,
+      "unit": "kg",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7217",
+      "brand": "Local",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "16 gauge thickness",
+      "stock": {
+        "quantity": 200,
+        "minLevel": 25
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "item_019",
+      "name": "Bundle 6mm - 20 pieces",
+      "categoryId": "cat_005",
+      "price": 2500,
+      "unit": "bundle",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "SAIL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "20 pieces of 6mm steel rods",
+      "stock": {
+        "quantity": 14,
+        "minLevel": 3
+      },
+      "isActive": true,
+      "createdAt": "2025-08-08T02:32:31.397Z",
+      "updatedAt": "2025-08-08T04:36:30.857Z",
+      "lastStockUpdate": "2025-08-08T04:36:30.855Z",
+      "lastStockMovement": {
+        "type": "sale",
+        "quantity": 1,
+        "billId": "bill_003",
+        "soldAt": "2025-08-08T04:36:30.855Z"
+      }
+    },
+    {
+      "id": "item_020",
+      "name": "Bundle 8mm - 10 pieces",
+      "categoryId": "cat_005",
+      "price": 4700,
+      "unit": "bundle",
+      "isTaxable": true,
+      "gstRate": 18,
+      "hsnCode": "7213",
+      "brand": "SAIL",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "10 pieces of 8mm steel rods",
+      "stock": {
+        "quantity": 10,
+        "minLevel": 2
+      },
+      "isActive": true,
+      "createdAt": "2025-08-08T02:32:31.397Z",
+      "updatedAt": "2025-08-08T02:46:45.052Z",
+      "lastStockUpdate": "2025-08-08T02:46:45.051Z",
+      "lastStockMovement": {
+        "type": "sale",
+        "quantity": 2,
+        "billId": "bill_001",
+        "soldAt": "2025-08-08T02:46:45.051Z"
+      }
+    },
+    {
+      "id": "item_021",
+      "name": "Tester1223",
+      "categoryId": "cat_001",
+      "price": 100,
+      "unit": "meter",
+      "isTaxable": false,
+      "gstRate": 0,
+      "hsnCode": "",
+      "brand": "Bata",
+      "isServiceItem": false,
+      "priceEditableAtBilling": false,
+      "bundleInfo": "",
+      "barcode": "",
+      "stock": {
+        "quantity": 199,
+        "minLevel": 20
+      },
+      "isActive": true,
+      "createdAt": "2025-08-08T03:33:04.393Z",
+      "updatedAt": "2025-08-08T04:36:03.695Z",
+      "lastStockUpdate": "2025-08-08T04:36:03.695Z",
+      "lastStockMovement": {
+        "type": "sale",
+        "quantity": 1,
+        "billId": "bill_002",
+        "soldAt": "2025-08-08T04:36:03.695Z"
+      }
+    }
+  ]
+}

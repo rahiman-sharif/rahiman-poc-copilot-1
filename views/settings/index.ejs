@@ -112,7 +112,8 @@
 
         <!-- Settings Categories -->
         <div class="settings-grid">
-            <!-- Company Settings -->
+            <!-- Company Settings (Super User Only) -->
+            <% if (user && user.role === 'super') { %>
             <div class="setting-card">
                 <div class="setting-icon">
                     <i class="fas fa-building"></i>
@@ -131,6 +132,7 @@
                     </a>
                 </div>
             </div>
+            <% } %>
 
             <!-- Tax & GST Settings -->
             <div class="setting-card">
@@ -311,6 +313,28 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Route Control (Super User Only) -->
+            <% if (user && user.role === 'super') { %>
+            <div class="setting-card">
+                <div class="setting-icon">
+                    <i class="fas fa-route"></i>
+                </div>
+                <div class="setting-content">
+                    <h3>Route Control Center</h3>
+                    <p>Control which features are accessible to users for client demonstrations</p>
+                    <div class="setting-details">
+                        <small><i class="fas fa-shield-alt"></i> Access: <strong>Super Admin Only</strong></small>
+                        <small><i class="fas fa-toggle-on"></i> Status: <strong>Active</strong></small>
+                    </div>
+                </div>
+                <div class="setting-actions">
+                    <a href="/settings/route-control" class="btn btn-warning">
+                        <i class="fas fa-cog"></i> Manage Routes
+                    </a>
+                </div>
+            </div>
+            <% } %>
         </div>
 
         <!-- Quick Actions -->
@@ -332,7 +356,7 @@
 
     <!-- Footer -->
     <footer class="main-footer">
-        <p>&copy; 2024 Vikram Steels. Settings Dashboard - System Configuration & Management</p>
+        <p>&copy; 2024 <%= companyName %>. Settings Dashboard - System Configuration & Management</p>
     </footer>
 
     <script>

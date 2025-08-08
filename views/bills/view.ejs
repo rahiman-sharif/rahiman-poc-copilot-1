@@ -187,7 +187,7 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p>Bill Details</p>
             </div>
             
@@ -228,7 +228,7 @@
             <div class="company-info">
                 <div class="company-name"><%= company.name %></div>
                 <div class="company-details">
-                    <%= company.address.line1 %><br>
+                    <%= company.address.line1 %>, <%= company.address.line2 %><br>
                     <%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %><br>
                     Phone: <%= company.contact.phone %> | Email: <%= company.contact.email %><br>
                     <% if (company.gst.gstin) { %>GSTIN: <%= company.gst.gstin %><% } %>

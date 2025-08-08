@@ -1,5 +1,45 @@
 {
-  "bills": [],
-  "nextBillNumber": 1,
-  "lastUpdated": "2025-08-07T16:01:31.875Z"
+  "bills": [
+    {
+      "id": "bill_001",
+      "billNumber": 1,
+      "customerId": "cust_002",
+      "customerName": "Rajesh Building Materials",
+      "customerPhone": "+91-98765-22222",
+      "customerGstin": "03BCDEF2345G2Z2",
+      "billDate": "2025-08-08T05:28:04.440Z",
+      "items": [
+        {
+          "itemId": "item_019",
+          "itemName": "Bundle 6mm - 20 pieces",
+          "hsnCode": "7213",
+          "quantity": 1,
+          "rate": 2500,
+          "amount": 2500,
+          "gstRate": 18,
+          "isServiceItem": false
+        }
+      ],
+      "extraCharges": [
+        {
+          "description": "Loading Charges",
+          "amount": 500,
+          "gstRate": 0
+        }
+      ],
+      "subtotal": 3000,
+      "cgstAmount": 225,
+      "sgstAmount": 225,
+      "totalGst": 450,
+      "finalTotal": 3450,
+      "paymentMethod": "Cash",
+      "paymentDetails": {
+        "method": "Cash"
+      },
+      "createdBy": "user_super",
+      "createdAt": "2025-08-08T05:28:04.440Z"
+    }
+  ],
+  "nextBillNumber": 2,
+  "lastUpdated": "2025-08-08T05:25:13.252Z"
 }

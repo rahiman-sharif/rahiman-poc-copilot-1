@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vikram Steels - Login</title>
+    <title><%= companyName %> - Login</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="login-body">
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p>Billing Management System</p>
             </div>
             
@@ -49,7 +49,7 @@
             </form>
             
             <div class="login-footer">                
-                <p><small>&copy; 2025 Vikram Steels. All rights reserved.</small></p>
+                <p><small>&copy; 2025 <%= companyName || 'Company Name' %>. All rights reserved.</small></p>
             </div>
         </div>
     </div>

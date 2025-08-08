@@ -11,7 +11,7 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 Vikram Steels</h1>
+                <h1>🏢 <%= companyName %></h1>
                 <p>Billing Management System</p>
             </div>
             
@@ -32,7 +32,7 @@
         <div class="dashboard-container">
             <div class="welcome-section">
                 <h2>🎉 Hello <%= user.name %>!</h2>
-                <p>Welcome to Vikram Steels Billing Management System</p>                
+                <p>Welcome to <%= companyName %> Billing Management System</p>                
             </div>
 
             <!-- Quick Stats -->
@@ -147,7 +147,7 @@
     </main>
 
     <footer class="main-footer">
-        <p>&copy; 2025 Vikram Steels Billing System. Built for offline use.</p>
+        <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
     </footer>
 </body>
 </html>

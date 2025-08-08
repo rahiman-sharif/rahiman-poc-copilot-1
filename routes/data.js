@@ -54,8 +54,20 @@ const requireAdmin = (req, res, next) => {
     }
 };
 
+// Admin or Super user middleware - both can access data management
+const requireAdminOrSuper = (req, res, next) => {
+    if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'super')) {
+        next();
+    } else {
+        res.status(403).render('error', { 
+            message: 'Access denied. Admin privileges required.',
+            user: req.session.user 
+        });
+    }
+};
+
 // GET /data - Data management dashboard
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAdminOrSuper, async (req, res) => {
     try {
         // Get file stats
         const dataDir = path.join(__dirname, '..', 'data');
@@ -103,7 +115,7 @@ router.get('/', requireAdmin, async (req, res) => {
 });
 
 // GET /data/backup - Create backup
-router.get('/backup', requireAdmin, async (req, res) => {
+router.get('/backup', requireAdminOrSuper, async (req, res) => {
     try {
         const dataDir = path.join(__dirname, '..', 'data');
         const backupDir = path.join(__dirname, '..', 'backups');
@@ -151,7 +163,7 @@ router.get('/backup', requireAdmin, async (req, res) => {
 });
 
 // GET /data/backups - List backups
-router.get('/backups', requireAdmin, (req, res) => {
+router.get('/backups', requireAdminOrSuper, (req, res) => {
     try {
         const backupDir = path.join(__dirname, '..', 'backups');
         
@@ -196,7 +208,7 @@ router.get('/backups', requireAdmin, (req, res) => {
 });
 
 // POST /data/restore/:backupName - Restore from backup
-router.post('/restore/:backupName', requireAdmin, async (req, res) => {
+router.post('/restore/:backupName', requireAdminOrSuper, async (req, res) => {
     try {
         const backupName = req.params.backupName;
         const backupDir = path.join(__dirname, '..', 'backups');
@@ -238,7 +250,7 @@ router.post('/restore/:backupName', requireAdmin, async (req, res) => {
 });
 
 // GET /data/export - Export data
-router.get('/export', requireAdmin, async (req, res) => {
+router.get('/export', requireAdminOrSuper, async (req, res) => {
     try {
         const format = req.query.format || 'json';
         const dataDir = path.join(__dirname, '..', 'data');
@@ -335,7 +347,7 @@ function jsonToCSV(data) {
 }
 
 // GET /data/download/:backupName - Download backup as ZIP
-router.get('/download/:backupName', requireAdmin, async (req, res) => {
+router.get('/download/:backupName', requireAdminOrSuper, async (req, res) => {
     try {
         const backupName = req.params.backupName;
         const backupDir = path.join(__dirname, '..', 'backups');
@@ -369,7 +381,7 @@ router.get('/download/:backupName', requireAdmin, async (req, res) => {
 });
 
 // POST /data/upload-restore - Upload and restore backup from ZIP
-router.post('/upload-restore', requireAdmin, upload.single('backupFile'), async (req, res) => {
+router.post('/upload-restore', requireAdminOrSuper, upload.single('backupFile'), async (req, res) => {
     try {
         if (!req.file) {
             return res.redirect('/data?error=No file uploaded');

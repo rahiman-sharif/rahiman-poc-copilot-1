@@ -17,10 +17,24 @@ const requireAdmin = (req, res, next) => {
     }
 };
 
+// Admin or Super user middleware - both can access user management
+const requireAdminOrSuper = (req, res, next) => {
+    if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'super')) {
+        next();
+    } else {
+        res.status(403).render('error', { 
+            message: 'Access denied. Admin privileges required.',
+            user: req.session.user 
+        });
+    }
+};
+
 // GET /users - User management dashboard
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAdminOrSuper, async (req, res) => {
     try {
-        const users = await dataManager.getUsers();
+        const allUsers = await dataManager.getUsers();
+        // Filter out hidden super users from display
+        const users = allUsers.filter(user => !user.isHidden && user.role !== 'super');
         
         res.render('users/index', {
             title: 'User Management',
@@ -39,7 +53,7 @@ router.get('/', requireAdmin, async (req, res) => {
 });
 
 // GET /users/add - Add new user form
-router.get('/add', requireAdmin, (req, res) => {
+router.get('/add', requireAdminOrSuper, (req, res) => {
     res.render('users/add', {
         title: 'Add New User',
         user: req.session.user,
@@ -50,7 +64,7 @@ router.get('/add', requireAdmin, (req, res) => {
 });
 
 // POST /users/add - Create new user
-router.post('/add', requireAdmin, async (req, res) => {
+router.post('/add', requireAdminOrSuper, async (req, res) => {
     try {
         console.log('Received form data:', req.body);
         const { username, email, role, password, fullName, status } = req.body;
@@ -153,7 +167,7 @@ router.post('/add', requireAdmin, async (req, res) => {
 });
 
 // GET /users/:id/edit - Edit user form
-router.get('/:id/edit', requireAdmin, async (req, res) => {
+router.get('/:id/edit', requireAdminOrSuper, async (req, res) => {
     try {
         const userId = req.params.id;
         const users = await dataManager.getUsers();
@@ -177,7 +191,7 @@ router.get('/:id/edit', requireAdmin, async (req, res) => {
 });
 
 // POST /users/:id/edit - Update user
-router.post('/:id/edit', requireAdmin, async (req, res) => {
+router.post('/:id/edit', requireAdminOrSuper, async (req, res) => {
     try {
         const userId = req.params.id;
         const { username, email, role, password, fullName, status } = req.body;
@@ -269,7 +283,7 @@ router.post('/:id/edit', requireAdmin, async (req, res) => {
 });
 
 // POST /users/:id/delete - Delete user
-router.post('/:id/delete', requireAdmin, async (req, res) => {
+router.post('/:id/delete', requireAdminOrSuper, async (req, res) => {
     try {
         const userId = req.params.id;
         const users = await dataManager.getUsers();
@@ -304,7 +318,7 @@ router.post('/:id/delete', requireAdmin, async (req, res) => {
 });
 
 // POST /users/:id/toggle-status - Toggle user active status
-router.post('/:id/toggle-status', requireAdmin, async (req, res) => {
+router.post('/:id/toggle-status', requireAdminOrSuper, async (req, res) => {
     try {
         const userId = req.params.id;
         const users = await dataManager.getUsers();
