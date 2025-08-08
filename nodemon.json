@@ -1,0 +1,21 @@
+{
+  "watch": [
+    "server.js",
+    "routes/",
+    "middleware/",
+    "utils/",
+    "views/"
+  ],
+  "ignore": [
+    "data/",
+    "uploads/",
+    "backups/",
+    "node_modules/",
+    ".git/",
+    "*.json",
+    "*.log",
+    ".vscode/"
+  ],
+  "ext": "js,ejs",
+  "delay": 1000
+}

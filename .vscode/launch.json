@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug with Nodemon",
+      "runtimeExecutable": "nodemon",
+      "program": "${workspaceFolder}/server.js",
+      "restart": true,
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "runtimeArgs": [
+        "--inspect",
+        "--ignore", "data/",
+        "--ignore", "uploads/",
+        "--ignore", "backups/",
+        "--ignore", "node_modules/",
+        "--ignore", ".git/",
+        "--ignore", "*.json",
+        "--watch", "server.js",
+        "--watch", "routes/",
+        "--watch", "middleware/",
+        "--watch", "utils/",
+        "--watch", "views/"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug with Node",
+      "program": "${workspaceFolder}/server.js",
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  ]
+}
