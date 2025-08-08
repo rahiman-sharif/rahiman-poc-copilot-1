@@ -26,7 +26,7 @@
       "creditLimit": 500000,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-08T05:25:13.249Z"
+      "createdAt": "2025-08-08T05:41:58.388Z"
     },
     {
       "id": "cust_002",
@@ -54,9 +54,7 @@
       "creditLimit": 0,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-08T05:25:13.249Z",
-      "totalPurchases": 3450,
-      "updatedAt": "2025-08-08T05:28:04.445Z"
+      "createdAt": "2025-08-08T05:41:58.388Z"
     },
     {
       "id": "cust_003",
@@ -84,7 +82,7 @@
       "creditLimit": 200000,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-08T05:25:13.249Z"
+      "createdAt": "2025-08-08T05:41:58.388Z"
     },
     {
       "id": "cust_004",
@@ -112,7 +110,7 @@
       "creditLimit": 0,
       "outstandingAmount": 0,
       "isActive": true,
-      "createdAt": "2025-08-08T05:25:13.249Z"
+      "createdAt": "2025-08-08T05:41:58.388Z"
     }
   ]
 }

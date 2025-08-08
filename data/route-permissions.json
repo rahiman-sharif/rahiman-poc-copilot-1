@@ -39,7 +39,7 @@
         "description": "Stock Management"
       },
       "/stock/adjust/:id": {
-        "enabled": true,
+        "enabled": false,
         "category": "Inventory",
         "description": "Stock Adjustments"
       },
@@ -228,5 +228,5 @@
       }
     }
   },
-  "lastUpdated": "2025-08-08T05:25:13.257Z"
+  "lastUpdated": "2025-08-08T05:41:58.398Z"
 }
