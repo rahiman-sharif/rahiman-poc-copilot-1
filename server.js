@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const dataManager = require('./utils/dataManager');
+const pathManager = require('./utils/path-manager');
+const { getCompanyName } = require('./utils/app-config');
 const { checkRoutePermission } = require('./middleware/routePermissions');
 
 const app = express();
@@ -133,7 +135,7 @@ function initializeFreshSystem() {
         const defaultCompany = {
             company: {
                 id: 'company_001',
-                name: 'Company Name',
+                name: getCompanyName(),
                 address: {
                     line1: '218/4B, Checkanurani',
                     line2: 'Madurai High Way, Arul Nagar, Uathupatti, Thirumanglam (T.K)',
@@ -315,9 +317,20 @@ function initializeFreshSystem() {
         console.log('✅ Empty quotations file initialized');
     }
 
-    // 8. Initialize route permissions file
+    // 8. Initialize stock movements file
+    const stockMovements = dataManager.getAll('stock-movements');
+    if (stockMovements.length === 0) {
+        // Create empty stock movements structure
+        fs.writeFileSync(path.join(pathManager.getDataPath(), 'stock-movements.json'), JSON.stringify({
+            movements: [],
+            lastUpdated: new Date().toISOString()
+        }, null, 2));
+        console.log('📦 Empty stock movements file initialized');
+    }
+
+    // 9. Initialize route permissions file
     try {
-        const routePermissionsPath = path.join(__dirname, 'data', 'route-permissions.json');
+        const routePermissionsPath = path.join(pathManager.getDataPath(), 'route-permissions.json');
         if (!fs.existsSync(routePermissionsPath)) {
             console.log('🛣️ Creating default route permissions...');
             
@@ -600,6 +613,28 @@ function createDefaultItems() {
     
     defaultItems.forEach(item => {
         dataManager.add('items', item);
+        
+        // Create initial stock movement record for physical items with stock
+        if (!item.isServiceItem && item.stock.quantity > 0) {
+            const stockMovement = {
+                id: `movement_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'initial',
+                itemId: item.id,
+                itemName: item.name,
+                quantity: item.stock.quantity,
+                oldStock: 0,
+                newStock: item.stock.quantity,
+                reference: 'System Initialization',
+                reason: 'Initial stock during system setup',
+                date: new Date().toISOString(),
+                user: 'system',
+                userName: 'System'
+            };
+
+            // Add to stock movements
+            dataManager.add('stock-movements', stockMovement);
+            console.log(`📦 Initial stock movement created: ${item.name} - ${item.stock.quantity} ${item.unit}`);
+        }
     });
 }
 
@@ -624,11 +659,11 @@ app.use((req, res, next) => {
     try {
         const companyData = dataManager.readData('company');
         res.locals.company = companyData.company || {};
-        res.locals.companyName = (companyData.company && companyData.company.name) || 'Company Name';
+        res.locals.companyName = (companyData.company && companyData.company.name) || getCompanyName();
     } catch (error) {
         console.error('Error loading company data:', error);
         res.locals.company = {};
-        res.locals.companyName = 'Company Name';
+        res.locals.companyName = getCompanyName();
     }
     next();
 });
@@ -771,9 +806,11 @@ app.post('/logout', (req, res) => {
 // Start server
 app.listen(PORT, () => {
     const companyData = dataManager.readData('company');
-    const companyName = (companyData.company && companyData.company.name) || 'Company Name';
+    const companyName = (companyData.company && companyData.company.name) || getCompanyName();
+    const appInfo = pathManager.getAppInfo();
     
     console.log(`🚀 ${companyName} Billing System running on http://localhost:${PORT}`);
+    console.log(`${appInfo.mode} - Using: ${appInfo.basePath}`);
     console.log(`📊 Default login credentials:`);
     console.log(`   Admin: admin / admin123`);
     console.log(`   Staff: staff / staff123`);

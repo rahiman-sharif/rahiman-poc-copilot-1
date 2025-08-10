@@ -177,6 +177,31 @@ router.post('/adjust/:id', requireAuth, (req, res) => {
                 lastStockUpdate: updateData.lastStockUpdate,
                 lastStockAdjustment: updateData.lastStockAdjustment
             });
+
+            // Create stock movement record for adjustment
+            const adjustmentQuantity = adjustmentType === 'add' ? adjustmentQty : 
+                                     adjustmentType === 'subtract' ? -adjustmentQty :
+                                     newStock - item.stock.quantity; // For 'set' type
+
+            const stockMovement = {
+                id: `movement_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'adjustment',
+                itemId: req.params.id,
+                itemName: item.name,
+                quantity: adjustmentQuantity,
+                oldStock: item.stock.quantity,
+                newStock: newStock,
+                reference: `Stock Adjustment - ${adjustmentType.toUpperCase()}`,
+                reason: reason,
+                adjustmentType: adjustmentType,
+                date: new Date().toISOString(),
+                user: req.session.user ? req.session.user.id : 'unknown',
+                userName: req.session.user ? req.session.user.username : 'Unknown'
+            };
+
+            // Add to stock movements
+            dataManager.add('stock-movements', stockMovement);
+            console.log(`📦 Stock movement recorded: ${item.name} - ${adjustmentType} ${adjustmentQty} units`);
             
             console.log(`✅ Stock adjusted: ${item.name} from ${item.stock.quantity} to ${newStock}`);
             res.redirect(`/stock?success=Stock adjusted successfully for ${item.name}&timestamp=${Date.now()}`);
@@ -199,24 +224,26 @@ router.get('/movements', requireAuth, (req, res) => {
         // Filter out service items and inactive items - only track active physical inventory movements
         const items = allItems.filter(item => !item.isServiceItem && item.isActive === true);
         
-        // Get stock movements from bills (sales) - only for physical items
-        const salesMovements = [];
-        bills.forEach(bill => {
-            bill.items.forEach(billItem => {
-                const item = items.find(i => i.id === billItem.itemId);
-                if (item && !item.isServiceItem) {
-                    salesMovements.push({
-                        type: 'sale',
-                        itemName: item.name,
-                        itemId: item.id,
-                        quantity: billItem.quantity,
-                        reference: `Bill #${bill.billNumber}`,
-                        date: bill.billDate,
-                        user: bill.createdBy
-                    });
-                }
-            });
-        });
+        // Get stock movements from dedicated stock movements file
+        const stockMovements = dataManager.getAll('stock-movements') || [];
+        const filteredStockMovements = stockMovements
+            .filter(movement => {
+                const item = items.find(i => i.id === movement.itemId);
+                return item && !item.isServiceItem && item.isActive === true;
+            })
+            .map(movement => ({
+                type: movement.type,
+                itemName: movement.itemName,
+                itemId: movement.itemId,
+                quantity: movement.quantity,
+                oldStock: movement.oldStock,
+                newStock: movement.newStock,
+                reference: movement.reference,
+                reason: movement.reason,
+                date: movement.date,
+                user: movement.user,
+                userName: movement.userName || movement.user
+            }));
 
         // Get stock adjustments - only for active physical items
         const adjustmentMovements = items
@@ -235,8 +262,8 @@ router.get('/movements', requireAuth, (req, res) => {
                 user: item.lastStockAdjustment.adjustedBy
             }));
 
-        // Combine and sort movements
-        const allMovements = [...salesMovements, ...adjustmentMovements]
+        // Combine and sort movements (now only using stock-movements file and old adjustments)
+        const allMovements = [...filteredStockMovements, ...adjustmentMovements]
             .sort((a, b) => new Date(b.date) - new Date(a.date));
 
         res.render('stock/movements', {

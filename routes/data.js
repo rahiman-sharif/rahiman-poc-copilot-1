@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const dataManager = require('../utils/dataManager');
+const pathManager = require('../utils/path-manager');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
@@ -12,7 +13,7 @@ console.log('💾 Data Management router loaded');
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadsDir = path.join(__dirname, '..', 'uploads');
+        const uploadsDir = pathManager.getUploadsPath();
         if (!fs.existsSync(uploadsDir)) {
             fs.mkdirSync(uploadsDir, { recursive: true });
         }
@@ -70,7 +71,7 @@ const requireAdminOrSuper = (req, res, next) => {
 router.get('/', requireAdminOrSuper, async (req, res) => {
     try {
         // Get file stats
-        const dataDir = path.join(__dirname, '..', 'data');
+        const dataDir = pathManager.getDataPath();
         const files = fs.readdirSync(dataDir);
         
         const fileStats = [];
@@ -117,8 +118,8 @@ router.get('/', requireAdminOrSuper, async (req, res) => {
 // GET /data/backup - Create backup
 router.get('/backup', requireAdminOrSuper, async (req, res) => {
     try {
-        const dataDir = path.join(__dirname, '..', 'data');
-        const backupDir = path.join(__dirname, '..', 'backups');
+        const dataDir = pathManager.getDataPath();
+        const backupDir = pathManager.getBackupPath();
         
         // Create backups directory if it doesn't exist
         if (!fs.existsSync(backupDir)) {
@@ -165,7 +166,7 @@ router.get('/backup', requireAdminOrSuper, async (req, res) => {
 // GET /data/backups - List backups
 router.get('/backups', requireAdminOrSuper, (req, res) => {
     try {
-        const backupDir = path.join(__dirname, '..', 'backups');
+        const backupDir = pathManager.getBackupPath();
         
         let backups = [];
         if (fs.existsSync(backupDir)) {
@@ -211,9 +212,9 @@ router.get('/backups', requireAdminOrSuper, (req, res) => {
 router.post('/restore/:backupName', requireAdminOrSuper, async (req, res) => {
     try {
         const backupName = req.params.backupName;
-        const backupDir = path.join(__dirname, '..', 'backups');
+        const backupDir = pathManager.getBackupPath();
         const backupPath = path.join(backupDir, backupName);
-        const dataDir = path.join(__dirname, '..', 'data');
+        const dataDir = pathManager.getDataPath();
         
         if (!fs.existsSync(backupPath)) {
             return res.redirect('/data/backups?error=Backup not found');
@@ -253,7 +254,7 @@ router.post('/restore/:backupName', requireAdminOrSuper, async (req, res) => {
 router.get('/export', requireAdminOrSuper, async (req, res) => {
     try {
         const format = req.query.format || 'json';
-        const dataDir = path.join(__dirname, '..', 'data');
+        const dataDir = pathManager.getDataPath();
         
         if (format === 'json') {
             // Export as single JSON file
@@ -350,7 +351,7 @@ function jsonToCSV(data) {
 router.get('/download/:backupName', requireAdminOrSuper, async (req, res) => {
     try {
         const backupName = req.params.backupName;
-        const backupDir = path.join(__dirname, '..', 'backups');
+        const backupDir = pathManager.getBackupPath();
         const backupPath = path.join(backupDir, backupName);
         
         if (!fs.existsSync(backupPath)) {
@@ -388,7 +389,7 @@ router.post('/upload-restore', requireAdminOrSuper, upload.single('backupFile'),
         }
 
         const uploadedFile = req.file.path;
-        const extractDir = path.join(__dirname, '..', 'temp-restore');
+        const extractDir = path.join(pathManager.getTempPath(), 'restore-' + Date.now());
         
         // Clean up any existing temp directory
         if (fs.existsSync(extractDir)) {
@@ -413,7 +414,7 @@ router.post('/upload-restore', requireAdminOrSuper, upload.single('backupFile'),
             // Create backup of current data before restore
             const backupTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const preRestoreBackupName = `pre-restore-${backupTimestamp}`;
-            const backupDir = path.join(__dirname, '..', 'backups');
+            const backupDir = pathManager.getBackupPath();
             const preRestoreBackupPath = path.join(backupDir, preRestoreBackupName);
             
             if (!fs.existsSync(backupDir)) {
@@ -422,7 +423,7 @@ router.post('/upload-restore', requireAdminOrSuper, upload.single('backupFile'),
             fs.mkdirSync(preRestoreBackupPath, { recursive: true });
             
             // Backup current data
-            const dataDir = path.join(__dirname, '..', 'data');
+            const dataDir = pathManager.getDataPath();
             const currentFiles = fs.readdirSync(dataDir);
             
             for (const file of currentFiles) {

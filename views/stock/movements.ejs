@@ -116,7 +116,9 @@
                                 </td>
                                 <td>
                                     <% if (movement.type === 'sale') { %>
-                                        <span class="quantity-negative">-<%= movement.quantity %></span>
+                                        <span class="quantity-negative">-<%= Math.abs(movement.quantity) %></span>
+                                    <% } else if (movement.type === 'initial') { %>
+                                        <span class="quantity-positive">+<%= movement.quantity %></span>
                                     <% } else { %>
                                         <% if (movement.adjustmentType === 'add') { %>
                                             <span class="quantity-positive">+<%= movement.quantity %></span>

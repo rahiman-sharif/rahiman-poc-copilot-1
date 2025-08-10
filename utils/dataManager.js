@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const pathManager = require('./path-manager');
 
 class DataManager {
     constructor() {
-        this.dataDir = path.join(__dirname, '..', 'data');
+        this.dataDir = pathManager.getDataPath();
         this.files = {
             items: path.join(this.dataDir, 'items.json'),
             customers: path.join(this.dataDir, 'customers.json'),
@@ -13,7 +14,9 @@ class DataManager {
             users: path.join(this.dataDir, 'users.json'),
             company: path.join(this.dataDir, 'company.json'),
             settings: path.join(this.dataDir, 'settings.json'),
-            stock: path.join(this.dataDir, 'stock.json')
+            stock: path.join(this.dataDir, 'stock.json'),
+            'stock-movements': path.join(this.dataDir, 'stock-movements.json'),
+            'route-permissions': path.join(this.dataDir, 'route-permissions.json')
         };
     }
 
@@ -64,6 +67,12 @@ class DataManager {
     // Get all records from a collection
     getAll(collection) {
         const data = this.readData(collection);
+        
+        // Special handling for stock-movements which has a different structure
+        if (collection === 'stock-movements') {
+            return data.movements || [];
+        }
+        
         return data[collection] || [];
     }
 
@@ -96,6 +105,18 @@ class DataManager {
     add(collection, record) {
         try {
             const data = this.readData(collection);
+            
+            // Special handling for stock-movements
+            if (collection === 'stock-movements') {
+                if (!data.movements) {
+                    data.movements = [];
+                }
+                data.movements.push(record);
+                data.lastUpdated = new Date().toISOString();
+                return this.writeData(collection, data);
+            }
+            
+            // Standard handling for other collections
             if (!data[collection]) {
                 data[collection] = [];
             }

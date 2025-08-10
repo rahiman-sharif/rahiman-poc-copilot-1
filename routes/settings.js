@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const dataManager = require('../utils/dataManager');
+const pathManager = require('../utils/path-manager');
 const { loadRoutePermissions } = require('../middleware/routePermissions');
 
 console.log('⚙️ Settings Router loaded');
@@ -205,7 +206,7 @@ router.post('/route-control', requireSuperUser, (req, res) => {
         // Save updated permissions
         const fs = require('fs');
         const path = require('path');
-        const permissionsPath = path.join(__dirname, '../data/route-permissions.json');
+        const permissionsPath = path.join(pathManager.getDataPath(), 'route-permissions.json');
         fs.writeFileSync(permissionsPath, JSON.stringify(existingPermissions, null, 2));
         console.log('💾 Permissions saved to file');
         

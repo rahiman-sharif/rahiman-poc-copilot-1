@@ -1,10 +1,11 @@
 // Middleware to check route permissions
 const fs = require('fs');
 const path = require('path');
+const pathManager = require('../utils/path-manager');
 
 function loadRoutePermissions() {
     try {
-        const permissionsPath = path.join(__dirname, '../data/route-permissions.json');
+        const permissionsPath = path.join(pathManager.getDataPath(), 'route-permissions.json');
         const data = fs.readFileSync(permissionsPath, 'utf8');
         return JSON.parse(data);
     } catch (error) {

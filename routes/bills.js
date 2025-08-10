@@ -319,7 +319,29 @@ router.post('/', requireAuth, (req, res) => {
                             soldAt: new Date().toISOString()
                         }
                     });
-                        
+
+                    // Create stock movement record
+                    const stockMovement = {
+                        id: `movement_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        type: 'sale',
+                        itemId: item.itemId,
+                        itemName: item.itemName,
+                        quantity: -item.quantity, // Negative for sales (stock decrease)
+                        oldStock: currentStock,
+                        newStock: newQuantity,
+                        reference: `Bill #${billNumber}`,
+                        reason: `Sale to ${customer.name}`,
+                        billId: billId,
+                        customerId: customer.id,
+                        customerName: customer.name,
+                        date: new Date().toISOString(),
+                        user: req.session.user ? req.session.user.id : 'unknown',
+                        userName: req.session.user ? req.session.user.username : 'Unknown'
+                    };
+
+                    // Add to stock movements
+                    dataManager.add('stock-movements', stockMovement);
+                    console.log(`📦 Stock movement recorded: ${item.itemName} - sold ${item.quantity} units`);
                     console.log(`Stock deducted: ${currentItem.name} - ${item.quantity} (${currentStock} → ${newQuantity})`);
                 }
             }

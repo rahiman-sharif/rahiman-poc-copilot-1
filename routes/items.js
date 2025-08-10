@@ -334,6 +334,28 @@ router.post('/', requireAuth, requireAdmin, (req, res) => {
 
         dataManager.add('items', newItem);
 
+        // Create initial stock movement record for physical items with stock
+        if (isServiceItem !== 'true' && parseInt(stockQuantity) > 0) {
+            const stockMovement = {
+                id: `movement_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: 'initial',
+                itemId: nextId,
+                itemName: name.trim(),
+                quantity: parseInt(stockQuantity),
+                oldStock: 0,
+                newStock: parseInt(stockQuantity),
+                reference: 'Initial Stock - Item Creation',
+                reason: 'New item added to inventory',
+                date: new Date().toISOString(),
+                user: req.session.user ? req.session.user.id : 'system',
+                userName: req.session.user ? req.session.user.username : 'System'
+            };
+
+            // Add to stock movements
+            dataManager.add('stock-movements', stockMovement);
+            console.log(`📦 Initial stock movement created: ${name.trim()} - ${stockQuantity} ${finalUnit}`);
+        }
+
         // Success message includes category creation info if applicable
         let successMessage = 'Item added successfully';
         if (categoryId === '__new__') {
