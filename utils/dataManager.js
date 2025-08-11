@@ -29,10 +29,15 @@ class DataManager {
             }
             
             if (!fs.existsSync(filePath)) {
-                // Create empty structure if file doesn't exist
-                const emptyData = { [collection]: [] };
-                this.writeData(collection, emptyData);
-                return emptyData;
+                // Try to copy initial data from packaged resources if running as executable
+                this.initializeDataFile(collection);
+                
+                // If still no file exists, create empty structure
+                if (!fs.existsSync(filePath)) {
+                    const emptyData = { [collection]: [] };
+                    this.writeData(collection, emptyData);
+                    return emptyData;
+                }
             }
             
             const rawData = fs.readFileSync(filePath, 'utf8');
@@ -40,6 +45,25 @@ class DataManager {
         } catch (error) {
             console.error(`Error reading ${collection}:`, error);
             return { [collection]: [] };
+        }
+    }
+
+    // Initialize data file from packaged resources
+    initializeDataFile(collection) {
+        if (process.pkg) {
+            try {
+                // When running as executable, try to copy from packaged data
+                const packagedDataPath = path.join(__dirname, '..', 'data', `${collection}.json`);
+                const targetPath = this.files[collection];
+                
+                if (fs.existsSync(packagedDataPath)) {
+                    const data = fs.readFileSync(packagedDataPath, 'utf8');
+                    fs.writeFileSync(targetPath, data);
+                    console.log(`📋 Initialized ${collection} data from package`);
+                }
+            } catch (error) {
+                console.log(`Could not copy initial ${collection} data:`, error.message);
+            }
         }
     }
 

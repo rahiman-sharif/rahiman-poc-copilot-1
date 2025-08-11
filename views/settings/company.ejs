@@ -20,9 +20,11 @@
                     <div class="user-name"><%= user.fullName %></div>
                     <div class="user-role"><%= user.role %></div>
                 </div>
-                <a href="/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
             </div>
         </div>
     </header>
@@ -47,8 +49,8 @@
                 <p>Configure your company information and branding</p>
             </div>
             <div class="header-right">
-                <a href="/settings" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Settings
+                <a href="/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </a>
             </div>
         </div>
@@ -113,10 +115,10 @@
                         
                         <div class="form-group">
                             <label for="website">Website</label>
-                            <input type="url" id="website" name="website" 
+                            <input type="text" id="website" name="website" 
                                    value="<%= company && company.contact ? company.contact.website : '' %>" 
-                                   placeholder="https://www.vikramsteels.com">
-                            <small class="form-help">Company website URL</small>
+                                   placeholder="www.vikramsteels.com">
+                            <small class="form-help">Company website (optional - can include www.domain.com or https://www.domain.com)</small>
                         </div>
                     </div>
                 </div>

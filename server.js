@@ -3,22 +3,35 @@ const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
+const { exec } = require('child_process');
 const dataManager = require('./utils/dataManager');
 const pathManager = require('./utils/path-manager');
 const { getCompanyName } = require('./utils/app-config');
 const { checkRoutePermission } = require('./middleware/routePermissions');
+const ConsoleManager = require('./utils/console-manager');
+
+// Initialize console manager for desktop mode
+const consoleManager = new ConsoleManager();
+if (process.pkg) {
+    consoleManager.init();
+} else {
+    // Development mode logging
+    console.log('🔧 Initializing Billing System...');
+    console.log(`📁 Working directory: ${process.cwd()}`);
+    console.log(`🏗️ Node version: ${process.version}`);
+}
 
 const app = express();
 const PORT = 3000;
 
 // Initialize fresh system data if data folder is empty
 function initializeFreshSystem() {
-    console.log('🔧 Initializing fresh system data...');
+   // console.log('🔧 Initializing fresh system data...');
     
     // 1. Create default users
     const users = dataManager.getAll('users');
     if (users.length === 0) {
-        console.log('👥 Creating default users...');
+        //console.log('👥 Creating default users...');
         
         // Admin user
         const hashedAdminPassword = bcrypt.hashSync('admin123', 10);
@@ -63,13 +76,13 @@ function initializeFreshSystem() {
             lastLogin: null
         });
         
-        console.log('✅ Default users created (including hidden super user)');
+        //console.log('✅ Default users created (including hidden super user)');
     }
     
     // 2. Create categories
     const categories = dataManager.getAll('categories');
     if (categories.length === 0) {
-        console.log('📂 Creating default categories...');
+        //console.log('📂 Creating default categories...');
         
         const defaultCategories = [
             {
@@ -113,24 +126,24 @@ function initializeFreshSystem() {
             dataManager.add('categories', category);
         });
         
-        console.log('✅ Default categories created');
+        //console.log('✅ Default categories created');
     }
     
     // 3. Create default items
     const items = dataManager.getAll('items');
     if (items.length === 0) {
-        console.log('📦 Creating default items...');
+        //console.log('📦 Creating default items...');
         
         // This will create a comprehensive set of 42 items across all categories
         createDefaultItems();
         
-        console.log('✅ Default items created');
+        //console.log('✅ Default items created');
     }
     
     // 4. Create company profile
     const company = dataManager.readData('company');
     if (!company.company || Object.keys(company.company).length === 0) {
-        console.log('🏢 Creating default company profile...');
+        //console.log('🏢 Creating default company profile...');
         
         const defaultCompany = {
             company: {
@@ -166,13 +179,13 @@ function initializeFreshSystem() {
         };
         
         dataManager.writeData('company', defaultCompany);
-        console.log('✅ Default company profile created');
+        //console.log('✅ Default company profile created');
     }
     
     // 5. Initialize customers with default samples
     const customers = dataManager.getAll('customers');
     if (customers.length === 0) {
-        console.log('👥 Creating default customers...');
+       // console.log('👥 Creating default customers...');
         
         const defaultCustomers = [
             {
@@ -290,7 +303,7 @@ function initializeFreshSystem() {
         ];
         
         dataManager.writeData('customers', { customers: defaultCustomers });
-        console.log('✅ Default customers created');
+       // console.log('✅ Default customers created');
     }
     
     // 6. Initialize empty bills file
@@ -302,7 +315,7 @@ function initializeFreshSystem() {
             nextBillNumber: 1,
             lastUpdated: new Date().toISOString()
         });
-        console.log('✅ Empty bills file initialized');
+        //console.log('✅ Empty bills file initialized');
     }
 
     // 7. Initialize empty quotations file
@@ -314,7 +327,7 @@ function initializeFreshSystem() {
             nextQuotationNumber: 1,
             lastUpdated: new Date().toISOString()
         });
-        console.log('✅ Empty quotations file initialized');
+        //console.log('✅ Empty quotations file initialized');
     }
 
     // 8. Initialize stock movements file
@@ -325,14 +338,14 @@ function initializeFreshSystem() {
             movements: [],
             lastUpdated: new Date().toISOString()
         }, null, 2));
-        console.log('📦 Empty stock movements file initialized');
+        //console.log('📦 Empty stock movements file initialized');
     }
 
     // 9. Initialize route permissions file
     try {
         const routePermissionsPath = path.join(pathManager.getDataPath(), 'route-permissions.json');
         if (!fs.existsSync(routePermissionsPath)) {
-            console.log('🛣️ Creating default route permissions...');
+          //  console.log('🛣️ Creating default route permissions...');
             
             const defaultRoutePermissions = {
                 "permissions": {
@@ -568,13 +581,13 @@ function initializeFreshSystem() {
             };
             
             fs.writeFileSync(routePermissionsPath, JSON.stringify(defaultRoutePermissions, null, 2));
-            console.log('✅ Default route permissions file created');
+            //console.log('✅ Default route permissions file created');
         }
     } catch (error) {
         console.warn('⚠️ Could not initialize route permissions file:', error.message);
     }
     
-    console.log('🎉 Fresh system initialization completed!');
+   // console.log('🎉 Fresh system initialization completed!');
 }
 
 // Function to create default items
@@ -633,7 +646,7 @@ function createDefaultItems() {
 
             // Add to stock movements
             dataManager.add('stock-movements', stockMovement);
-            console.log(`📦 Initial stock movement created: ${item.name} - ${item.stock.quantity} ${item.unit}`);
+            //console.log(`📦 Initial stock movement created: ${item.name} - ${item.stock.quantity} ${item.unit}`);
         }
     });
 }
@@ -644,7 +657,15 @@ initializeFreshSystem();
 // Middleware setup
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static('public'));
+
+// Serve static files - handle both development and packaged executable
+if (process.pkg) {
+    // When running as packaged executable, use path relative to executable
+    app.use(express.static(path.join(__dirname, 'public')));
+} else {
+    // When running in development, use relative path
+    app.use(express.static('public'));
+}
 
 // Session configuration
 app.use(session({
@@ -687,7 +708,7 @@ const dataRouter = require('./routes/data');
 const settingsRouter = require('./routes/settings');
 
 app.use('/items', (req, res, next) => {
-    console.log(`📋 Items route request: ${req.method} ${req.originalUrl}`);
+    //console.log(`📋 Items route request: ${req.method} ${req.originalUrl}`);
     next();
 }, itemsRouter);
 app.use('/customers', customersRouter);
@@ -718,18 +739,30 @@ app.get('/', (req, res) => {
 });
 
 app.get('/welcome', (req, res) => {
-    // Use the getCompanyName function that's already imported at the top
-    const companyName = getCompanyName();
-    res.render('welcome', { companyName });
+    // Read company name from company.json, fallback to default
+    try {
+        const companyData = dataManager.readData('company');
+        const companyName = (companyData.company && companyData.company.name) || getCompanyName();
+        res.render('welcome', { companyName });
+    } catch (error) {
+        const companyName = getCompanyName();
+        res.render('welcome', { companyName });
+    }
 });
 
 app.get('/login', (req, res) => {
     if (req.session.user) {
         res.redirect('/dashboard');
     } else {
-        // Use the getCompanyName function that's already imported at the top
-        const companyName = getCompanyName();
-        res.render('login', { error: null, companyName });
+        // Read company name from company.json, fallback to default
+        try {
+            const companyData = dataManager.readData('company');
+            const companyName = (companyData.company && companyData.company.name) || getCompanyName();
+            res.render('login', { error: null, companyName });
+        } catch (error) {
+            const companyName = getCompanyName();
+            res.render('login', { error: null, companyName });
+        }
     }
 });
 
@@ -753,7 +786,15 @@ app.post('/login', (req, res) => {
         };
         res.redirect('/dashboard');
     } else {
-        res.render('login', { error: 'Invalid username or password' });
+        // Read company name from company.json, fallback to default
+        try {
+            const companyData = dataManager.readData('company');
+            const companyName = (companyData.company && companyData.company.name) || getCompanyName();
+            res.render('login', { error: 'Invalid username or password', companyName });
+        } catch (error) {
+            const companyName = getCompanyName();
+            res.render('login', { error: 'Invalid username or password', companyName });
+        }
     }
 });
 
@@ -817,15 +858,99 @@ app.listen(PORT, () => {
     const companyName = (companyData.company && companyData.company.name) || getCompanyName();
     const appInfo = pathManager.getAppInfo();
     
-    console.log(`🚀 ${companyName} Billing System running on http://localhost:${PORT}`);
-    console.log(`${appInfo.mode} - Using: ${appInfo.basePath}`);
-    console.log(`📊 Default login credentials:`);
-    console.log(`   Admin: admin / admin123`);
-    console.log(`   Staff: staff / staff123`);
-    console.log(`📁 System initialized with:`);
-    console.log(`   • 5 Categories (Steel Products, Cement, Services, Hardware, Bundles)`);
-    console.log(`   • 20+ Items with proper stock levels`);
-    console.log(`   • Company profile and settings`);
-    console.log(`   • Ready for billing operations`);
-    console.log(`⌨️  Keyboard shortcuts ready for implementation`);
+    if (process.pkg) {
+        console.log(`✅ ${companyName} ready at http://localhost:${PORT}`);
+        console.log(`� Login: admin/admin123 or staff/staff123`);
+        console.log(`🌐 Opening application interface...`);
+        
+        // Open desktop app after slight delay
+        setTimeout(() => {
+            openDesktopApp();
+        }, 1000);
+    } else {
+        // Full development mode logging
+        console.log(`�🚀 ${companyName} Billing System running on http://localhost:${PORT}`);
+        console.log(`${appInfo.mode} - Using: ${appInfo.basePath}`);
+        console.log(`📊 Default login credentials:`);
+        console.log(`   Admin: admin / admin123`);
+        console.log(`   Staff: staff / staff123`);
+       // console.log(`📁 System initialized with:`);
+       //// console.log(`   • 5 Categories (Steel Products, Cement, Services, Hardware, Bundles)`);
+       // console.log(`   • 20+ Items with proper stock levels`);
+       // console.log(`   • Company profile and settings`);
+      //  console.log(`   • Ready for billing operations`);
+       // console.log(`⌨️  Keyboard shortcuts ready for implementation`);
+       // console.log(`💻 Development mode - Open http://localhost:${PORT} manually`);
+    }
+
+/**
+ * Try to open the app in the best available browser
+ */
+function openDesktopApp() {
+    const url = `http://localhost:${PORT}`;
+    
+   // console.log(`🌐 Launching application interface...`);
+    
+    // Try Chrome first (best app-like experience)
+    exec(`"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --app=${url} --window-size=1200,800`, (error) => {
+        if (!error) {
+            //console.log(`✅ Opened in Chrome app mode`);
+            return;
+        }
+        
+        // Try Chrome in different locations
+        exec(`"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" --app=${url} --window-size=1200,800`, (error) => {
+            if (!error) {
+               // console.log(`✅ Opened in Chrome app mode`);
+                return;
+            }
+            
+            // Try Edge with app mode (comes with Windows 10/11)
+            exec(`start msedge --app=${url}`, (error) => {
+                if (!error) {
+                  //  console.log(`✅ Opened in Microsoft Edge app mode`);
+                    return;
+                }
+                
+                // Try regular Edge
+                exec(`start msedge ${url}`, (error) => {
+                    if (!error) {
+                       // console.log(`✅ Opened in Microsoft Edge`);
+                        return;
+                    }
+                    
+                    // Try Firefox
+                    exec(`start firefox ${url}`, (error) => {
+                        if (!error) {
+                         //   console.log(`✅ Opened in Firefox`);
+                            return;
+                        }
+                        
+                        // Fall back to default browser
+                        exec(`start ${url}`, (error) => {
+                            if (!error) {
+                            //    console.log(`✅ Opened in default browser`);
+                                return;
+                            }
+                            
+                            // If all fails, show instructions
+                            console.log(`❌ Could not open browser automatically`);
+                            console.log(`� Please manually open your browser and go to:`);
+                            console.log(`   ${url}`);
+                            console.log(`\n🔑 Login credentials:`);
+                            console.log(`   Admin: admin / admin123`);
+                            console.log(`   Staff: staff / staff123`);
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+}).on('error', (err) => {
+    console.error('❌ Server failed to start:', err);
+    if (err.code === 'EADDRINUSE') {
+        console.log(`🔧 Port ${PORT} is already in use. Please close any other instances and try again.`);
+    }
+    process.exit(1);
 });

@@ -20,9 +20,11 @@
                     <div class="user-name"><%= user.fullName %></div>
                     <div class="user-role"><%= user.role %></div>
                 </div>
-                <a href="/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
             </div>
         </div>
     </header>

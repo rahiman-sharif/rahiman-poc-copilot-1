@@ -3,7 +3,7 @@ const router = express.Router();
 const dataManager = require('../utils/dataManager');
 const bcrypt = require('bcryptjs');
 
-console.log('👥 User Management router loaded');
+//console.log('👥 User Management router loaded');
 
 // Admin only middleware
 const requireAdmin = (req, res, next) => {

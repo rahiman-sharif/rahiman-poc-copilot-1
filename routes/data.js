@@ -8,7 +8,7 @@ const archiver = require('archiver');
 const multer = require('multer');
 const extractZip = require('extract-zip');
 
-console.log('💾 Data Management router loaded');
+//console.log('💾 Data Management router loaded');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -41,7 +41,7 @@ const upload = multer({
     }
 });
 
-console.log('💾 Data Management router loaded');
+//console.log('💾 Data Management router loaded');
 
 // Admin only middleware
 const requireAdmin = (req, res, next) => {

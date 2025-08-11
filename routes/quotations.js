@@ -511,6 +511,28 @@ router.post('/:id/convert', requireAuth, (req, res) => {
                             soldAt: new Date().toISOString()
                         }
                     });
+
+                    // Create stock movement record
+                    const stockMovement = {
+                        id: `movement_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        type: 'sale',
+                        itemId: quotationItem.itemId,
+                        itemName: quotationItem.itemName,
+                        quantity: -quotationItem.quantity, // Negative for sales (stock decrease)
+                        oldStock: currentStock,
+                        newStock: newQuantity,
+                        reference: `Bill #${newBill.billNumber}`,
+                        reason: `Sale to ${quotation.customerInfo.name}`,
+                        billId: newBill.id,
+                        customerId: newBill.customerId,
+                        customerName: quotation.customerInfo.name,
+                        date: new Date().toISOString(),
+                        user: req.session.user ? req.session.user.id : 'unknown',
+                        userName: req.session.user ? req.session.user.username : 'Unknown'
+                    };
+
+                    // Add to stock movements
+                    dataManager.add('stock-movements', stockMovement);
                 }
             }
         });

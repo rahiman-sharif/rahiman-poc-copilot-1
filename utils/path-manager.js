@@ -24,7 +24,7 @@ class PathManager {
         }
         
         // Desktop mode - expand %APPDATA% path
-        const expanded = configPath.replace('%APPDATA%', os.homedir() + '/AppData/Roaming');
+        const expanded = configPath.replace('%APPDATA%', path.join(os.homedir(), 'AppData', 'Roaming'));
         return path.resolve(expanded);
     }
 

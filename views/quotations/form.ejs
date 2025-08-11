@@ -109,8 +109,8 @@
             font-size: 14px;
         }
         
-        .customer-section input, .customer-section select,
-        .quotation-info-section input, .quotation-info-section select {
+        .customer-section input, .customer-section select, .customer-section textarea,
+        .quotation-info-section input, .quotation-info-section select, .quotation-info-section textarea {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e5e7eb;
@@ -119,13 +119,79 @@
             transition: all 0.3s ease;
             background: white;
             margin-bottom: 16px;
+            font-family: inherit;
         }
         
-        .customer-section input:focus, .customer-section select:focus,
-        .quotation-info-section input:focus, .quotation-info-section select:focus {
+        .customer-section input:focus, .customer-section select:focus, .customer-section textarea:focus,
+        .quotation-info-section input:focus, .quotation-info-section select:focus, .quotation-info-section textarea:focus {
             outline: none;
             border-color: #8b5cf6;
             box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        /* Enhanced Radio Button Styling */
+        .customer-type-selection {
+            margin-bottom: 20px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            flex: 1;
+            border: 2px solid transparent;
+        }
+
+        .radio-option:hover {
+            background: rgba(139, 92, 246, 0.05);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            accent-color: #8b5cf6;
+            cursor: pointer;
+        }
+
+        .radio-label {
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .radio-option:has(input[type="radio"]:checked) {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+        }
+
+        .radio-option:has(input[type="radio"]:checked) .radio-label {
+            color: #8b5cf6;
+            font-weight: 600;
+        }
+
+        /* Enhanced Textarea Styling */
+        .customer-section textarea, .quotation-info-section textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.5;
         }
         
         .items-section {

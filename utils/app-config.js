@@ -4,8 +4,9 @@
  */
 
 // ========== CONFIGURATION SETTINGS ==========
-const COMPANY_NAME = "Vikram Steels";
-const APP_TYPE = "web"; // Change to "desktop" for desktop mode
+const COMPANY_NAME = "Ram Steels";
+const APP_TYPE = "desktop"; // Change to "desktop" for desktop mode
+const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
 
 // ========== FUNCTIONS ==========
 
@@ -15,7 +16,7 @@ const APP_TYPE = "web"; // Change to "desktop" for desktop mode
  */
 function getFolderPath() {
     if (APP_TYPE === "desktop") {
-        return `%APPDATA%/${COMPANY_NAME}`;
+        return `%APPDATA%/${companyNameNoSpaces}`;
     }
     return ""; // Empty string means current project folder
 }
@@ -29,6 +30,15 @@ function getCompanyName() {
 }
 
 /**
+ * Get the company name
+ * @returns {string} The company name
+ */
+function getCompanyNameFolder() {
+    return companyNameNoSpaces;
+}
+
+
+/**
  * Get the app type
  * @returns {string} "web" or "desktop"
  */
@@ -39,5 +49,6 @@ function getAppType() {
 module.exports = {
     getFolderPath,
     getCompanyName,
-    getAppType
+    getAppType,
+    getCompanyNameFolder
 };
