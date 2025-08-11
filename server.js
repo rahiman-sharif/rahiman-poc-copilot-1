@@ -713,15 +713,23 @@ app.get('/', (req, res) => {
     if (req.session.user) {
         res.redirect('/dashboard');
     } else {
-        res.redirect('/login');
+        res.redirect('/welcome');
     }
+});
+
+app.get('/welcome', (req, res) => {
+    // Use the getCompanyName function that's already imported at the top
+    const companyName = getCompanyName();
+    res.render('welcome', { companyName });
 });
 
 app.get('/login', (req, res) => {
     if (req.session.user) {
         res.redirect('/dashboard');
     } else {
-        res.render('login', { error: null });
+        // Use the getCompanyName function that's already imported at the top
+        const companyName = getCompanyName();
+        res.render('login', { error: null, companyName });
     }
 });
 

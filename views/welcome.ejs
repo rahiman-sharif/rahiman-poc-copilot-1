@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to <%= companyName %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Inline styles as a fallback */
+        .welcome-body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .welcome-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
+        
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: welcomeSlideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        @keyframes welcomeSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(60px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .welcome-header {
+            text-align: center;
+            padding: 60px 40px 40px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+        
+        .company-logo {
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            font-size: 80px;
+            color: #667eea;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .welcome-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .company-name {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        
+        .welcome-subtitle {
+            font-size: 18px;
+            color: #6c757d;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .welcome-content {
+            padding: 40px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(102, 126, 234, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: featuresFadeIn 1s ease forwards;
+        }
+        
+        .feature-item:nth-child(1) { animation-delay: 0.2s; }
+        .feature-item:nth-child(2) { animation-delay: 0.4s; }
+        .feature-item:nth-child(3) { animation-delay: 0.6s; }
+        .feature-item:nth-child(4) { animation-delay: 0.8s; }
+        
+        @keyframes featuresFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.2);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .feature-icon {
+            font-size: 36px;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .feature-item h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .feature-item p {
+            font-size: 14px;
+            color: #6c757d;
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .welcome-footer {
+            text-align: center;
+            padding: 40px;
+            background: rgba(248, 249, 250, 0.8);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .continue-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            margin-bottom: 20px;
+            animation: buttonPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes buttonPulse {
+            0%, 100% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            }
+        }
+        
+        .continue-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .continue-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        .btn-arrow {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .continue-btn:hover .btn-arrow {
+            transform: translateX(5px);
+        }
+        
+        .version-info {
+            font-size: 12px;
+            color: #6c757d;
+            margin: 0;
+            opacity: 0.8;
+        }
+        
+        /* Animated Background Shapes */
+        .welcome-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .shape-1 {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        
+        .shape-3 {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.3;
+            }
+            33% {
+                transform: translateY(-20px) rotate(120deg);
+                opacity: 0.6;
+            }
+            66% {
+                transform: translateY(10px) rotate(240deg);
+                opacity: 0.4;
+            }
+        }
+    </style>
+</head>
+<body class="welcome-body">
+    <div class="welcome-container">
+        <div class="welcome-card">
+            <div class="welcome-header">               
+                <h1 class="welcome-title">Welcome to</h1>
+                <h2 class="company-name"><%= companyName %></h2>
+                <p class="welcome-subtitle">Billing Management System</p>
+            </div>
+            
+            <div class="welcome-content">
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">📋</div>
+                        <h3>Billing Management</h3>
+                        <p>Create and manage invoices efficiently</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <h3>Inventory Tracking</h3>
+                        <p>Track stock levels and movements</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">👥</div>
+                        <h3>Customer Management</h3>
+                        <p>Manage customer information and history</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📈</div>
+                        <h3>Reports & Analytics</h3>
+                        <p>Generate comprehensive business reports</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="welcome-footer">
+                <a href="/login" class="continue-btn">
+                    <span>Continue to Login</span>
+                    <span class="btn-arrow">→</span>
+                </a>
+                <p class="version-info">Version 1.0.0</p>
+            </div>
+        </div>
+        
+        <div class="welcome-background">
+            <div class="bg-shape shape-1"></div>
+            <div class="bg-shape shape-2"></div>
+            <div class="bg-shape shape-3"></div>
+        </div>
+    </div>
+
+    <script>
+       
+        // Add pulse effect to continue button after a few seconds
+        setTimeout(() => {
+            const continueBtn = document.querySelector('.continue-btn');
+            continueBtn.classList.add('pulse');
+        }, 3000);
+    </script>
+</body>
+</html>
