@@ -50,33 +50,10 @@ class ConsoleManager {
     // Hide console window after startup
     hideConsole() {
         if (process.pkg && process.platform === 'win32') {
-            console.log('🔒 Minimizing console window...');
-            
-            // Use PowerShell to minimize the current console window
-            const script = `
-                Add-Type -TypeDefinition '
-                    using System;
-                    using System.Runtime.InteropServices;
-                    public class Win32 {
-                        [DllImport("kernel32.dll")]
-                        public static extern IntPtr GetConsoleWindow();
-                        [DllImport("user32.dll")]
-                        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-                        public const int SW_HIDE = 0;
-                        public const int SW_MINIMIZE = 6;
-                    }
-                ';
-                $consolePtr = [Win32]::GetConsoleWindow();
-                [Win32]::ShowWindow($consolePtr, 6);
-            `;
-            
-            exec(`powershell -WindowStyle Hidden -Command "${script}"`, (error) => {
-                if (error) {
-                    console.log('Console minimization attempted');
-                }
-            });
-            
-            this.isVisible = false;
+            console.log('🔒 Console window will remain visible for debugging...');
+            // Removed PowerShell command for security reasons
+            // Console window will stay visible but minimized by user if needed
+            this.isVisible = true; // Keep it visible for transparency
         }
     }
 
@@ -98,11 +75,9 @@ class ConsoleManager {
     hideAfterStartup() {
         setTimeout(() => {
             console.log('✅ Application started successfully!');
-            console.log('🔒 Minimizing console window in 2 seconds...');
-            
-            setTimeout(() => {
-                this.hideConsole();
-            }, 2000);
+            console.log('� Desktop application is now running...');
+            console.log('💡 You can manually minimize this window if desired');
+            // Removed automatic console hiding for security reasons
         }, 1500);
     }
 
