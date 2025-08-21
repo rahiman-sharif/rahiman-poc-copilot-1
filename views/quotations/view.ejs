@@ -522,7 +522,7 @@
                             <p><%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %></p>
                         <% } %>
                         <% if (company && company.contact) { %>
-                            <p>📞 <%= company.contact.phone %> | 📧 <%= company.contact.email %></p>
+                            <p>📞 <%= company.contact.phone1 %>, <%= company.contact.phone2 %></p>
                         <% } %>
                         <% if (company && company.gst && company.gst.gstin) { %>
                             <p>GST: <%= company.gst.gstin %></p>

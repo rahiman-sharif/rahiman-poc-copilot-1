@@ -154,18 +154,18 @@ function initializeFreshSystem() {
                     line2: 'Madurai High Way, Arul Nagar, Uathupatti, Thirumanglam (T.K)',
                     city: 'Madurai',
                     state: 'Tamil Nadu',
-                    pincode: '625020',
+                    pincode: '625514',
                     country: 'India'
                 },
                 contact: {
                     phone1: '+91-9042412524',
                     phone2: '+91-9626260336',
-                    email: 'info@vikramsteels.com',
-                    website: 'www.vikramsteels.com'
+                    email: '',
+                    website: ''
                 },
                 gst: {
-                    gstin: '33EEOPR7876R1ZZ',
-                    panNo: 'ABCDE1234F',
+                    gstin: '33EEOPR7876R1Z2',
+                    panNo: '',
                     registrationDate: '2022-04-01'
                 },
                 invoice: {
@@ -358,22 +358,22 @@ function initializeFreshSystem() {
                     },
                     "inventory": {
                         "/items": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Items Management"
                         },
                         "/items/new": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Add New Item"
                         },
                         "/items/:id": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "View Item Details"
                         },
                         "/items/:id/edit": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Edit Item"
                         },
@@ -410,12 +410,12 @@ function initializeFreshSystem() {
                     },
                     "sales": {
                         "/bills": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "Bills Management"
                         },
                         "/bills/new": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "Create New Bill"
                         },
@@ -425,12 +425,12 @@ function initializeFreshSystem() {
                             "description": "Fresh Stock API"
                         },
                         "/bills/:id": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "View Bill"
                         },
                         "/bills/:id/print": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "Print Bill"
                         },
@@ -457,17 +457,17 @@ function initializeFreshSystem() {
                     },
                     "customers": {
                         "/customers": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Customer Relations",
                             "description": "Customers Management"
                         },
                         "/customers/new": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Customer Relations",
                             "description": "Add New Customer"
                         },
                         "/customers/:id/edit": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Customer Relations",
                             "description": "Edit Customer"
                         }

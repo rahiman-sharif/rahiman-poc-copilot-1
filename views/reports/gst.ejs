@@ -187,7 +187,7 @@
                         <p><%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %></p>
                     <% } %>
                     <% if (company.contact) { %>
-                        <p><strong>Phone:</strong> <%= company.contact.phone %> | <strong>Email:</strong> <%= company.contact.email %></p>
+                        <p><strong>Cell:</strong> <%= company.contact.phone1 %>, <%= company.contact.phone2 %></p>
                     <% } %>
                     <% if (company.gst && company.gst.gstin) { %>
                         <p><strong>GSTIN:</strong> <%= company.gst.gstin %></p>

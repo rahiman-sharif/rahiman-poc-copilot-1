@@ -273,7 +273,7 @@
                     <%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %><br>
                 <% } %>
                 <% if (company.contact) { %>
-                    Phone: <%= company.contact.phone %> | Email: <%= company.contact.email %><br>
+                    Cell: <%= company.contact.phone1 %>, <%= company.contact.phone2 %><br>
                 <% } %>
                 <% if (company.gst && company.gst.gstin) { %>
                     GST No: <%= company.gst.gstin %>
