@@ -127,6 +127,100 @@
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+
+        /* Modern GST Checkbox Styles */
+        .gst-checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            padding: 16px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .gst-checkbox-container:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        }
+        
+        .gst-checkbox-container.checked {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        }
+        
+        .gst-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gst-checkbox input[type="checkbox"] {
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            cursor: pointer;
+            position: absolute;
+        }
+        
+        .gst-checkbox::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            transform: scale(0);
+            transition: all 0.2s ease;
+        }
+        
+        .gst-checkbox input:checked ~ .gst-checkbox,
+        .gst-checkbox:has(input:checked) {
+            background: #10b981;
+            border-color: #10b981;
+        }
+        
+        .gst-checkbox input:checked ~ .gst-checkbox::after,
+        .gst-checkbox:has(input:checked)::after {
+            transform: scale(1);
+        }
+        
+        .gst-checkbox-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .gst-status-text {
+            margin-left: auto;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .gst-status-text.disabled {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .gst-status-text.enabled {
+            background: #dcfce7;
+            color: #16a34a;
+        }
         
         .items-section {
             margin: 32px 0;
@@ -602,9 +696,19 @@
                     <!-- Bill Information -->
                     <div class="bill-info-section">
                         <h3>📄 Bill Information</h3>
+                        
+                        <!-- GST Checkbox Section -->
+                        <div class="gst-checkbox-container" title="Enable GST for this bill" onclick="toggleGSTCheckbox()">
+                            <div class="gst-checkbox">
+                                <input type="checkbox" id="gstEnabled" name="gstEnabled" onchange="handleGSTChange()">
+                            </div>
+                            <label class="gst-checkbox-label" for="gstEnabled">Enable GST Billing</label>
+                            <span class="gst-status-text disabled" id="gstStatusText">Disabled</span>
+                        </div>
+                        
                         <div>
                             <label>Bill Number</label>
-                            <input type="text" value="<%= billNumber %>" readonly style="background: #f8f9fa;">
+                            <input type="text" id="billNumberDisplay" value="<%= billNumber %>" readonly style="background: #f8f9fa;">
                         </div>
                         <div>
                             <label>Date</label>
@@ -742,6 +846,7 @@
                 <input type="hidden" name="cgstAmount" id="cgstValue">
                 <input type="hidden" name="sgstAmount" id="sgstValue">
                 <input type="hidden" name="finalTotal" id="finalTotalValue">
+                <input type="hidden" name="gstEnabledValue" id="gstEnabledValue" value="false">
 
                 <!-- Form Actions -->
                 <div class="form-actions">
@@ -761,6 +866,10 @@
     <script>
         // Available items data (initial load)
         let availableItems = <%- JSON.stringify(items) %>;
+        
+        // Bill number templates
+        const normalBillNumber = '<%= billNumber %>';
+        const gstBillNumber = '<%= gstBillNumber %>';
         
         // Fresh stock data
         let freshStockData = {};
@@ -794,6 +903,40 @@
         async function refreshStockData() {
             await fetchFreshStock();
             alert('Stock data refreshed! Current stock levels are now up to date.');
+        }
+        
+        // GST Checkbox Handler
+        function handleGSTChange() {
+            const gstCheckbox = document.getElementById('gstEnabled');
+            const container = document.querySelector('.gst-checkbox-container');
+            const statusText = document.getElementById('gstStatusText');
+            const hiddenField = document.getElementById('gstEnabledValue');
+            const billNumberDisplay = document.getElementById('billNumberDisplay');
+            
+            if (gstCheckbox.checked) {
+                container.classList.add('checked');
+                statusText.textContent = 'Enabled';
+                statusText.className = 'gst-status-text enabled';
+                hiddenField.value = 'true';
+                billNumberDisplay.value = gstBillNumber;
+                console.log('GST billing enabled - GST will be calculated');
+            } else {
+                container.classList.remove('checked');
+                statusText.textContent = 'Disabled';
+                statusText.className = 'gst-status-text disabled';
+                hiddenField.value = 'false';
+                billNumberDisplay.value = normalBillNumber;
+                console.log('Regular billing - GST will be 0');
+            }
+            
+            // Recalculate totals immediately when GST status changes
+            calculateGrandTotal();
+        }
+        
+        function toggleGSTCheckbox() {
+            const gstCheckbox = document.getElementById('gstEnabled');
+            gstCheckbox.checked = !gstCheckbox.checked;
+            handleGSTChange();
         }
         
         // Payment method toggle function
@@ -1189,6 +1332,9 @@
             let totalCgst = 0;
             let totalSgst = 0;
 
+            // Check if GST is enabled
+            const gstEnabled = document.getElementById('gstEnabled').checked;
+
             // Calculate items total
             document.querySelectorAll('.item-row').forEach(row => {
                 const select = row.cells[1].querySelector('select');
@@ -1199,7 +1345,7 @@
                 
                 subtotal += amount;
                 
-                if (option.value && amount > 0) {
+                if (option.value && amount > 0 && gstEnabled) {
                     const gstRate = parseFloat(option.dataset.gst) || 0;
                     const gstAmount = (amount * gstRate) / 100;
                     totalCgst += gstAmount / 2;
@@ -1217,7 +1363,7 @@
                 
                 subtotal += amount;
                 
-                if (amount > 0 && gstRate > 0) {
+                if (amount > 0 && gstRate > 0 && gstEnabled) {
                     const gstAmount = (amount * gstRate) / 100;
                     totalCgst += gstAmount / 2;
                     totalSgst += gstAmount / 2;

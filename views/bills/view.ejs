@@ -6,168 +6,443 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
+        /* Desktop-Optimized Bill View Design */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         .invoice-container {
-            max-width: 800px;
-            margin: 20px auto;
+            max-width: 1000px;
+            margin: 30px auto;
             background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            font-family: Arial, sans-serif;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .invoice-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #007bff, #0056b3, #007bff);
         }
         
         .invoice-header {
-            background: #f8f9fa;
-            padding: 20px;
-            border-bottom: 3px solid #007bff;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 40px;
+            position: relative;
         }
         
         .company-info {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            position: relative;
         }
         
         .company-name {
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 42px;
+            font-weight: 700;
             color: #007bff;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 123, 255, 0.1);
+            letter-spacing: 1px;
         }
         
         .company-details {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.4;
+            font-size: 16px;
+            color: #6c757d;
+            line-height: 1.6;
+            font-weight: 500;
         }
         
         .invoice-title {
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin: 20px 0;
+            font-size: 32px;
+            font-weight: 700;
+            color: #495057;
+            margin: 40px 0;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            position: relative;
+        }
+        
+        .invoice-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            border-radius: 2px;
         }
         
         .invoice-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-            padding: 0 20px;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding: 0 40px;
         }
         
         .bill-to, .bill-details {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .bill-to::before, .bill-details::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            border-radius: 12px 12px 0 0;
         }
         
         .section-title {
-            font-weight: bold;
+            font-weight: 700;
             color: #007bff;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #007bff;
+            border-radius: 50%;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            font-weight: 700;
+            color: #495057;
+            font-size: 14px;
         }
         
         .items-section {
-            padding: 0 20px;
+            padding: 0 40px 40px;
+        }
+        
+        .items-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #495057;
+        }
+        
+        .items-header::before {
+            content: '📦';
+            font-size: 28px;
         }
         
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
         
         .items-table th {
-            background: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: white;
-            padding: 12px 8px;
+            padding: 18px 15px;
             text-align: left;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .items-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #ddd;
+            padding: 16px 15px;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 14px;
+            background: white;
         }
         
         .items-table tbody tr:nth-child(even) {
             background: #f8f9fa;
         }
         
+        .items-table tbody tr:hover {
+            background: #e3f2fd;
+            transition: background-color 0.3s ease;
+        }
+        
+        .item-name {
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 4px;
+        }
+        
+        .item-details {
+            font-size: 12px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
         .text-right {
             text-align: right;
+            font-weight: 600;
+        }
+        
+        .amount-highlight {
+            color: #28a745;
+            font-weight: 700;
         }
         
         .totals-section {
-            margin: 20px;
-            max-width: 300px;
-            margin-left: auto;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 40px;
+            border-top: 3px solid #007bff;
+            position: relative;
+        }
+        
+        .totals-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: start;
+        }
+        
+        .payment-info {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        .payment-title {
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .payment-title::before {
+            content: '💳';
+            font-size: 20px;
+        }
+        
+        .totals-table {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+            min-width: 350px;
         }
         
         .total-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
         }
         
-        .total-row.final {
-            font-weight: bold;
-            font-size: 18px;
-            background: #007bff;
-            color: white;
-            padding: 12px 15px;
-            margin-top: 10px;
+        .total-row:last-child {
+            border-bottom: none;
+            border-top: 3px solid #007bff;
+            padding-top: 20px;
+            margin-top: 15px;
         }
         
-        .footer {
-            margin-top: 40px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #ddd;
-            text-align: center;
+        .total-label {
+            font-weight: 600;
+            color: #6c757d;
             font-size: 14px;
-            color: #666;
         }
         
-        .actions {
-            padding: 20px;
+        .total-amount {
+            font-weight: 700;
+            color: #495057;
+            font-size: 16px;
+        }
+        
+        .final-total .total-label,
+        .final-total .total-amount {
+            font-size: 20px;
+            color: #007bff;
+            font-weight: 800;
+        }
+        
+        .action-buttons {
             text-align: center;
+            padding: 30px 40px;
             background: #f8f9fa;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
         
         .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 0 10px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .btn-primary {
-            background: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
         }
         
         .btn-secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
         }
         
         .btn-success {
-            background: #28a745;
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
         }
         
-        .btn:hover {
-            opacity: 0.9;
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+        
+        /* Charges Section */
+        .charges-section {
+            margin-top: 30px;
+        }
+        
+        .charges-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #495057;
+        }
+        
+        .charges-header::before {
+            content: '💰';
+            font-size: 24px;
+        }
+        
+        .charges-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .charges-table th {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+            padding: 16px 15px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .charges-table td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .charges-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
         
         @media print {
@@ -262,6 +537,11 @@
 
         <!-- Items Section -->
         <div class="items-section">
+            <div class="items-header">
+                <h3>🛒 Items & Services</h3>
+                <div class="items-count"><%= bill.items.length %> item(s)</div>
+            </div>
+            
             <table class="items-table">
                 <thead>
                     <tr>
@@ -277,26 +557,26 @@
                 <tbody>
                     <% let itemCounter = 1; %>
                     <% bill.items.forEach(item => { %>
-                        <tr>
+                        <tr class="item-row">
                             <td><%= itemCounter++ %></td>
-                            <td><%= item.itemName %></td>
+                            <td class="item-name"><%= item.itemName %></td>
                             <td><%= item.hsnCode %></td>
                             <td class="text-right"><%= item.quantity %></td>
                             <td class="text-right">₹<%= item.rate.toFixed(2) %></td>
-                            <td class="text-right">₹<%= item.amount.toFixed(2) %></td>
+                            <td class="text-right amount-cell">₹<%= item.amount.toFixed(2) %></td>
                             <td class="text-right"><%= item.gstRate %>%</td>
                         </tr>
                     <% }); %>
                     
                     <% if (bill.extraCharges && bill.extraCharges.length > 0) { %>
                         <% bill.extraCharges.forEach(charge => { %>
-                            <tr>
+                            <tr class="charge-row">
                                 <td><%= itemCounter++ %></td>
-                                <td><%= charge.description %></td>
+                                <td class="item-name"><%= charge.description %></td>
                                 <td>9967</td>
                                 <td class="text-right">1</td>
                                 <td class="text-right">₹<%= charge.amount.toFixed(2) %></td>
-                                <td class="text-right">₹<%= charge.amount.toFixed(2) %></td>
+                                <td class="text-right amount-cell">₹<%= charge.amount.toFixed(2) %></td>
                                 <td class="text-right"><%= charge.gstRate || 0 %>%</td>
                             </tr>
                         <% }); %>
@@ -307,23 +587,25 @@
 
         <!-- Totals Section -->
         <div class="totals-section">
-            <div class="total-row">
-                <span>Subtotal:</span>
-                <span>₹<%= bill.subtotal.toFixed(2) %></span>
-            </div>
-            <% if (bill.cgstAmount > 0) { %>
+            <div class="totals-grid">
                 <div class="total-row">
-                    <span>CGST:</span>
-                    <span>₹<%= bill.cgstAmount.toFixed(2) %></span>
+                    <span class="total-label">Subtotal:</span>
+                    <span class="total-amount">₹<%= bill.subtotal.toFixed(2) %></span>
                 </div>
-                <div class="total-row">
-                    <span>SGST:</span>
-                    <span>₹<%= bill.sgstAmount.toFixed(2) %></span>
+                <% if (bill.cgstAmount > 0) { %>
+                    <div class="total-row">
+                        <span class="total-label">CGST:</span>
+                        <span class="total-amount">₹<%= bill.cgstAmount.toFixed(2) %></span>
+                    </div>
+                    <div class="total-row">
+                        <span class="total-label">SGST:</span>
+                        <span class="total-amount">₹<%= bill.sgstAmount.toFixed(2) %></span>
+                    </div>
+                <% } %>
+                <div class="total-row final-total">
+                    <span class="total-label">Total Amount:</span>
+                    <span class="total-amount">₹<%= bill.finalTotal.toFixed(2) %></span>
                 </div>
-            <% } %>
-            <div class="total-row final">
-                <span>Total Amount:</span>
-                <span>₹<%= bill.finalTotal.toFixed(2) %></span>
             </div>
         </div>
 
@@ -336,9 +618,27 @@
 
     <!-- Actions -->
     <div class="actions">
-        <a href="/bills" class="btn btn-secondary">← Back to Bills</a>
-        <button onclick="window.print()" class="btn btn-primary">🖨️ Print Invoice</button>
-        <a href="/bills/new" class="btn btn-success">➕ New Bill</a>
+        <div class="action-buttons">
+            <a href="/bills" class="btn btn-secondary">
+                <i class="icon">←</i>
+                <span>Back to Bills</span>
+            </a>
+            
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="icon">🖨️</i>
+                <span>Print Invoice</span>
+            </button>
+            
+            <a href="/bills/<%= bill.id %>/print" target="_blank" class="btn" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; margin-left: 10px;">
+                <i class="icon">📄</i>
+                <span>Compact Print</span>
+            </a>
+            
+            <a href="/bills/new" class="btn btn-success">
+                <i class="icon">➕</i>
+                <span>New Bill</span>
+            </a>
+        </div>
     </div>
 
     <!-- JavaScript -->

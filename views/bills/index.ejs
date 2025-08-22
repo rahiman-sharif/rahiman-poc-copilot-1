@@ -5,6 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Filter Form Styles */
+        .filter-form {
+            margin-bottom: 20px;
+        }
+        
+        .search-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: end;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 150px;
+        }
+        
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .filter-select, .date-input {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .custom-date-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .date-input-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+        
+        .filter-actions .btn {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .filter-summary {
+            margin: 10px 0;
+            padding: 10px 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .filter-info {
+            color: #1976d2;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .search-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                min-width: auto;
+            }
+            
+            .custom-date-inputs {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -100,20 +196,75 @@
                 </div>
             </div>
 
-            <!-- Search Section -->
+            <!-- Search and Filter Section -->
             <div class="search-section">
-                <div class="search-controls">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="🔍 Search bills..." class="search-input">
+                <form method="GET" action="/bills" class="filter-form">
+                    <div class="search-controls">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="🔍 Search bills..." class="search-input">
+                        </div>
+                        
+                        <!-- Date Range Filter -->
+                        <div class="filter-group">
+                            <label for="dateRange">📅 Date Range:</label>
+                            <select name="dateRange" id="dateRange" class="filter-select" onchange="toggleCustomDates()">
+                                <option value="today" <%= currentDateRange === 'today' ? 'selected' : '' %>>Current Day</option>
+                                <option value="month" <%= currentDateRange === 'month' ? 'selected' : '' %>>Last 30 Days</option>
+                                <option value="all" <%= currentDateRange === 'all' ? 'selected' : '' %>>All Time</option>
+                                <option value="custom" <%= currentDateRange === 'custom' ? 'selected' : '' %>>Custom Range</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Custom Date Inputs -->
+                        <div class="custom-date-inputs" id="customDateInputs" <% if (currentDateRange === 'custom') { %>style="display: flex;"<% } else { %>style="display: none;"<% } %>>
+                            <div class="date-input-group">
+                                <label for="fromDate">From:</label>
+                                <input type="date" name="fromDate" id="fromDate" value="<%= fromDate %>" class="date-input">
+                            </div>
+                            <div class="date-input-group">
+                                <label for="toDate">To:</label>
+                                <input type="date" name="toDate" id="toDate" value="<%= toDate %>" class="date-input">
+                            </div>
+                        </div>
+                        
+                        <!-- GST Filter -->
+                        <div class="filter-group">
+                            <label for="gstFilter">📊 GST Type:</label>
+                            <select name="gstFilter" id="gstFilter" class="filter-select">
+                                <option value="all" <%= currentGstFilter === 'all' ? 'selected' : '' %>>All Bills</option>
+                                <option value="gst" <%= currentGstFilter === 'gst' ? 'selected' : '' %>>GST Bills Only</option>
+                                <option value="normal" <%= currentGstFilter === 'normal' ? 'selected' : '' %>>Non-GST Bills Only</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filter Buttons -->
+                        <div class="filter-actions">
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                            <a href="/bills" class="btn btn-secondary">Reset</a>
+                        </div>
                     </div>
-                    <div class="filter-controls">
-                        <select id="dateFilter" class="filter-select">
-                            <option value="">All Dates</option>
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                        </select>
-                    </div>
+                </form>
+                
+                <!-- Filter Summary -->
+                <div class="filter-summary">
+                    <span class="filter-info">
+                        Showing <%= bills.length %> bills
+                        <% if (currentDateRange === 'today') { %>
+                            (Today)
+                        <% } else if (currentDateRange === 'month') { %>
+                            (Last 30 days)
+                        <% } else if (currentDateRange === 'custom' && fromDate && toDate) { %>
+                            (From <%= new Date(fromDate).toLocaleDateString() %> to <%= new Date(toDate).toLocaleDateString() %>)
+                        <% } else if (currentDateRange === 'all') { %>
+                            (All time)
+                        <% } %>
+                        
+                        <% if (currentGstFilter === 'gst') { %>
+                            - GST Bills only
+                        <% } else if (currentGstFilter === 'normal') { %>
+                            - Non-GST Bills only
+                        <% } %>
+                    </span>
                 </div>
             </div>
 
@@ -145,7 +296,7 @@
                                 <tr class="item-row" data-date="<%= bill.billDate %>">
                                     <td>
                                         <strong>#<%= bill.billNumber %></strong>
-                                        <small class="bill-id"><%= bill.id %></small>
+                                        <!-- <small class="bill-id"><%= bill.id %></small> -->
                                     </td>
                                     <td>
                                         <div class="date-info">
@@ -293,6 +444,28 @@
 
         function closeDeleteModal() {
             document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Toggle custom date inputs
+        function toggleCustomDates() {
+            const dateRange = document.getElementById('dateRange').value;
+            const customInputs = document.getElementById('customDateInputs');
+            
+            if (dateRange === 'custom') {
+                customInputs.style.display = 'flex';
+                // Set default dates if empty
+                const fromInput = document.getElementById('fromDate');
+                const toInput = document.getElementById('toDate');
+                if (!fromInput.value) {
+                    const today = new Date();
+                    const thirtyDaysAgo = new Date(today);
+                    thirtyDaysAgo.setDate(today.getDate() - 30);
+                    fromInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+                    toInput.value = today.toISOString().split('T')[0];
+                }
+            } else {
+                customInputs.style.display = 'none';
+            }
         }
 
         // Close modal when clicking outside

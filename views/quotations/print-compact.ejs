@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotation #<%= quotation.quotationNumber %> - <%= quotation.customerName %></title>
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            line-height: 1.1;
+            color: #000;
+            background: white;
+            margin: 0;
+            padding: 2mm;
+        }
+        
+        /* Ultra-compact print styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            
+            body {
+                font-size: 6px !important;
+                line-height: 1.0 !important;
+                margin: 0 !important;
+                padding: 1mm !important;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+        
+        .quotation-container {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* Header section - ultra compact with purple theme */
+        .header {
+            text-align: center;
+            margin-bottom: 2mm;
+            border-bottom: 2px solid #8b5cf6;
+            padding-bottom: 1mm;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        }
+        
+        .company-name {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 1px;
+            color: #8b5cf6;
+        }
+        
+        .company-details {
+            font-size: 6px;
+            line-height: 1.0;
+            margin-bottom: 1px;
+        }
+        
+        .quotation-title {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 1mm 0;
+            color: #8b5cf6;
+        }
+        
+        /* Quote info section - side by side ultra compact */
+        .quote-info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2mm;
+            font-size: 6px;
+        }
+        
+        .quote-to, .quote-details {
+            width: 48%;
+        }
+        
+        .section-label {
+            font-weight: bold;
+            font-size: 7px;
+            margin-bottom: 1px;
+            text-decoration: underline;
+            color: #8b5cf6;
+        }
+        
+        /* Items table - ultra compact like sample */
+        .items-section {
+            margin-bottom: 2mm;
+        }
+        
+        .items-header {
+            font-size: 7px;
+            font-weight: bold;
+            margin-bottom: 1px;
+            text-align: center;
+            color: #8b5cf6;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 6px;
+            border: 1px solid #8b5cf6;
+        }
+        
+        .items-table th {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: 1px solid #8b5cf6;
+            padding: 0.5mm;
+            text-align: center;
+            font-weight: bold;
+            font-size: 6px;
+            line-height: 1.0;
+        }
+        
+        .items-table td {
+            border: 1px solid #8b5cf6;
+            padding: 0.5mm;
+            text-align: center;
+            font-size: 6px;
+            line-height: 1.0;
+            vertical-align: top;
+        }
+        
+        .items-table .desc-col {
+            text-align: left;
+        }
+        
+        .items-table .amount-col {
+            text-align: right;
+        }
+        
+        /* Totals section - compact like sample */
+        .totals-section {
+            margin-top: 2mm;
+            border-top: 2px solid #8b5cf6;
+            padding-top: 1mm;
+        }
+        
+        .totals-table {
+            float: right;
+            width: 40%;
+            font-size: 6px;
+            border-collapse: collapse;
+        }
+        
+        .totals-table td {
+            padding: 0.5mm 1mm;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .totals-table .label {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .totals-table .amount {
+            text-align: right;
+            width: 25mm;
+        }
+        
+        .final-total {
+            border-top: 2px solid #8b5cf6 !important;
+            font-weight: bold !important;
+            font-size: 7px !important;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        }
+        
+        /* Validity section */
+        .validity-section {
+            clear: both;
+            margin-top: 2mm;
+            padding: 1mm;
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border: 1px solid #f59e0b;
+            border-radius: 2mm;
+            font-size: 6px;
+            text-align: center;
+        }
+        
+        /* Footer */
+        .footer {
+            clear: both;
+            margin-top: 3mm;
+            text-align: center;
+            font-size: 6px;
+            border-top: 2px solid #8b5cf6;
+            padding-top: 1mm;
+        }
+        
+        /* Print controls - hide on print */
+        .print-controls {
+            margin-top: 5mm;
+            text-align: center;
+        }
+        
+        .print-btn {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 3mm 6mm;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 2mm;
+        }
+        
+        @media print {
+            .print-controls {
+                display: none !important;
+            }
+            
+            .company-name {
+                font-size: 10px !important;
+            }
+            
+            .company-details {
+                font-size: 5px !important;
+            }
+            
+            .quotation-title {
+                font-size: 8px !important;
+            }
+            
+            .quote-info-section {
+                font-size: 5px !important;
+            }
+            
+            .section-label {
+                font-size: 6px !important;
+            }
+            
+            .items-header {
+                font-size: 6px !important;
+            }
+            
+            .items-table th, .items-table td {
+                font-size: 5px !important;
+                padding: 0.3mm !important;
+            }
+            
+            .totals-table {
+                font-size: 5px !important;
+            }
+            
+            .final-total {
+                font-size: 6px !important;
+            }
+            
+            .validity-section {
+                font-size: 5px !important;
+            }
+            
+            .footer {
+                font-size: 5px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quotation-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-name"><%= company.name || companyName %></div>
+            <div class="company-details">
+                <%= company.address.line1 %>, <%= company.address.line2 %><br>
+                <%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %><br>
+                Cell: <%= company.contact.phone1 %>, <%= company.contact.phone2 %><br>
+                <% if (company.gst.gstin) { %>GSTIN: <%= company.gst.gstin %><% } %>
+            </div>
+            <div class="quotation-title">QUOTATION</div>
+        </div>
+
+        <!-- Quotation Information Section -->
+        <div class="quote-info-section">
+            <div class="quote-to">
+                <div class="section-label">Quote To:</div>
+                <strong><%= quotation.customerName %></strong><br>
+                Phone: <%= quotation.customerPhone %><br>
+                <% if (quotation.customerGstin) { %>
+                    GSTIN: <%= quotation.customerGstin %>
+                <% } else { %>
+                    <em>Unregistered Customer</em>
+                <% } %>
+            </div>
+            
+            <div class="quote-details">
+                <div class="section-label">Quote Details:</div>
+                <strong>Quote No:</strong> #<%= quotation.quotationNumber %><br>
+                <strong>Date:</strong> <%= new Date(quotation.quotationDate).toLocaleDateString('en-IN') %><br>
+                <strong>Valid Till:</strong> <%= new Date(quotation.validTill).toLocaleDateString('en-IN') %><br>
+                <strong>Created By:</strong> <%= user.name %>
+            </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="items-section">
+            <div class="items-header">📋 Items & Services (<%= quotation.items.length %> item<%= quotation.items.length !== 1 ? 's' : '' %>)</div>
+            
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 6%">S.No</th>
+                        <th style="width: 40%" class="desc-col">Description</th>
+                        <th style="width: 10%">HSN</th>
+                        <th style="width: 8%">Qty</th>
+                        <th style="width: 12%">Rate</th>
+                        <th style="width: 12%">Amount</th>
+                        <th style="width: 8%">GST</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let itemCounter = 1; %>
+                    <% quotation.items.forEach(item => { %>
+                        <tr>
+                            <td><%= itemCounter++ %></td>
+                            <td class="desc-col"><%= item.itemName %></td>
+                            <td><%= item.hsnCode %></td>
+                            <td><%= item.quantity %></td>
+                            <td class="amount-col">₹<%= item.rate.toFixed(2) %></td>
+                            <td class="amount-col">₹<%= item.amount.toFixed(2) %></td>
+                            <td><%= item.gstRate %>%</td>
+                        </tr>
+                    <% }); %>
+                    
+                    <% if (quotation.extraCharges && quotation.extraCharges.length > 0) { %>
+                        <% quotation.extraCharges.forEach(charge => { %>
+                            <tr>
+                                <td><%= itemCounter++ %></td>
+                                <td class="desc-col"><%= charge.description %></td>
+                                <td>9967</td>
+                                <td>1</td>
+                                <td class="amount-col">₹<%= charge.amount.toFixed(2) %></td>
+                                <td class="amount-col">₹<%= charge.amount.toFixed(2) %></td>
+                                <td><%= charge.gstRate || 0 %>%</td>
+                            </tr>
+                        <% }); %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <table class="totals-table">
+                <tr>
+                    <td class="label">Subtotal:</td>
+                    <td class="amount">₹<%= quotation.subtotal.toFixed(2) %></td>
+                </tr>
+                <% if (quotation.cgstAmount > 0) { %>
+                    <tr>
+                        <td class="label">CGST:</td>
+                        <td class="amount">₹<%= quotation.cgstAmount.toFixed(2) %></td>
+                    </tr>
+                    <tr>
+                        <td class="label">SGST:</td>
+                        <td class="amount">₹<%= quotation.sgstAmount.toFixed(2) %></td>
+                    </tr>
+                <% } %>
+                <tr class="final-total">
+                    <td class="label">Total Amount:</td>
+                    <td class="amount">₹<%= quotation.finalTotal.toFixed(2) %></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Validity Section -->
+        <div class="validity-section">
+            <strong>⚠️ Quote Validity: <%= new Date(quotation.validTill).toLocaleDateString('en-IN') %></strong><br>
+            Prices subject to change without notice. GST applicable as per current rates.
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <strong>Thank you for considering our quote!</strong><br>
+            This quotation is valid until the date mentioned above.
+        </div>
+
+        <!-- Print Controls -->
+        <div class="print-controls no-print">
+            <button onclick="window.print()" class="print-btn">🖨️ Print Quotation</button>
+            <a href="/quotations/<%= quotation.id %>" style="margin-left: 10px; text-decoration: none; background: #6c757d; color: white; padding: 3mm 6mm; border-radius: 2mm; font-size: 10px;">👁️ View Quotation</a>
+            <a href="/quotations" style="margin-left: 5px; text-decoration: none; background: #28a745; color: white; padding: 3mm 6mm; border-radius: 2mm; font-size: 10px;">📋 All Quotations</a>
+        </div>
+    </div>
+
+    <script>
+        // Print functionality
+        function printQuotation() {
+            window.print();
+        }
+        
+        // Optional: Print when user presses Ctrl+P
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>

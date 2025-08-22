@@ -5,23 +5,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bill #<%= bill.billNumber %> - <%= bill.customerName %></title>
     <style>
-        /* Print-specific styling */
+        /* Print-optimized styling */
         @media print {
-            body { margin: 0; }
+            body { 
+                margin: 0; 
+                font-size: 5px;
+                line-height: 1.0;
+            }
             .no-print { display: none !important; }
             .print-break { page-break-after: always; }
+            .invoice-container {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .company-name {
+                font-size: 10px !important;
+                font-weight: bold !important;
+                margin-bottom: 1px !important;
+            }
+            
+            .company-details {
+                font-size: 5px !important;
+                line-height: 1.0 !important;
+                margin-bottom: 2px !important;
+            }
+            
+            .invoice-title {
+                font-size: 8px !important;
+                padding: 2px !important;
+                margin: 2px 0 !important;
+            }
+            
+            .section-title {
+                font-size: 5px !important;
+                margin-bottom: 1px !important;
+            }
+            
+            .info-label, .info-value {
+                font-size: 5px !important;
+                margin-bottom: 0 !important;
+            }
+            
+            .items-table th {
+                padding: 1px 1px !important;
+                font-size: 5px !important;
+                line-height: 1.0 !important;
+            }
+            
+            .items-table td {
+                padding: 1px 1px !important;
+                font-size: 5px !important;
+                line-height: 1.0 !important;
+            }
+            
+            .item-name {
+                font-size: 5px !important;
+                line-height: 1.0 !important;
+            }
+            
+            .item-details {
+                font-size: 4px !important;
+                line-height: 1.0 !important;
+            }
+            
+            .amount-column {
+                font-size: 5px !important;
+            }
+            
+            .charges-table th, .charges-table td {
+                padding: 1px 1px !important;
+                font-size: 5px !important;
+            }
+            
+            .bill-details {
+                padding: 2px 5px !important;
+                gap: 5px !important;
+            }
+            
+            .items-section {
+                padding: 2px 5px !important;
+            }
+            
+            .totals-section {
+                padding: 2px 5px !important;
+            }
+            
+            .invoice-header {
+                padding: 2px 5px !important;
+            }
+            
+            .bill-info, .customer-info {
+                padding: 2px !important;
+                margin-bottom: 2px !important;
+            }
+            
+            .info-row {
+                margin-bottom: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .totals-table {
+                font-size: 5px !important;
+            }
+            
+            .totals-table td {
+                padding: 1px 2px !important;
+            }
+            
+            .totals-table .final-total {
+                font-size: 6px !important;
+            }
         }
         
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 5px;
             background: white;
             color: #333;
+            font-size: 6px;
+            line-height: 1.1;
         }
         
         .invoice-container {
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
             background: white;
             border: 1px solid #ddd;
@@ -29,98 +139,102 @@
         
         .invoice-header {
             background: #f8f9fa;
-            padding: 20px;
-            border-bottom: 3px solid #007bff;
+            padding: 4px 8px;
+            border-bottom: 2px solid #007bff;
             text-align: center;
         }
         
         .company-name {
-            font-size: 32px;
+            font-size: 12px;
             font-weight: bold;
             color: #007bff;
-            margin-bottom: 5px;
+            margin-bottom: 1px;
         }
         
         .company-details {
-            font-size: 14px;
+            font-size: 6px;
             color: #666;
-            line-height: 1.5;
+            line-height: 1.1;
         }
         
         .invoice-title {
             text-align: center;
-            font-size: 24px;
+            font-size: 10px;
             font-weight: bold;
-            color: #333;
-            margin: 20px 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: #007bff;
             color: white;
-            padding: 10px;
+            margin: 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #007bff;
+            padding: 3px;
         }
         
         .bill-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding: 20px;
+            gap: 8px;
+            padding: 4px 8px;
             border-bottom: 1px solid #eee;
         }
         
         .bill-info, .customer-info {
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 4px;
+            border-radius: 3px;
         }
         
         .section-title {
             font-weight: bold;
             color: #007bff;
-            margin-bottom: 10px;
-            font-size: 16px;
+            margin-bottom: 2px;
+            font-size: 6px;
         }
         
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            padding: 2px 0;
+            margin-bottom: 1px;
+            padding: 0;
         }
         
         .info-label {
             font-weight: 500;
             color: #555;
+            font-size: 5px;
         }
         
         .info-value {
             font-weight: bold;
             color: #333;
+            font-size: 5px;
         }
         
         .items-section {
-            padding: 20px;
+            padding: 4px 8px;
         }
         
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 4px;
+            font-size: 5px;
         }
         
         .items-table th {
             background: #007bff;
             color: white;
-            padding: 12px 8px;
+            padding: 2px 1px;
             text-align: left;
             font-weight: bold;
             border: 1px solid #007bff;
+            font-size: 5px;
         }
         
         .items-table td {
-            padding: 10px 8px;
+            padding: 1px 1px;
             border: 1px solid #ddd;
             vertical-align: top;
+            font-size: 5px;
         }
         
         .items-table tbody tr:nth-child(even) {
@@ -130,63 +244,70 @@
         .item-name {
             font-weight: bold;
             color: #333;
+            font-size: 5px;
         }
         
         .item-details {
-            font-size: 12px;
+            font-size: 4px;
             color: #666;
-            margin-top: 2px;
+            margin-top: 0;
         }
         
         .amount-column {
             text-align: right;
             font-weight: bold;
+            font-size: 5px;
         }
         
         .charges-section {
-            margin-top: 20px;
+            margin-top: 4px;
         }
         
         .charges-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 4px;
+            font-size: 5px;
         }
         
         .charges-table th {
             background: #28a745;
             color: white;
-            padding: 10px 8px;
+            padding: 2px 1px;
             text-align: left;
             border: 1px solid #28a745;
+            font-size: 5px;
         }
         
         .charges-table td {
-            padding: 8px;
+            padding: 1px;
             border: 1px solid #ddd;
+            font-size: 5px;
         }
         
         .totals-section {
             background: #f8f9fa;
-            padding: 20px;
+            padding: 4px 8px;
             border-top: 2px solid #007bff;
         }
         
         .totals-grid {
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 20px;
+            gap: 6px;
         }
         
         .payment-info {
-            padding: 15px;
+            padding: 2px;
             background: white;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 3px;
+            font-size: 5px;
         }
         
         .totals-table {
-            min-width: 300px;
+            min-width: 120px;
+            font-size: 5px;
         }
         
         .totals-table tr {
@@ -194,7 +315,7 @@
         }
         
         .totals-table td {
-            padding: 8px 12px;
+            padding: 1px 2px;
             text-align: right;
         }
         
@@ -202,31 +323,33 @@
             text-align: left;
             font-weight: 500;
             color: #555;
+            font-size: 5px;
         }
         
         .totals-table .final-total {
             background: #007bff;
             color: white;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 6px;
         }
         
         .print-controls {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             border-top: 1px solid #eee;
         }
         
         .btn {
             display: inline-block;
-            padding: 10px 20px;
+            padding: 8px 16px;
             margin: 0 5px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
             text-decoration: none;
             font-weight: bold;
             transition: all 0.3s;
+            font-size: 12px;
         }
         
         .btn-primary {
@@ -248,9 +371,9 @@
             display: inline-block;
             background: #28a745;
             color: white;
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 8px;
             font-weight: bold;
             text-transform: uppercase;
         }
@@ -260,6 +383,44 @@
         .cheque-badge { background: #6f42c1; }
         .card-badge { background: #fd7e14; }
         .credit-badge { background: #dc3545; }
+        
+        /* Compact spacing for print */
+        h3, h4 {
+            margin: 8px 0 6px 0;
+            font-size: 11px;
+        }
+        
+        /* More items per page */
+        @media print {
+            .items-table th,
+            .items-table td {
+                padding: 2px 3px;
+                font-size: 8px;
+            }
+            
+            .company-name {
+                font-size: 16px;
+            }
+            
+            .invoice-title {
+                font-size: 14px;
+                padding: 4px;
+                margin: 6px 0;
+            }
+            
+            .bill-details {
+                padding: 8px 12px;
+                gap: 10px;
+            }
+            
+            .items-section {
+                padding: 8px 12px;
+            }
+            
+            .totals-section {
+                padding: 8px 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -309,22 +470,22 @@
                     </span>
                 </div>
                 <% if (bill.paymentDetails && Object.keys(bill.paymentDetails).length > 1) { %>
-                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Payment Details:</div>
+                    <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #eee;">
+                        <div style="font-size: 9px; color: #666; margin-bottom: 3px;">Payment Details:</div>
                         <% if (bill.paymentDetails.transactionId) { %>
-                            <div style="font-size: 11px;">Transaction ID: <%= bill.paymentDetails.transactionId %></div>
+                            <div style="font-size: 8px;">Transaction ID: <%= bill.paymentDetails.transactionId %></div>
                         <% } %>
                         <% if (bill.paymentDetails.referenceNumber) { %>
-                            <div style="font-size: 11px;">Reference: <%= bill.paymentDetails.referenceNumber %></div>
+                            <div style="font-size: 8px;">Reference: <%= bill.paymentDetails.referenceNumber %></div>
                         <% } %>
                         <% if (bill.paymentDetails.chequeNumber) { %>
-                            <div style="font-size: 11px;">Cheque #: <%= bill.paymentDetails.chequeNumber %></div>
+                            <div style="font-size: 8px;">Cheque #: <%= bill.paymentDetails.chequeNumber %></div>
                         <% } %>
                         <% if (bill.paymentDetails.last4Digits) { %>
-                            <div style="font-size: 11px;">Card: ****<%= bill.paymentDetails.last4Digits %></div>
+                            <div style="font-size: 8px;">Card: ****<%= bill.paymentDetails.last4Digits %></div>
                         <% } %>
                         <% if (bill.paymentDetails.bankName) { %>
-                            <div style="font-size: 11px;">Bank: <%= bill.paymentDetails.bankName %></div>
+                            <div style="font-size: 8px;">Bank: <%= bill.paymentDetails.bankName %></div>
                         <% } %>
                     </div>
                 <% } %>
@@ -351,16 +512,16 @@
 
         <!-- Items Section -->
         <div class="items-section">
-            <h3 style="color: #007bff; margin-bottom: 15px;">📦 Items & Services</h3>
+            <h3 style="color: #007bff; margin-bottom: 8px; font-size: 11px;">📦 Items & Services</h3>
             <table class="items-table">
                 <thead>
                     <tr>
-                        <th style="width: 5%;">S.No</th>
-                        <th style="width: 35%;">Description</th>
-                        <th style="width: 10%;">HSN</th>
-                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 4%;">S.No</th>
+                        <th style="width: 40%;">Description</th>
+                        <th style="width: 8%;">HSN</th>
+                        <th style="width: 8%;">Qty</th>
                         <th style="width: 12%;">Rate</th>
-                        <th style="width: 10%;">GST %</th>
+                        <th style="width: 8%;">GST %</th>
                         <th style="width: 15%;">Amount</th>
                     </tr>
                 </thead>
@@ -389,7 +550,7 @@
             <!-- Extra Charges -->
             <% if (bill.extraCharges && bill.extraCharges.length > 0) { %>
                 <div class="charges-section">
-                    <h4 style="color: #28a745; margin-bottom: 10px;">💰 Additional Charges</h4>
+                    <h4 style="color: #28a745; margin-bottom: 6px; font-size: 10px;">💰 Additional Charges</h4>
                     <table class="charges-table">
                         <thead>
                             <tr>

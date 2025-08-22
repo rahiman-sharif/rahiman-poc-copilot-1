@@ -45,9 +45,13 @@
     "express-session": "^1.18.2",
     "extract-zip": "^2.0.1",
     "lowdb": "^1.0.0",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "puppeteer": "^24.17.0",
+    "qrcode": "^1.5.4",
+    "whatsapp-web.js": "^1.32.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "pkg": "^5.8.1"
   }
 }

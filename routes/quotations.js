@@ -12,14 +12,21 @@ const requireAuth = (req, res, next) => {
     }
 };
 
-// GET /quotations - View all quotations
+// GET /quotations - View all quotations with GST filtering
 router.get('/', requireAuth, (req, res) => {
     try {
         const quotationsData = dataManager.readData('quotations');
         let quotations = quotationsData.quotations.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         
         // Extract query parameters for filtering
-        const { search, status, dateFrom, dateTo } = req.query;
+        const { search, status, dateFrom, dateTo, gstFilter } = req.query;
+        
+        // Apply GST filter
+        if (gstFilter === 'gst') {
+            quotations = quotations.filter(quotation => quotation.gstEnabled === true);
+        } else if (gstFilter === 'normal') {
+            quotations = quotations.filter(quotation => quotation.gstEnabled === false);
+        }
         
         // Apply search filter
         if (search && search.trim()) {
@@ -92,6 +99,10 @@ router.get('/', requireAuth, (req, res) => {
             return quotation.status === 'active' && !isExpired;
         }).length;
 
+        // Calculate GST statistics
+        const gstQuotations = quotations.filter(quotation => quotation.gstEnabled);
+        const normalQuotations = quotations.filter(quotation => !quotation.gstEnabled);
+
         res.render('quotations/index', {
             title: `Quotations - ${res.locals.companyName}`,
             user: req.session.user,
@@ -100,6 +111,9 @@ router.get('/', requireAuth, (req, res) => {
             totalQuotations: quotations.length,
             todaysValue: totalToday,
             activeQuotations: activeQuotations,
+            gstQuotationsCount: gstQuotations.length,
+            normalQuotationsCount: normalQuotations.length,
+            currentFilter: gstFilter || 'all',
             query: req.query
         });
     } catch (error) {
@@ -137,8 +151,10 @@ router.get('/new', requireAuth, (req, res) => {
                 panNo: 'ABCDE1234F'
             }
         };
-                // Generate quotation number with proper counter
-        const nextQuotationNumber = dataManager.readData('quotations').nextQuotationNumber || 1;
+        // Generate quotation numbers with proper counters
+        const quotationsData = dataManager.readData('quotations');
+        const nextNormalQuotationNumber = quotationsData.nextNormalQuotationNumber || 1;
+        const nextGSTQuotationNumber = quotationsData.nextGSTQuotationNumber || 1;
         
         res.render('quotations/form', {
             title: `Create New Quotation - ${res.locals.companyName}`,
@@ -146,7 +162,8 @@ router.get('/new', requireAuth, (req, res) => {
             customers: customers,
             items: items,
             company: company,
-            nextQuotationNumber: nextQuotationNumber,
+            nextQuotationNumber: nextNormalQuotationNumber,
+            nextGSTQuotationNumber: nextGSTQuotationNumber,
             quotation: null,
             isEdit: false
         });
@@ -221,7 +238,7 @@ router.get('/:id', requireAuth, (req, res) => {
     }
 });
 
-// POST /quotations - Create new quotation
+// POST /quotations - Create new quotation with GST support
 router.post('/', requireAuth, (req, res) => {
     try {
         const { 
@@ -239,8 +256,13 @@ router.post('/', requireAuth, (req, res) => {
             subtotal,
             cgstAmount,
             sgstAmount,
-            finalTotal
+            finalTotal,
+            gstEnabled, // NEW: GST toggle field
+            gstEnabledValue // NEW: GST hidden field
         } = req.body;
+
+        // Parse GST enabled status - check both checkbox and hidden field
+        const isGSTEnabled = gstEnabled === 'on' || gstEnabled === 'true' || gstEnabledValue === 'true';
         
         let customerInfo = {};
         
@@ -367,19 +389,25 @@ router.post('/', requireAuth, (req, res) => {
             return res.redirect('/quotations/new?error=Please add at least one item');
         }
 
-        // Generate quotation number
-        const quotationsData = dataManager.readData('quotations');
-        const nextQuotationNumber = quotationsData.nextQuotationNumber;
-        const quotationNumber = `QT-${String(nextQuotationNumber).padStart(4, '0')}`;
+        // Generate quotation ID based on GST status
+        const quotationId = dataManager.generateNextQuotationId(isGSTEnabled);
+        if (!quotationId) {
+            return res.redirect('/quotations/new?error=Failed to generate quotation number. Please try again.');
+        }
+
+        // Use the full quotation ID as the quotation number for display
+        const quotationNumber = quotationId;
 
         // Calculate validity date
         const validityDate = new Date(quotationDate);
         validityDate.setDate(validityDate.getDate() + parseInt(validityDays));
 
-        // Create quotation object
+        // Create quotation object with GST support
         const newQuotation = {
-            id: `quotation_${Date.now()}_${nextQuotationNumber}`,
+            id: quotationId,
             quotationNumber: quotationNumber,
+            gstEnabled: isGSTEnabled,
+            documentType: isGSTEnabled ? 'GST' : 'NORMAL',
             customerInfo: customerInfo, // Store customer info directly, not reference
             quotationDate: quotationDate,
             validUntil: validityDate.toISOString().split('T')[0], // YYYY-MM-DD format
@@ -387,22 +415,22 @@ router.post('/', requireAuth, (req, res) => {
             items: items,
             extraCharges: charges,
             subtotal: parseFloat(subtotal) || 0,
-            cgstAmount: parseFloat(cgstAmount) || 0,
-            sgstAmount: parseFloat(sgstAmount) || 0,
+            cgstAmount: isGSTEnabled ? (parseFloat(cgstAmount) || 0) : 0,
+            sgstAmount: isGSTEnabled ? (parseFloat(sgstAmount) || 0) : 0,
             finalTotal: parseFloat(finalTotal) || 0,
             status: 'active',
             createdBy: req.session.user.id,
             createdAt: new Date().toISOString()
         };
 
-        // Save quotation (NO stock reduction, NO customer database update)
-        quotationsData.quotations.push(newQuotation);
-        quotationsData.nextQuotationNumber = nextQuotationNumber + 1;
-        quotationsData.lastUpdated = new Date().toISOString();
+        // Save quotation using new GST-aware method
+        const success = dataManager.addQuotationWithGST(newQuotation);
         
-        // Save to file using dataManager
-        dataManager.writeData('quotations', quotationsData);
+        if (!success) {
+            return res.redirect('/quotations/new?error=Failed to save quotation. Please try again.');
+        }
 
+        console.log('✅ About to redirect to:', `/quotations/${newQuotation.id}?success=Quotation created successfully`);
         res.redirect(`/quotations/${newQuotation.id}?success=Quotation created successfully`);
     } catch (error) {
         console.error('Error creating quotation:', error);
@@ -452,15 +480,29 @@ router.post('/:id/convert', requireAuth, (req, res) => {
             }
         }
 
-        // Get bills data
+        // Get bills data and determine bill numbering based on quotation GST status
         const billsData = dataManager.readData('bills');
-        const nextBillNumber = billsData.nextBillNumber || 1;
-        const billId = `bill_${String(nextBillNumber).padStart(3, '0')}`;
+        const isGSTBill = quotation.gstEnabled || quotation.documentType === 'GST';
+        
+        let billId, displayBillNumber;
+        if (isGSTBill) {
+            // GST Bill numbering
+            const nextGSTBillNumber = billsData.nextGSTBillNumber || 1;
+            billId = `GST-BILL-${String(nextGSTBillNumber).padStart(3, '0')}`;
+            displayBillNumber = `GST-BILL-${String(nextGSTBillNumber).padStart(3, '0')}`;
+        } else {
+            // Normal Bill numbering  
+            const nextNormalBillNumber = billsData.nextNormalBillNumber || 1;
+            billId = `BILL-${String(nextNormalBillNumber).padStart(3, '0')}`;
+            displayBillNumber = `BILL-${String(nextNormalBillNumber).padStart(3, '0')}`;
+        }
 
         // Create bill from quotation with consistent structure
         const newBill = {
             id: billId,
-            billNumber: nextBillNumber,
+            billNumber: displayBillNumber,
+            gstEnabled: isGSTBill,
+            documentType: isGSTBill ? 'GST' : 'NORMAL',
             customerId: quotation.customerInfo.customerId || `cust_${Date.now()}`, // Use existing or generate ID
             customerName: quotation.customerInfo.name,
             customerPhone: quotation.customerInfo.phone,
@@ -486,11 +528,12 @@ router.post('/:id/convert', requireAuth, (req, res) => {
             convertedFromQuotationNumber: quotation.quotationNumber
         };
 
-        // Add bill to database using dataManager
-        dataManager.add('bills', newBill);
-
-        // Update bill number using dataManager
-        dataManager.updateNextBillNumber(nextBillNumber + 1);
+        // Add bill to database using GST-aware method
+        const success = dataManager.addBillWithGST(newBill);
+        
+        if (!success) {
+            return res.redirect(`/quotations/${quotationId}?error=Failed to convert quotation to bill. Please try again.`);
+        }
 
         // Update item stock quantities using dataManager (only for physical items)
         quotation.items.forEach(quotationItem => {
@@ -641,16 +684,69 @@ router.get('/:id/print', requireAuth, (req, res) => {
             }
         };
 
-        res.render('quotations/print', {
-            title: `Print Quotation ${quotation.quotationNumber}`,
+        res.render('quotations/print-compact', {
+            title: `Print Quotation ${quotation.quotationNumber} - Compact`,
             user: req.session.user,
             quotation: quotation,
-            company: company
+            company: company,
+            companyName: company.name || 'Vikram Steels',
+            layout: false // No layout for print view
         });
     } catch (error) {
         console.error('Error loading quotation for print:', error);
         res.status(500).render('error', { 
             message: 'Error loading quotation for print',
+            user: req.session.user 
+        });
+    }
+});
+
+// GET /:id/print-original - Print quotation (original template)
+router.get('/:id/print-original', requireAuth, async (req, res) => {
+    try {
+        const quotationId = req.params.id;
+        console.log(`📄 Loading quotation ${quotationId} for original print`);
+        
+        const quotation = dataManager.getById('quotations', quotationId);
+        if (!quotation) {
+            console.log(`❌ Quotation ${quotationId} not found`);
+            return res.status(404).render('error', { 
+                message: 'Quotation not found',
+                user: req.session.user 
+            });
+        }
+
+        // Get company information from settings
+        const company = {
+            name: 'Vikram Steels',
+            address: {
+                line1: 'Industrial Area',
+                line2: 'Phase-1',
+                city: 'Chennai',
+                state: 'Tamil Nadu',
+                pincode: '600001'
+            },
+            contact: {
+                phone1: '+91 98765 43210',
+                phone2: '+91 98765 43211',
+                email: 'info@vikramsteels.com'
+            },
+            gst: {
+                gstin: '33EEOPR7876R1ZZ',
+                panNo: 'ABCDE1234F'
+            }
+        };
+
+        res.render('quotations/print', {
+            title: `Print Quotation ${quotation.quotationNumber} - Original`,
+            user: req.session.user,
+            quotation: quotation,
+            company: company
+        });
+    } catch (error) {
+        console.error('Error loading quotation for original print:', error);
+        res.status(500).render('error', { 
+            message: 'Error loading quotation for original print',
             user: req.session.user 
         });
     }

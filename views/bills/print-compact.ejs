@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill #<%= bill.billNumber %> - <%= bill.customerName %></title>
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            line-height: 1.1;
+            color: #000;
+            background: white;
+            margin: 0;
+            padding: 2mm;
+        }
+        
+        /* Ultra-compact print styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            
+            body {
+                font-size: 6px !important;
+                line-height: 1.0 !important;
+                margin: 0 !important;
+                padding: 1mm !important;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+        
+        .invoice-container {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* Header section - ultra compact with blue theme */
+        .header {
+            text-align: center;
+            margin-bottom: 2mm;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 1mm;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        }
+        
+        .company-name {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 1px;
+            color: #007bff;
+        }
+        
+        .company-details {
+            font-size: 6px;
+            line-height: 1.0;
+            margin-bottom: 1px;
+        }
+        
+        .invoice-title {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 1mm 0;
+            color: #007bff;
+        }
+        
+        /* Bill info section - side by side ultra compact */
+        .bill-info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2mm;
+            font-size: 6px;
+        }
+        
+        .bill-to, .bill-details {
+            width: 48%;
+        }
+        
+        .section-label {
+            font-weight: bold;
+            font-size: 7px;
+            margin-bottom: 1px;
+            text-decoration: underline;
+            color: #007bff;
+        }
+        
+        /* Items table - ultra compact like sample */
+        .items-section {
+            margin-bottom: 2mm;
+        }
+        
+        .items-header {
+            font-size: 7px;
+            font-weight: bold;
+            margin-bottom: 1px;
+            text-align: center;
+            color: #007bff;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 6px;
+            border: 1px solid #007bff;
+        }
+        
+        .items-table th {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: 1px solid #007bff;
+            padding: 0.5mm;
+            text-align: center;
+            font-weight: bold;
+            font-size: 6px;
+            line-height: 1.0;
+        }
+        
+        .items-table td {
+            border: 1px solid #007bff;
+            padding: 0.5mm;
+            text-align: center;
+            font-size: 6px;
+            line-height: 1.0;
+            vertical-align: top;
+        }
+        
+        .items-table .desc-col {
+            text-align: left;
+        }
+        
+        .items-table .amount-col {
+            text-align: right;
+        }
+        
+        /* Totals section - compact like sample */
+        .totals-section {
+            margin-top: 2mm;
+            border-top: 2px solid #007bff;
+            padding-top: 1mm;
+        }
+        
+        .totals-table {
+            float: right;
+            width: 40%;
+            font-size: 6px;
+            border-collapse: collapse;
+        }
+        
+        .totals-table td {
+            padding: 0.5mm 1mm;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .totals-table .label {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .totals-table .amount {
+            text-align: right;
+            width: 25mm;
+        }
+        
+        .final-total {
+            border-top: 2px solid #007bff !important;
+            font-weight: bold !important;
+            font-size: 7px !important;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        }
+        
+        /* Payment section */
+        .payment-section {
+            clear: both;
+            margin-top: 2mm;
+            padding: 1mm;
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            border: 1px solid #007bff;
+            border-radius: 2mm;
+            font-size: 6px;
+            text-align: center;
+        }
+        
+        /* Footer */
+        .footer {
+            clear: both;
+            margin-top: 3mm;
+            text-align: center;
+            font-size: 6px;
+            border-top: 2px solid #007bff;
+            padding-top: 1mm;
+        }
+        
+        /* Print controls - hide on print */
+        .print-controls {
+            margin-top: 5mm;
+            text-align: center;
+        }
+        
+        .print-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 3mm 6mm;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 2mm;
+        }
+        
+        @media print {
+            .print-controls {
+                display: none !important;
+            }
+            
+            .company-name {
+                font-size: 10px !important;
+            }
+            
+            .company-details {
+                font-size: 5px !important;
+            }
+            
+            .invoice-title {
+                font-size: 8px !important;
+            }
+            
+            .bill-info-section {
+                font-size: 5px !important;
+            }
+            
+            .section-label {
+                font-size: 6px !important;
+            }
+            
+            .items-header {
+                font-size: 6px !important;
+            }
+            
+            .items-table th, .items-table td {
+                font-size: 5px !important;
+                padding: 0.3mm !important;
+            }
+            
+            .totals-table {
+                font-size: 5px !important;
+            }
+            
+            .final-total {
+                font-size: 6px !important;
+            }
+            
+            .payment-section {
+                font-size: 5px !important;
+            }
+            
+            .footer {
+                font-size: 5px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-name"><%= company.name || companyName %></div>
+            <div class="company-details">
+                <%= company.address.line1 %>, <%= company.address.line2 %><br>
+                <%= company.address.city %>, <%= company.address.state %> - <%= company.address.pincode %><br>
+                Cell: <%= company.contact.phone1 %>, <%= company.contact.phone2 %><br>
+                <% if (company.gst.gstin) { %>GSTIN: <%= company.gst.gstin %><% } %>
+            </div>
+            <div class="invoice-title">TAX INVOICE</div>
+        </div>
+
+        <!-- Bill Information Section -->
+        <div class="bill-info-section">
+            <div class="bill-to">
+                <div class="section-label">Bill To:</div>
+                <strong><%= bill.customerName %></strong><br>
+                Phone: <%= bill.customerPhone %><br>
+                <% if (bill.customerGstin) { %>
+                    GSTIN: <%= bill.customerGstin %>
+                <% } else { %>
+                    <em>Unregistered Customer</em>
+                <% } %>
+            </div>
+            
+            <div class="bill-details">
+                <div class="section-label">Bill Details:</div>
+                <strong>Bill No:</strong> #<%= bill.billNumber %><br>
+                <strong>Date:</strong> <%= new Date(bill.billDate).toLocaleDateString('en-IN') %><br>
+                <strong>Payment:</strong> <%= bill.paymentMethod %><br>
+                <strong>Created By:</strong> <%= user.name %>
+            </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="items-section">
+            <div class="items-header">🛒 Items & Services (<%= bill.items.length %> item<%= bill.items.length !== 1 ? 's' : '' %>)</div>
+            
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 6%">S.No</th>
+                        <th style="width: 40%" class="desc-col">Description</th>
+                        <th style="width: 10%">HSN</th>
+                        <th style="width: 8%">Qty</th>
+                        <th style="width: 12%">Rate</th>
+                        <th style="width: 12%">Amount</th>
+                        <th style="width: 8%">GST</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let itemCounter = 1; %>
+                    <% bill.items.forEach(item => { %>
+                        <tr>
+                            <td><%= itemCounter++ %></td>
+                            <td class="desc-col"><%= item.itemName %></td>
+                            <td><%= item.hsnCode %></td>
+                            <td><%= item.quantity %></td>
+                            <td class="amount-col">₹<%= item.rate.toFixed(2) %></td>
+                            <td class="amount-col">₹<%= item.amount.toFixed(2) %></td>
+                            <td><%= item.gstRate %>%</td>
+                        </tr>
+                    <% }); %>
+                    
+                    <% if (bill.extraCharges && bill.extraCharges.length > 0) { %>
+                        <% bill.extraCharges.forEach(charge => { %>
+                            <tr>
+                                <td><%= itemCounter++ %></td>
+                                <td class="desc-col"><%= charge.description %></td>
+                                <td>9967</td>
+                                <td>1</td>
+                                <td class="amount-col">₹<%= charge.amount.toFixed(2) %></td>
+                                <td class="amount-col">₹<%= charge.amount.toFixed(2) %></td>
+                                <td><%= charge.gstRate || 0 %>%</td>
+                            </tr>
+                        <% }); %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <table class="totals-table">
+                <tr>
+                    <td class="label">Subtotal:</td>
+                    <td class="amount">₹<%= bill.subtotal.toFixed(2) %></td>
+                </tr>
+                <% if (bill.cgstAmount > 0) { %>
+                    <tr>
+                        <td class="label">CGST:</td>
+                        <td class="amount">₹<%= bill.cgstAmount.toFixed(2) %></td>
+                    </tr>
+                    <tr>
+                        <td class="label">SGST:</td>
+                        <td class="amount">₹<%= bill.sgstAmount.toFixed(2) %></td>
+                    </tr>
+                <% } %>
+                <tr class="final-total">
+                    <td class="label">Total Amount:</td>
+                    <td class="amount">₹<%= bill.finalTotal.toFixed(2) %></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Payment Section -->
+        <div class="payment-section">
+            <strong>💳 Payment Method: <%= bill.paymentMethod %></strong><br>
+            <% if (bill.paymentDetails && bill.paymentDetails.transactionId) { %>
+                Transaction ID: <%= bill.paymentDetails.transactionId %>
+            <% } %>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <strong>Thank you for your business!</strong><br>
+            This is a computer generated invoice and does not require signature.
+        </div>
+
+        <!-- Print Controls -->
+        <div class="print-controls no-print">
+            <button onclick="window.print()" class="print-btn">🖨️ Print Bill</button>
+            <a href="/bills/<%= bill.id %>" style="margin-left: 10px; text-decoration: none; background: #6c757d; color: white; padding: 3mm 6mm; border-radius: 2mm; font-size: 10px;">👁️ View Bill</a>
+            <a href="/bills" style="margin-left: 5px; text-decoration: none; background: #28a745; color: white; padding: 3mm 6mm; border-radius: 2mm; font-size: 10px;">📋 All Bills</a>
+        </div>
+    </div>
+
+    <script>
+        // Print functionality
+        function printBill() {
+            window.print();
+        }
+        
+        // Optional: Print when user presses Ctrl+P
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>

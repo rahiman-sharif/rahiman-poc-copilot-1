@@ -461,6 +461,10 @@
                             <span>🖨️</span>
                             Print
                         </a>
+                        <a href="/quotations/<%= quotation.id %>/print" class="btn" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; margin-left: 5px;" target="_blank">
+                            <span>📄</span>
+                            Compact Print
+                        </a>
                         <% if (user.role === 'admin' || user.role === 'manager') { %>
                             <button onclick="deleteQuotation('<%= quotation.id %>')" class="btn btn-danger">
                                 <span>🗑️</span>

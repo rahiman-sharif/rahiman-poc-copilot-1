@@ -332,16 +332,18 @@ class DataManager {
         }
     }
 
-    // Special method for bills collection that might have different structure
+    // Enhanced method for bills collection with GST support
     getBillsData() {
         const data = this.readData('bills');
         return {
             bills: data.bills || [],
-            nextBillNumber: data.nextBillNumber || 1
+            nextBillNumber: data.nextBillNumber || 1,
+            nextGSTBillNumber: data.nextGSTBillNumber || 1,
+            nextNormalBillNumber: data.nextNormalBillNumber || 1
         };
     }
 
-    // Update next bill number
+    // Update next bill number (legacy support)
     updateNextBillNumber(number) {
         try {
             const data = this.readData('bills');
@@ -349,6 +351,52 @@ class DataManager {
             return this.writeData('bills', data);
         } catch (error) {
             console.error('Error updating next bill number:', error);
+            return false;
+        }
+    }
+
+    // Generate next bill ID based on GST status
+    generateNextBillId(isGST = false) {
+        try {
+            const data = this.getBillsData();
+            let billId, nextNumber;
+            
+            if (isGST) {
+                nextNumber = data.nextGSTBillNumber;
+                billId = `GST-BILL-${String(nextNumber).padStart(3, '0')}`;
+                data.nextGSTBillNumber = nextNumber + 1;
+            } else {
+                nextNumber = data.nextNormalBillNumber;
+                billId = `BILL-${String(nextNumber).padStart(3, '0')}`;
+                data.nextNormalBillNumber = nextNumber + 1;
+            }
+            
+            // Save updated counters
+            this.writeData('bills', data);
+            return billId;
+        } catch (error) {
+            console.error('Error generating bill ID:', error);
+            return null;
+        }
+    }
+
+    // Add bill with GST support
+    addBillWithGST(billData) {
+        try {
+            const data = this.getBillsData();
+            
+            // Ensure GST fields are set
+            billData.gstEnabled = billData.gstEnabled || false;
+            billData.documentType = billData.gstEnabled ? 'GST' : 'NORMAL';
+            billData.id = billData.id || this.generateNextBillId(billData.gstEnabled);
+            billData.createdAt = billData.createdAt || new Date().toISOString();
+            
+            data.bills.push(billData);
+            data.lastUpdated = new Date().toISOString();
+            
+            return this.writeData('bills', data);
+        } catch (error) {
+            console.error('Error adding bill:', error);
             return false;
         }
     }
@@ -412,18 +460,28 @@ class DataManager {
 
     // ===== QUOTATIONS METHODS =====
     
-    // Get quotations data (similar to getBillsData)
+    // Enhanced quotations data with GST support
     getQuotationsData() {
         try {
             const data = this.readData('quotations');
-            return data || { quotations: [], nextQuotationNumber: 1 };
+            return {
+                quotations: data.quotations || [],
+                nextQuotationNumber: data.nextQuotationNumber || 1,
+                nextGSTQuotationNumber: data.nextGSTQuotationNumber || 1,
+                nextNormalQuotationNumber: data.nextNormalQuotationNumber || 1
+            };
         } catch (error) {
             console.error('Error reading quotations data:', error);
-            return { quotations: [], nextQuotationNumber: 1 };
+            return {
+                quotations: [],
+                nextQuotationNumber: 1,
+                nextGSTQuotationNumber: 1,
+                nextNormalQuotationNumber: 1
+            };
         }
     }
 
-    // Update next quotation number
+    // Update next quotation number (legacy support)
     updateNextQuotationNumber(newNumber) {
         try {
             const data = this.getQuotationsData();
@@ -437,18 +495,83 @@ class DataManager {
         }
     }
 
-    // Add quotation (similar to bills but for quotations)
-    addQuotation(quotationData) {
+    // Generate next quotation ID based on GST status
+    generateNextQuotationId(isGST = false) {
         try {
             const data = this.getQuotationsData();
+            let quotationId, nextNumber;
+            
+            if (isGST) {
+                nextNumber = data.nextGSTQuotationNumber;
+                quotationId = `GST-QT-${String(nextNumber).padStart(4, '0')}`;
+                data.nextGSTQuotationNumber = nextNumber + 1;
+            } else {
+                nextNumber = data.nextNormalQuotationNumber;
+                quotationId = `QT-${String(nextNumber).padStart(4, '0')}`;
+                data.nextNormalQuotationNumber = nextNumber + 1;
+            }
+            
+            // Save updated counters
+            this.writeData('quotations', data);
+            return quotationId;
+        } catch (error) {
+            console.error('Error generating quotation ID:', error);
+            return null;
+        }
+    }
+
+    // Add quotation with GST support
+    addQuotationWithGST(quotationData) {
+        try {
+            const data = this.getQuotationsData();
+            
+            // Ensure GST fields are set
+            quotationData.gstEnabled = quotationData.gstEnabled || false;
+            quotationData.documentType = quotationData.gstEnabled ? 'GST' : 'NORMAL';
+            quotationData.id = quotationData.id || this.generateNextQuotationId(quotationData.gstEnabled);
+            quotationData.createdAt = quotationData.createdAt || new Date().toISOString();
+            
             data.quotations.push(quotationData);
             data.lastUpdated = new Date().toISOString();
-            this.writeData('quotations', data);
-            return true;
+            
+            return this.writeData('quotations', data);
         } catch (error) {
             console.error('Error adding quotation:', error);
             return false;
         }
+    }
+
+    // Get bills filtered by GST status
+    getBillsByGSTStatus(gstEnabled = null) {
+        try {
+            const data = this.getBillsData();
+            if (gstEnabled === null) {
+                return data.bills; // Return all bills
+            }
+            return data.bills.filter(bill => bill.gstEnabled === gstEnabled);
+        } catch (error) {
+            console.error('Error filtering bills by GST status:', error);
+            return [];
+        }
+    }
+
+    // Get quotations filtered by GST status
+    getQuotationsByGSTStatus(gstEnabled = null) {
+        try {
+            const data = this.getQuotationsData();
+            if (gstEnabled === null) {
+                return data.quotations; // Return all quotations
+            }
+            return data.quotations.filter(quotation => quotation.gstEnabled === gstEnabled);
+        } catch (error) {
+            console.error('Error filtering quotations by GST status:', error);
+            return [];
+        }
+    }
+
+    // Legacy add quotation method (maintained for compatibility)
+    addQuotation(quotationData) {
+        return this.addQuotationWithGST(quotationData);
     }
 }
 

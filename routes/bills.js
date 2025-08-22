@@ -12,10 +12,62 @@ const requireAuth = (req, res, next) => {
     }
 };
 
-// GET /bills - Bills list page
+// GET /bills - Bills list page with date range and GST filtering
 router.get('/', requireAuth, (req, res) => {
     try {
-        const bills = dataManager.getAll('bills').sort((a, b) => new Date(b.billDate) - new Date(a.billDate));
+        const { gstFilter, fromDate, toDate, dateRange } = req.query;
+        console.log('🔍 Bills route - Query params:', { gstFilter, fromDate, toDate, dateRange });
+        
+        // Get all bills first
+        let bills = dataManager.getAll('bills');
+        
+        // Apply GST filtering
+        if (gstFilter === 'gst') {
+            bills = bills.filter(bill => bill.gstEnabled === true);
+        } else if (gstFilter === 'normal') {
+            bills = bills.filter(bill => bill.gstEnabled === false);
+        }
+        // If gstFilter is 'all' or undefined, show all bills
+        
+        // Apply date filtering
+        const today = new Date();
+        let startDate = null;
+        let endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999); // End of today
+        
+        if (dateRange === 'custom' && fromDate && toDate) {
+            // Custom date range
+            startDate = new Date(fromDate);
+            endDate = new Date(toDate);
+            endDate.setHours(23, 59, 59, 999); // End of selected day
+        } else if (dateRange === 'today' || (!dateRange && !fromDate && !toDate)) {
+            // Default: Today's bills only
+            startDate = new Date(today);
+            startDate.setHours(0, 0, 0, 0); // Start of today
+            endDate = new Date(today);
+            endDate.setHours(23, 59, 59, 999); // End of today
+        } else if (dateRange === 'month') {
+            // Last 30 days
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - 30);
+            startDate.setHours(0, 0, 0, 0); // Start of day
+        } else if (dateRange === 'all') {
+            // Show all bills - no date filtering
+            startDate = null;
+            endDate = null;
+        }
+        
+        // Filter bills by date range if specified
+        if (startDate && endDate) {
+            bills = bills.filter(bill => {
+                const billDate = new Date(bill.billDate);
+                return billDate >= startDate && billDate <= endDate;
+            });
+        }
+        
+        // Sort by date (newest first)
+        bills = bills.sort((a, b) => new Date(b.billDate) - new Date(a.billDate));
+        
         const totalBills = bills.length;
         const todaysBills = bills.filter(bill => {
             const billDate = new Date(bill.billDate).toDateString();
@@ -30,6 +82,15 @@ router.get('/', requireAuth, (req, res) => {
             return billDate === today;
         }).reduce((sum, bill) => sum + bill.finalTotal, 0);
 
+        // Calculate GST statistics
+        const gstBills = bills.filter(bill => bill.gstEnabled);
+        const normalBills = bills.filter(bill => !bill.gstEnabled);
+
+        console.log('🔍 Bills route - Rendering with:', { 
+            currentDateRange: dateRange || 'today',
+            totalBills: bills.length 
+        });
+
         res.render('bills/index', {
             title: `Billing System - ${res.locals.companyName}`,
             user: req.session.user,
@@ -38,6 +99,12 @@ router.get('/', requireAuth, (req, res) => {
             todaysBills: todaysBills,
             totalAmount: totalAmount,
             todaysAmount: todaysAmount,
+            gstBillsCount: gstBills.length,
+            normalBillsCount: normalBills.length,
+            currentGstFilter: gstFilter || 'all',
+            currentDateRange: dateRange || 'today',
+            fromDate: fromDate || '',
+            toDate: toDate || '',
             query: req.query
         });
     } catch (error) {
@@ -78,7 +145,8 @@ router.get('/new', requireAuth, (req, res) => {
         const categories = dataManager.findBy('categories', { isActive: true });
         const company = dataManager.getCompanyData();
         const billsData = dataManager.getBillsData();
-        const nextBillNumber = billsData.nextBillNumber;
+        const nextNormalBillNumber = billsData.nextNormalBillNumber;
+        const nextGSTBillNumber = billsData.nextGSTBillNumber;
 
         // Add category names to items and ensure fresh stock data
         const itemsWithCategories = items.map(item => {
@@ -100,7 +168,8 @@ router.get('/new', requireAuth, (req, res) => {
             customers: customers,
             items: itemsWithCategories,
             company: company,
-            billNumber: nextBillNumber,
+            billNumber: `BILL-${String(nextNormalBillNumber).padStart(3, '0')}`,
+            gstBillNumber: `GST-BILL-${String(nextGSTBillNumber).padStart(3, '0')}`,
             isEdit: false,
             bill: null
         });
@@ -113,7 +182,7 @@ router.get('/new', requireAuth, (req, res) => {
     }
 });
 
-// POST /bills - Create new bill
+// POST /bills - Create new bill with GST support
 router.post('/', requireAuth, (req, res) => {
     try {
         const { 
@@ -121,8 +190,11 @@ router.post('/', requireAuth, (req, res) => {
             billItems, extraCharges, subtotal, cgstAmount, sgstAmount, finalTotal,
             paymentMethod, upiTransactionId, bankReference, bankName,
             chequeNumber, chequeBankName, chequeDate, cardLast4, cardType,
-            creditDueDate, creditTerms
+            creditDueDate, creditTerms, gstEnabled, gstEnabledValue // NEW: GST toggle fields
         } = req.body;
+
+        // Parse GST enabled status - check both checkbox and hidden field
+        const isGSTEnabled = gstEnabled === 'on' || gstEnabled === 'true' || gstEnabledValue === 'true';
 
         // Validate required fields
         if (!customerType) {
@@ -220,10 +292,14 @@ router.post('/', requireAuth, (req, res) => {
             return res.redirect('/bills/new?error=Failed to process customer information. Please try again.');
         }
 
-        // Generate bill number
-        const billsData = dataManager.getBillsData();
-        const billNumber = billsData.nextBillNumber;
-        const billId = `bill_${String(billNumber).padStart(3, '0')}`;
+        // Generate bill ID based on GST status
+        const billId = dataManager.generateNextBillId(isGSTEnabled);
+        if (!billId) {
+            return res.redirect('/bills/new?error=Failed to generate bill number. Please try again.');
+        }
+
+        // Use the full bill ID as the bill number for display
+        const billNumber = billId;
 
         // Parse bill items and charges
         const parsedItems = JSON.parse(billItems);
@@ -267,10 +343,12 @@ router.post('/', requireAuth, (req, res) => {
             if (creditTerms) paymentDetails.terms = creditTerms.trim();
         }
 
-        // Create bill object matching the sample invoice format
+        // Create bill object with GST support
         const newBill = {
             id: billId,
             billNumber: billNumber,
+            gstEnabled: isGSTEnabled,
+            documentType: isGSTEnabled ? 'GST' : 'NORMAL',
             customerId: customer.id,
             customerName: customer.name,
             customerPhone: customer.contact.phone,
@@ -279,9 +357,9 @@ router.post('/', requireAuth, (req, res) => {
             items: parsedItems,
             extraCharges: parsedCharges,
             subtotal: parseFloat(subtotal),
-            cgstAmount: parseFloat(cgstAmount),
-            sgstAmount: parseFloat(sgstAmount),
-            totalGst: parseFloat(cgstAmount) + parseFloat(sgstAmount),
+            cgstAmount: isGSTEnabled ? parseFloat(cgstAmount) : 0,
+            sgstAmount: isGSTEnabled ? parseFloat(sgstAmount) : 0,
+            totalGst: isGSTEnabled ? (parseFloat(cgstAmount) + parseFloat(sgstAmount)) : 0,
             finalTotal: parseFloat(finalTotal),
             paymentMethod: paymentDetails.method,
             paymentDetails: paymentDetails,
@@ -289,11 +367,12 @@ router.post('/', requireAuth, (req, res) => {
             createdAt: new Date().toISOString()
         };
 
-        // Add bill to database
-        dataManager.add('bills', newBill);
-
-        // Update bill number
-        dataManager.updateNextBillNumber(billNumber + 1);
+        // Add bill using new GST-aware method
+        const success = dataManager.addBillWithGST(newBill);
+        
+        if (!success) {
+            return res.redirect('/bills/new?error=Failed to save bill. Please try again.');
+        }
 
         // Update customer total purchases
         dataManager.updateById('customers', customer.id, {
@@ -396,15 +475,49 @@ router.get('/:id/print', requireAuth, (req, res) => {
 
         const company = dataManager.getAll('company');
         
+        res.render('bills/print-compact', {
+            title: `Bill #${bill.billNumber} - Compact Print`,
+            user: req.session.user,
+            bill: bill,
+            company: company,
+            companyName: company.name || 'Vikram Steels',
+            layout: false // No layout for print view
+        });
+    } catch (error) {
+        console.error('Error loading bill for print:', error);
+        res.status(500).render('error', { 
+            message: 'Error loading bill',
+            user: req.session.user 
+        });
+    }
+});
+
+// Original print route (for comparison)
+router.get('/:id/print-original', async (req, res) => {
+    try {
+        const billId = req.params.id;
+        console.log(`📄 Loading bill ${billId} for original print`);
+        
+        const bill = dataManager.getById('bills', billId);
+        if (!bill) {
+            console.log(`❌ Bill ${billId} not found`);
+            return res.status(404).render('error', { 
+                message: 'Bill not found',
+                user: req.session.user 
+            });
+        }
+
+        const company = dataManager.getAll('company');
+        
         res.render('bills/print', {
-            title: `Bill #${bill.billNumber} - Print`,
+            title: `Bill #${bill.billNumber} - Original Print`,
             user: req.session.user,
             bill: bill,
             company: company,
             layout: false // No layout for print view
         });
     } catch (error) {
-        console.error('Error loading bill for print:', error);
+        console.error('Error loading bill for original print:', error);
         res.status(500).render('error', { 
             message: 'Error loading bill',
             user: req.session.user 

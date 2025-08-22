@@ -5,23 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quotation #<%= quotation.quotationNumber %> - <%= quotation.customerInfo.name %></title>
     <style>
-        /* Print-specific styling */
+        /* Print-optimized styling */
         @media print {
-            body { margin: 0; }
+            body { 
+                margin: 0; 
+                font-size: 10px;
+                line-height: 1.2;
+            }
             .no-print { display: none !important; }
             .print-break { page-break-after: always; }
+            .invoice-container {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
         }
         
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background: white;
             color: #333;
+            font-size: 11px;
+            line-height: 1.3;
         }
         
         .invoice-container {
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
             background: white;
             border: 1px solid #ddd;
@@ -29,98 +41,102 @@
         
         .invoice-header {
             background: #f8f9fa;
-            padding: 20px;
-            border-bottom: 3px solid #8b5cf6;
+            padding: 10px 15px;
+            border-bottom: 2px solid #8b5cf6;
             text-align: center;
         }
         
         .company-name {
-            font-size: 32px;
+            font-size: 18px;
             font-weight: bold;
             color: #8b5cf6;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
         .company-details {
-            font-size: 14px;
+            font-size: 10px;
             color: #666;
-            line-height: 1.5;
+            line-height: 1.3;
         }
         
         .invoice-title {
             text-align: center;
-            font-size: 24px;
+            font-size: 16px;
             font-weight: bold;
-            color: #333;
-            margin: 20px 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: #8b5cf6;
             color: white;
-            padding: 10px;
+            margin: 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #8b5cf6;
+            padding: 6px;
         }
         
         .quotation-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding: 20px;
+            gap: 15px;
+            padding: 10px 15px;
             border-bottom: 1px solid #eee;
         }
         
         .quotation-info, .customer-info {
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 8px;
+            border-radius: 3px;
         }
         
         .section-title {
             font-weight: bold;
             color: #8b5cf6;
-            margin-bottom: 10px;
-            font-size: 16px;
+            margin-bottom: 6px;
+            font-size: 12px;
         }
         
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            padding: 2px 0;
+            margin-bottom: 4px;
+            padding: 1px 0;
         }
         
         .info-label {
             font-weight: 500;
             color: #555;
+            font-size: 10px;
         }
         
         .info-value {
             font-weight: bold;
             color: #333;
+            font-size: 10px;
         }
         
         .items-section {
-            padding: 20px;
+            padding: 10px 15px;
         }
         
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            font-size: 9px;
         }
         
         .items-table th {
             background: #8b5cf6;
             color: white;
-            padding: 12px 8px;
+            padding: 6px 4px;
             text-align: left;
             font-weight: bold;
             border: 1px solid #8b5cf6;
+            font-size: 9px;
         }
         
         .items-table td {
-            padding: 10px 8px;
+            padding: 4px 3px;
             border: 1px solid #ddd;
             vertical-align: top;
+            font-size: 9px;
         }
         
         .items-table tbody tr:nth-child(even) {
@@ -130,102 +146,111 @@
         .item-name {
             font-weight: bold;
             color: #333;
+            font-size: 9px;
         }
         
         .item-details {
-            font-size: 12px;
+            font-size: 8px;
             color: #666;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         
         .amount-column {
             text-align: right;
             font-weight: bold;
+            font-size: 9px;
         }
         
         .charges-section {
-            margin-top: 20px;
+            margin-top: 10px;
         }
         
         .charges-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            font-size: 9px;
         }
         
         .charges-table th {
             background: #6b7280;
             color: white;
-            padding: 10px 8px;
+            padding: 6px 4px;
             text-align: left;
             font-weight: bold;
             border: 1px solid #6b7280;
+            font-size: 9px;
         }
         
         .charges-table td {
-            padding: 8px;
+            padding: 4px;
             border: 1px solid #ddd;
+            font-size: 9px;
         }
         
         .totals-section {
             background: #f8f9fa;
-            padding: 20px;
+            padding: 10px 15px;
             border-top: 2px solid #8b5cf6;
         }
         
         .totals-table {
             width: 100%;
-            max-width: 400px;
+            max-width: 250px;
             margin-left: auto;
+            font-size: 10px;
         }
         
         .totals-table td {
-            padding: 8px 12px;
+            padding: 4px 8px;
             border-bottom: 1px solid #ddd;
         }
         
         .total-label {
             font-weight: 500;
             color: #555;
+            font-size: 10px;
         }
         
         .total-amount {
             font-weight: bold;
             text-align: right;
             color: #333;
+            font-size: 10px;
         }
         
         .final-total {
             background: #8b5cf6;
             color: white;
-            font-size: 18px;
+            font-size: 12px;
             font-weight: bold;
         }
         
         .final-total td {
-            padding: 12px;
+            padding: 6px 8px;
             border: none;
         }
         
         .terms-section {
-            padding: 20px;
+            padding: 10px 15px;
             border-top: 1px solid #eee;
         }
         
         .terms-title {
             font-weight: bold;
             color: #8b5cf6;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
+            font-size: 11px;
         }
         
         .terms-content {
-            font-size: 12px;
+            font-size: 9px;
             color: #666;
-            line-height: 1.5;
+            line-height: 1.3;
         }
         
         .footer-section {
-            padding: 20px;
+            padding: 10px 15px;
             border-top: 1px solid #eee;
             text-align: center;
         }
@@ -233,32 +258,33 @@
         .signature-area {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 50px;
-            margin-top: 40px;
+            gap: 30px;
+            margin-top: 25px;
         }
         
         .signature-box {
             text-align: center;
             border-top: 1px solid #333;
-            padding-top: 10px;
+            padding-top: 6px;
+            font-size: 9px;
         }
         
         .print-controls {
             text-align: center;
-            margin: 20px 0;
-            padding: 10px;
+            margin: 15px 0;
+            padding: 8px;
             background: #f8f9fa;
-            border-radius: 5px;
+            border-radius: 4px;
         }
         
         .print-btn {
             background: #8b5cf6;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 12px;
             margin: 0 5px;
         }
         
@@ -270,10 +296,10 @@
             background: #6b7280;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 12px;
             margin: 0 5px;
             text-decoration: none;
             display: inline-block;
@@ -285,19 +311,72 @@
         
         .validity-notice {
             background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
-            text-align: center;
-            font-weight: bold;
+            padding: 6px 10px;
+            border-radius: 3px;
+            margin: 8px 0;
+            font-size: 9px;
             color: #92400e;
+            border-left: 3px solid #f59e0b;
+        }
+        
+        /* Compact spacing for print */
+        h3, h4 {
+            margin: 8px 0 6px 0;
+            font-size: 11px;
+        }
+        
+        /* More items per page */
+        @media print {
+            .items-table th,
+            .items-table td {
+                padding: 2px 3px;
+                font-size: 8px;
+            }
+            
+            .company-name {
+                font-size: 16px;
+            }
+            
+            .invoice-title {
+                font-size: 14px;
+                padding: 4px;
+                margin: 6px 0;
+            }
+            
+            .quotation-details {
+                padding: 8px 12px;
+                gap: 10px;
+            }
+            
+            .items-section {
+                padding: 8px 12px;
+            }
+            
+            .totals-section {
+                padding: 8px 12px;
+            }
+            
+            .terms-section,
+            .footer-section {
+                padding: 8px 12px;
+            }
+            
+            .signature-area {
+                margin-top: 15px;
+                gap: 20px;
+            }
         }
         
         .expired-notice {
             background: #fee2e2;
             border: 1px solid #ef4444;
             color: #991b1b;
+            border-radius: 3px;
+            padding: 6px 10px;
+            margin: 8px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 9px;
         }
     </style>
 </head>
@@ -397,15 +476,15 @@
 
         <!-- Items Section -->
         <div class="items-section">
-            <h3 style="color: #8b5cf6; margin-bottom: 15px;">📦 Items</h3>
+            <h3 style="color: #8b5cf6; margin-bottom: 8px; font-size: 11px;">📦 Items</h3>
             <table class="items-table">
                 <thead>
                     <tr>
-                        <th style="width: 5%;">#</th>
-                        <th style="width: 35%;">Item Details</th>
-                        <th style="width: 10%;">HSN Code</th>
-                        <th style="width: 10%;">Qty</th>
-                        <th style="width: 10%;">Unit</th>
+                        <th style="width: 4%;">#</th>
+                        <th style="width: 40%;">Item Details</th>
+                        <th style="width: 8%;">HSN</th>
+                        <th style="width: 8%;">Qty</th>
+                        <th style="width: 8%;">Unit</th>
                         <th style="width: 15%;">Rate (₹)</th>
                         <th style="width: 15%;">Amount (₹)</th>
                     </tr>
@@ -413,7 +492,7 @@
                 <tbody>
                     <% quotation.items.forEach((item, index) => { %>
                         <tr>
-                            <td><%= index + 1 %></td>
+                            <td style="text-align: center;"><%= index + 1 %></td>
                             <td>
                                 <div class="item-name"><%= item.itemName %></div>
                                 <% if (item.description) { %>
