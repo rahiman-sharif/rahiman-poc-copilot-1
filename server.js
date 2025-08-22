@@ -1,3 +1,7 @@
+// ========== UNIVERSAL JSON PROTECTION SYSTEM ==========
+// Must be loaded FIRST to override fs globally
+require('./utils/json-protection');
+
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
