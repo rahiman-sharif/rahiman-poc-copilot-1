@@ -1,0 +1,237 @@
+{
+  "permissions": {
+    "dashboard": {
+      "/dashboard": {
+        "enabled": true,
+        "category": "Dashboard",
+        "description": "Main Dashboard"
+      },
+      "/whatsapp": {
+        "enabled": true,
+        "category": "Dashboard",
+        "description": "Send Bills via WhatsApp"
+      }
+    },
+    "inventory": {
+      "/items": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Items Management"
+      },
+      "/items/new": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Add New Item"
+      },
+      "/items/:id": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "View Item Details"
+      },
+      "/items/:id/edit": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Edit Item"
+      },
+      "/items/test/stock/:id": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Test Stock Data"
+      },
+      "/stock": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Stock Management"
+      },
+      "/stock/adjust/:id": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Stock Adjustments"
+      },
+      "/stock/movements": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Stock Movements"
+      },
+      "/stock/api/item/:id": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Stock API Endpoints"
+      },
+      "/stock/debug/items": {
+        "enabled": true,
+        "category": "Inventory",
+        "description": "Debug Stock Items"
+      }
+    },
+    "sales": {
+      "/bills": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "Bills Management"
+      },
+      "/bills/new": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "Create New Bill"
+      },
+      "/bills/api/fresh-stock": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "Fresh Stock API"
+      },
+      "/bills/:id": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "View Bill"
+      },
+      "/bills/:id/print": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "Print Bill"
+      },
+      "/quotations": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "Quotations Management"
+      },
+      "/quotations/new": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "Create New Quotation"
+      },
+      "/quotations/:id": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "View Quotation"
+      },
+      "/quotations/:id/print": {
+        "enabled": true,
+        "category": "Sales & Orders",
+        "description": "Print Quotation"
+      }
+    },
+    "customers": {
+      "/customers": {
+        "enabled": true,
+        "category": "Customer Relations",
+        "description": "Customers Management"
+      },
+      "/customers/new": {
+        "enabled": true,
+        "category": "Customer Relations",
+        "description": "Add New Customer"
+      },
+      "/customers/:id/edit": {
+        "enabled": true,
+        "category": "Customer Relations",
+        "description": "Edit Customer"
+      }
+    },
+    "reports": {
+      "/reports": {
+        "enabled": true,
+        "category": "Reports & Analytics",
+        "description": "Reports Dashboard"
+      },
+      "/reports/sales": {
+        "enabled": true,
+        "category": "Reports & Analytics",
+        "description": "Sales Reports"
+      },
+      "/reports/inventory": {
+        "enabled": true,
+        "category": "Reports & Analytics",
+        "description": "Inventory Reports"
+      },
+      "/reports/customers": {
+        "enabled": true,
+        "category": "Reports & Analytics",
+        "description": "Customer Reports"
+      },
+      "/reports/gst": {
+        "enabled": true,
+        "category": "Reports & Analytics",
+        "description": "GST Reports"
+      }
+    },
+    "administration": {
+      "/users": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "User Management"
+      },
+      "/users/add": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Add New User"
+      },
+      "/users/:id/edit": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Edit User"
+      },
+      "/users/:id/delete": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Delete User"
+      },
+      "/users/:id/toggle-status": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Toggle User Status"
+      },
+      "/data": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Data Management"
+      },
+      "/data/backup": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Create Backup"
+      },
+      "/data/backups": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "View Backups"
+      },
+      "/data/restore/:backupName": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Restore Data"
+      },
+      "/data/export": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Export Data"
+      },
+      "/data/download/:backupName": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Download Backups"
+      },
+      "/data/upload-restore": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Upload & Restore"
+      },
+      "/settings": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Settings Dashboard"
+      },
+      "/settings/company": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Company Settings"
+      },
+      "/settings/route-control": {
+        "enabled": true,
+        "category": "System Administration",
+        "description": "Route Control Center"
+      }
+    }
+  },
+  "lastUpdated": "2025-08-22T04:10:06.501Z"
+}

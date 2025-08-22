@@ -105,8 +105,10 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 <%= companyName %></h1>
-                <p>GST Report</p>
+                <a href="/dashboard" style="text-decoration: none; color: inherit;">
+                    <h1>🏢 <%= companyName %></h1>
+                    <p>GST Report</p>
+                </a>
             </div>
             
             <div class="user-section">
@@ -229,7 +231,7 @@
                     <div style="font-size: 2em; font-weight: bold; margin: 10px 0;">
                         ₹<%= totals.totalGst.toLocaleString() %>
                     </div>
-                    <div style="font-size: 0.8em;"><%= totals.billCount %> bills</div>
+                    <div style="font-size: 0.8em;"><%= totals.billCount %> GST bills</div>
                 </div>
             </div>
 

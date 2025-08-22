@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - <%= companyName %></title>
+    <title>Error - <%= typeof companyName !== 'undefined' ? companyName : 'Billing System' %></title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -11,11 +11,11 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 <%= companyName %></h1>
+                <h1>🏢 <%= typeof companyName !== 'undefined' ? companyName : 'Billing System' %></h1>
                 <p>Billing Management System</p>
             </div>
             
-            <% if (user) { %>
+            <% if (typeof user !== 'undefined' && user) { %>
             <div class="user-section">
                 <div class="user-info">
                     <span class="user-name">Welcome, <%= user.name %></span>
@@ -38,7 +38,7 @@
                 <p class="error-message"><%= message %></p>
                 
                 <div class="error-actions">
-                    <% if (user) { %>
+                    <% if (typeof user !== 'undefined' && user) { %>
                         <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
                     <% } else { %>
                         <a href="/login" class="btn btn-primary">Go to Login</a>

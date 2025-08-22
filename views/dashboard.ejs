@@ -11,8 +11,10 @@
     <header class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <h1>🏢 <%= companyName %></h1>
-                <p>Billing Management System</p>
+                <a href="/dashboard" style="text-decoration: none; color: inherit;">
+                    <h1>🏢 <%= companyName %></h1>
+                    <p>Billing Management System</p>
+                </a>
             </div>
             
             <div class="user-section">
@@ -26,7 +28,6 @@
             </div>
         </div>
     </header>
-
     <!-- Main Dashboard -->
     <main class="dashboard-main">
         <div class="dashboard-container">
@@ -114,6 +115,14 @@
                                 <div class="mgmt-info">
                                     <h5>Quotations</h5>
                                     <p>Manage price quotes</p>
+                                </div>
+                            </a>
+
+                            <a href="/whatsapp" class="mgmt-card">
+                                <span class="mgmt-icon">💬</span>
+                                <div class="mgmt-info">
+                                    <h5>Send Bills via WhatsApp</h5>
+                                    <p>Share bill information</p>
                                 </div>
                             </a>
                         </div>

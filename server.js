@@ -358,6 +358,11 @@ function initializeFreshSystem() {
                             "enabled": true,
                             "category": "Dashboard",
                             "description": "Main Dashboard"
+                        },
+                        "/whatsapp": {
+                            "enabled": true,
+                            "category": "Dashboard",
+                            "description": "Send Bills via WhatsApp"
                         }
                     },
                     "inventory": {
@@ -710,6 +715,7 @@ const reportsRouter = require('./routes/reports');
 const usersRouter = require('./routes/users');
 const dataRouter = require('./routes/data');
 const settingsRouter = require('./routes/settings');
+const whatsappRouter = require('./routes/whatsapp');
 
 app.use('/items', (req, res, next) => {
     //console.log(`📋 Items route request: ${req.method} ${req.originalUrl}`);
@@ -723,6 +729,7 @@ app.use('/reports', reportsRouter);
 app.use('/users', usersRouter);
 app.use('/data', dataRouter);
 app.use('/settings', settingsRouter);
+app.use('/whatsapp', whatsappRouter);
 
 // Authentication middleware
 const requireAuth = (req, res, next) => {

@@ -4,7 +4,7 @@
  */
 
 // ========== CONFIGURATION SETTINGS ==========
-const COMPANY_NAME = "Vikram Steels";
+const COMPANY_NAME = "Vikram POC";
 const APP_TYPE = "web"; // Change to "desktop" for desktop mode
 const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
 

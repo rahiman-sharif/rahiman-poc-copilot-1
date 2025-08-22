@@ -275,46 +275,69 @@ router.get('/gst', requireAuth, (req, res) => {
         const bills = billsData.bills || [];
         const company = dataManager.getAll('company');
         
-        // Filter bills for the selected month/year
+        // Filter bills for the selected month/year and only include bills with actual GST collected
         const monthlyBills = bills.filter(bill => {
             const billDate = new Date(bill.createdAt || bill.billDate);
-            return billDate.getMonth() + 1 === reportMonth && billDate.getFullYear() === reportYear;
+            const isInSelectedPeriod = billDate.getMonth() + 1 === reportMonth && billDate.getFullYear() === reportYear;
+            
+            // Check if this bill has actual GST amounts (not just GST rates)
+            const hasActualGst = (bill.totalGst || 0) > 0;
+            
+            return isInSelectedPeriod && hasActualGst;
         });
         
-        // Group by GST rates
+        // Group by GST rates - only process GST items from GST bills
         const gstBreakdown = {};
         let totalTaxableValue = 0;
         let totalCgst = 0;
         let totalSgst = 0;
         
         monthlyBills.forEach(bill => {
-            if (bill.items && Array.isArray(bill.items)) {
-                bill.items.forEach(item => {
-                    const gstRate = item.gstRate || 0;
-                    const taxableAmount = item.amount || (item.quantity * item.rate) || 0;
-                    const cgst = taxableAmount * (gstRate / 2) / 100;
-                    const sgst = taxableAmount * (gstRate / 2) / 100;
+            // Use actual GST amounts from bill data instead of calculating
+            const billCgst = bill.cgstAmount || 0;
+            const billSgst = bill.sgstAmount || 0;
+            const billTotalGst = bill.totalGst || 0;
+            const billSubtotal = bill.subtotal || 0;
+            
+            // Only process if this bill has actual GST
+            if (billTotalGst > 0 && bill.items && Array.isArray(bill.items)) {
+                // Find the primary GST rate for this bill (from items with GST)
+                const gstItems = bill.items.filter(item => (item.gstRate || 0) > 0);
+                if (gstItems.length > 0) {
+                    const primaryGstRate = gstItems[0].gstRate; // Use first GST rate found
                     
-                    if (!gstBreakdown[gstRate]) {
-                        gstBreakdown[gstRate] = {
-                            gstRate,
+                    if (!gstBreakdown[primaryGstRate]) {
+                        gstBreakdown[primaryGstRate] = {
+                            gstRate: primaryGstRate,
                             taxableValue: 0,
                             cgstAmount: 0,
                             sgstAmount: 0,
                             totalGst: 0,
-                            billCount: 0
+                            billCount: 0,
+                            items: []
                         };
                     }
                     
-                    gstBreakdown[gstRate].taxableValue += taxableAmount;
-                    gstBreakdown[gstRate].cgstAmount += cgst;
-                    gstBreakdown[gstRate].sgstAmount += sgst;
-                    gstBreakdown[gstRate].totalGst += cgst + sgst;
+                    gstBreakdown[primaryGstRate].taxableValue += billSubtotal;
+                    gstBreakdown[primaryGstRate].cgstAmount += billCgst;
+                    gstBreakdown[primaryGstRate].sgstAmount += billSgst;
+                    gstBreakdown[primaryGstRate].totalGst += billTotalGst;
+                    gstBreakdown[primaryGstRate].billCount += 1;
+                    gstBreakdown[primaryGstRate].items.push({
+                        billNumber: bill.billNumber,
+                        billDate: bill.billDate,
+                        customerName: bill.customerName,
+                        gstin: bill.customerGstin,
+                        taxableValue: billSubtotal,
+                        cgst: billCgst,
+                        sgst: billSgst,
+                        total: bill.finalTotal
+                    });
                     
-                    totalTaxableValue += taxableAmount;
-                    totalCgst += cgst;
-                    totalSgst += sgst;
-                });
+                    totalTaxableValue += billSubtotal;
+                    totalCgst += billCgst;
+                    totalSgst += billSgst;
+                }
             }
         });
         
@@ -332,7 +355,7 @@ router.get('/gst', requireAuth, (req, res) => {
             title: `GST Report - ${res.locals.companyName}`,
             user: req.session.user,
             gstSummary,
-            monthlyBills,
+            monthlyBills,  // This already contains only GST bills from our filter
             monthOptions,
             reportMonth,
             reportYear,
@@ -342,7 +365,9 @@ router.get('/gst', requireAuth, (req, res) => {
                 cgstAmount: totalCgst,
                 sgstAmount: totalSgst,
                 totalGst: totalCgst + totalSgst,
-                billCount: monthlyBills.length
+                grandTotal: totalTaxableValue + totalCgst + totalSgst,
+                billCount: monthlyBills.length,
+                gstBillCount: monthlyBills.length  // All bills in this report are GST bills
             },
             query: req.query
         });
