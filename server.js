@@ -64,22 +64,21 @@ function initializeFreshSystem() {
             status: 'active',
             createdAt: new Date().toISOString(),
             lastLogin: null
-        });
-        
-        // Super user (hidden)
-        const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
-        dataManager.add('users', {
-            id: 'user_super',
-            username: 'superuser',
-            password: hashedSuperPassword,
-            role: 'super',
-            fullName: 'Super Administrator',
-            email: '',
-            status: 'active',
-            isHidden: true,
-            createdAt: new Date().toISOString(),
-            lastLogin: null
-        });
+        });       
+       
+        // const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
+        // dataManager.add('users', {
+        //     id: 'user_super',
+        //     username: 'superuser',
+        //     password: hashedSuperPassword,
+        //     role: 'super',
+        //     fullName: 'Super Administrator',
+        //     email: '',
+        //     status: 'active',
+        //     isHidden: true,
+        //     createdAt: new Date().toISOString(),
+        //     lastLogin: null
+        // });
         
         //console.log('✅ Default users created (including hidden super user)');
     }
@@ -705,6 +704,52 @@ app.use((req, res, next) => {
     next();
 });
 
+// License blocking middleware - check for license issues (MUST BE BEFORE ALL ROUTES)
+app.use((req, res, next) => {
+    // Allow access to static files and license-related routes
+    if (req.path.startsWith('/css/') || 
+        req.path.startsWith('/js/') || 
+        req.path.startsWith('/images/') || 
+        req.path.startsWith('/uploads/') ||
+        req.path.startsWith('/license/') ||
+        req.path === '/license-expired') {
+        return next();
+    }
+    
+    // Perform real-time license validation on every request
+    const validation = licenseManager.validateLicense();
+    
+    if (!validation.isValid) {
+        // Check if it's expired (either natural expiry or manual deletion)
+        if (validation.isExpired || validation.isManuallyDeleted) {
+            const reason = validation.isManuallyDeleted ? 'License tampering detected' : 'License expired';
+            console.log(`🚫 Blocking access to ${req.path} - ${reason}`);
+            
+            return res.render('license-expired', {
+                companyName: res.locals.companyName || 'Billing System',
+                licenseError: validation,
+                licenseInfo: null
+            });
+        }
+        
+        // Other license issues (invalid format, etc.)
+        if (validation.needsDefault) {
+            // This should only happen on fresh install - allow it to continue
+            return next();
+        }
+        
+        // Any other license validation failure
+        console.log(`🚫 Blocking access to ${req.path} - License validation failed: ${validation.reason}`);
+        return res.render('license-expired', {
+            companyName: res.locals.companyName || 'Billing System',
+            licenseError: validation,
+            licenseInfo: null
+        });
+    }
+    
+    next();
+});
+
 // Route permission middleware (applied to specific routes)
 app.use(checkRoutePermission);
 
@@ -811,6 +856,7 @@ app.get('/license-expired', (req, res) => {
     res.render('license-expired', { 
         companyName,
         licenseInfo: licenseValidation.license,
+        licenseError: licenseValidation,
         error: req.query.error,
         success: req.query.success
     });
@@ -931,8 +977,60 @@ app.post('/logout', (req, res) => {
 console.log('🔐 Initializing License System...');
 
 if (!licenseManager.licenseExists()) {
-    console.log('📋 No license found - creating default 45-day license');
-    licenseManager.createDefaultLicense();
+    // No license found - always show license expired screen (no automatic creation)
+    console.log('❌ No license found - blocking application access');
+    console.log('🚫 License required to access the application');
+    
+    app.locals.licenseExpired = true;
+    app.locals.licenseError = {
+        isExpired: true,
+        reason: 'No valid license found. Please upload a valid license to access the system.',
+        blockAccess: true
+    };
+} else {
+    const validation = licenseManager.validateLicense();
+    if (validation.isValid) {
+        console.log(`✅ License valid - ${validation.daysRemaining} days remaining`);
+        if (validation.isExpiringSoon) {
+            console.log(`⚠️  License expires soon! (${validation.daysRemaining} days)`);
+        }
+        // Clear any previous license flags
+        app.locals.licenseExpired = false;
+        app.locals.licenseError = null;
+    } else {
+        console.log(`❌ License issue: ${validation.reason}`);
+        
+        // All invalid licenses show expired screen
+        app.locals.licenseExpired = true;
+        app.locals.licenseError = validation;
+        
+        if (validation.isManuallyDeleted) {
+            console.log('� SECURITY VIOLATION: License tampering detected!');
+        } else if (validation.isExpired) {
+            console.log('📅 License has expired');
+        }
+        console.log('🚫 Showing license expired screen');
+    }
+}
+// Check and initialize license system
+console.log('🔐 Initializing License System...');
+
+if (!licenseManager.licenseExists()) {
+    // Check if license was manually deleted
+    if (licenseManager.isLicenseManuallyDeleted()) {
+        console.log('� SECURITY VIOLATION: License file was manually deleted!');
+        console.log('🚫 Application access blocked due to license tampering');
+        
+        // Set global flag to block all routes except license expired page
+        app.locals.licenseBlocked = true;
+        app.locals.licenseError = {
+            isManuallyDeleted: true,
+            reason: 'License file was manually deleted. This is a security violation.',
+            blockAccess: true
+        };
+    } else {
+        console.log('�📋 No license found');
+    }
 } else {
     const validation = licenseManager.validateLicense();
     if (validation.isValid) {
@@ -942,9 +1040,15 @@ if (!licenseManager.licenseExists()) {
         }
     } else {
         console.log(`❌ License issue: ${validation.reason}`);
-        if (validation.needsDefault) {
-            console.log('📋 Creating default license...');
-            licenseManager.createDefaultLicense();
+        
+        if (validation.isManuallyDeleted) {
+            console.log('🚨 SECURITY VIOLATION: License tampering detected!');
+            app.locals.licenseBlocked = true;
+            app.locals.licenseError = validation;
+        } else {
+            // License expired or other issue
+            app.locals.licenseExpired = true;
+            app.locals.licenseError = validation;
         }
     }
 }

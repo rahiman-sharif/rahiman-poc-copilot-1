@@ -5,13 +5,28 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const appConfig = require('./app-config');
 
 // License configuration
 const LICENSE_SECRET = 'vikram-steels-license-secret-2025'; // In production, use environment variable
-const LICENSE_DIR = path.join(process.cwd(), 'license');
+
+// Dynamic license directory based on app type
+function getLicenseDir() {
+    if (appConfig.getAppType() === 'desktop') {
+        // For desktop mode: create license folder in user's AppData
+        const appDataPath = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
+        const companyFolder = appConfig.getCompanyNameFolder();
+        return path.join(appDataPath, companyFolder, 'license');
+    } else {
+        // For web mode: create license folder inside app
+        return path.join(process.cwd(), 'license');
+    }
+}
+
+const LICENSE_DIR = getLicenseDir();
 const LICENSE_FILE = path.join(LICENSE_DIR, 'current.lic');
 
 /**
@@ -153,13 +168,25 @@ function activateLicense(licenseData) {
  */
 function validateLicense() {
     try {
+        // Check if license was manually deleted after creation
+        if (isLicenseManuallyDeleted()) {
+            return {
+                isValid: false,
+                reason: 'License file was manually deleted. This is a security violation.',
+                isExpired: true, // Treat as expired to show license expired screen
+                isManuallyDeleted: true,
+                blockAccess: true
+            };
+        }
+        
         const license = loadLicense();
         
         if (!license) {
             return {
                 isValid: false,
                 reason: 'No license found',
-                needsDefault: true
+                isExpired: true, // Treat no license as expired
+                blockAccess: true
             };
         }
         
@@ -181,6 +208,7 @@ function validateLicense() {
             return {
                 isValid: false,
                 reason: 'License expired',
+                isExpired: true,
                 license: license,
                 daysExpired: Math.ceil((now - expiryDate) / (1000 * 60 * 60 * 24))
             };
@@ -223,6 +251,8 @@ function createDefaultLicense() {
         const activatedLicense = activateLicense(defaultLicense);
         
         if (activatedLicense) {
+            // Save state to track that default license was created
+            saveLicenseState('default-created');
             console.log('✅ Default license created and activated');
             console.log(`   Valid until: ${new Date(activatedLicense.expiryDate).toLocaleDateString()}`);
             return activatedLicense;
@@ -277,15 +307,65 @@ function getLicenseInfo() {
     };
 }
 
+/**
+ * Save license state to track if default license was created
+ * @param {string} state - State to save ('default-created', 'activated', etc.)
+ */
+function saveLicenseState(state) {
+    try {
+        ensureLicenseDir();
+        const stateData = {
+            state: state,
+            timestamp: new Date().toISOString(),
+            appType: appConfig.getAppType()
+        };
+        const stateFile = path.join(LICENSE_DIR, '.license-state');
+        fs.writeFileSync(stateFile, JSON.stringify(stateData, null, 2));
+    } catch (error) {
+        console.error('Error saving license state:', error);
+    }
+}
+
+/**
+ * Load license state
+ * @returns {Object|null} License state or null if not found
+ */
+function loadLicenseState() {
+    try {
+        const stateFile = path.join(LICENSE_DIR, '.license-state');
+        if (fs.existsSync(stateFile)) {
+            const stateData = fs.readFileSync(stateFile, 'utf8');
+            return JSON.parse(stateData);
+        }
+        return null;
+    } catch (error) {
+        console.error('Error loading license state:', error);
+        return null;
+    }
+}
+
+/**
+ * Check if license file was manually deleted after default creation
+ * @returns {boolean} True if license was manually deleted
+ */
+function isLicenseManuallyDeleted() {
+    const state = loadLicenseState();
+    return state && (state.state === 'default-created' || state.state === 'activated') && !licenseExists();
+}
+
 module.exports = {
     generateLicense,
     saveLicense,
     loadLicense,
     activateLicense,
     validateLicense,
-    createDefaultLicense,
+    // createDefaultLicense, // Removed - no automatic license creation
     licenseExists,
     getLicenseInfo,
     ensureLicenseDir,
+    getLicenseDir,
+    isLicenseManuallyDeleted,
+    saveLicenseState,
+    loadLicenseState,
     LICENSE_DIR
 };

@@ -313,8 +313,9 @@ router.post('/upload', upload.single('licenseFile'), (req, res) => {
             console.log('⚠️ Uploading expired license for testing purposes');
         }
         
-        // Simply overwrite the current license file
-        const LICENSE_DIR = path.join(process.cwd(), 'license');
+        // Simply overwrite the current license file using the proper license directory
+        const licenseManager = require('../utils/licenseManager');
+        const LICENSE_DIR = licenseManager.getLicenseDir();
         const LICENSE_FILE = path.join(LICENSE_DIR, 'current.lic');
         
         // Ensure license directory exists
@@ -325,11 +326,21 @@ router.post('/upload', upload.single('licenseFile'), (req, res) => {
         // Write the new license file directly
         fs.writeFileSync(LICENSE_FILE, licenseFile.buffer.toString());
         
+        // Update license state to reflect successful upload
+        licenseManager.saveLicenseState('activated');
+        
+        // Clear the license expired flags in the app
+        const app = req.app;
+        app.locals.licenseExpired = false;
+        app.locals.licenseBlocked = false;
+        app.locals.licenseError = null;
+        
         const daysRemaining = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
         
         console.log(`✅ License uploaded successfully for: ${licenseData.companyName}`);
         console.log(`   Valid until: ${expiryDate.toLocaleDateString()}`);
         console.log(`   Days remaining: ${daysRemaining} ${daysRemaining < 0 ? '(EXPIRED for testing)' : ''}`);
+        console.log(`🔄 License flags cleared - application access restored`);
         
         // Handle response based on where request came from
         if (isFromExpiredPage) {
@@ -337,22 +348,16 @@ router.post('/upload', upload.single('licenseFile'), (req, res) => {
                 // Still expired after upload - redirect back to expired page
                 return res.redirect('/license-expired?error=' + encodeURIComponent('The uploaded license is expired. Please upload a valid license.'));
             } else {
-                // Valid license uploaded - redirect to welcome page
-                return res.redirect('/welcome?success=' + encodeURIComponent('License uploaded and activated successfully! You can now access the system.'));
+                // Valid license uploaded - redirect to dashboard
+                return res.redirect('/?success=' + encodeURIComponent('License uploaded and activated successfully! Welcome back to the system.'));
             }
         } else {
-            // JSON response for API calls
-            res.json({
-                success: true,
-                message: `License uploaded and activated successfully${isExpired ? ' (expired license for testing)' : ''}`,
-                license: {
-                    companyName: licenseData.companyName,
-                    expiryDate: expiryDate.toLocaleDateString(),
-                    daysRemaining: daysRemaining,
-                    isExpired: isExpired,
-                    features: licenseData.features || []
-                }
-            });
+            // Valid license uploaded - redirect to dashboard instead of JSON
+            if (isExpired) {
+                return res.redirect('/license-expired?error=' + encodeURIComponent('The uploaded license is expired. Please upload a valid license.'));
+            } else {
+                return res.redirect('/?success=' + encodeURIComponent('License uploaded and activated successfully!'));
+            }
         }
         
     } catch (error) {
