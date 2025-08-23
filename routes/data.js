@@ -170,26 +170,43 @@ router.get('/backups', requireAdminOrSuper, (req, res) => {
         
         let backups = [];
         if (fs.existsSync(backupDir)) {
-            const backupFolders = fs.readdirSync(backupDir);
+            const backupItems = fs.readdirSync(backupDir);
             
-            backups = backupFolders.map(folder => {
-                const folderPath = path.join(backupDir, folder);
-                const stats = fs.statSync(folderPath);
+            backups = backupItems.map(item => {
+                const itemPath = path.join(backupDir, item);
+                const stats = fs.statSync(itemPath);
                 
-                let backupInfo = {};
-                const infoPath = path.join(folderPath, 'backup-info.json');
-                if (fs.existsSync(infoPath)) {
-                    backupInfo = JSON.parse(fs.readFileSync(infoPath, 'utf8'));
+                // Handle directories (full backups)
+                if (stats.isDirectory()) {
+                    let backupInfo = {};
+                    const infoPath = path.join(itemPath, 'backup-info.json');
+                    if (fs.existsSync(infoPath)) {
+                        backupInfo = JSON.parse(fs.readFileSync(infoPath, 'utf8'));
+                    }
+                    
+                    return {
+                        name: item,
+                        type: 'full',
+                        created: backupInfo.created || stats.ctime.toISOString(),
+                        createdBy: backupInfo.createdBy || 'Unknown',
+                        size: getFolderSize(itemPath),
+                        files: backupInfo.files ? backupInfo.files.length : 0
+                    };
+                } 
+                // Handle individual JSON files (company backups, etc.)
+                else if (stats.isFile() && item.endsWith('.json')) {
+                    return {
+                        name: item,
+                        type: 'file',
+                        created: stats.ctime.toISOString(),
+                        createdBy: 'System',
+                        size: (stats.size / 1024).toFixed(2) + ' KB',
+                        files: 1
+                    };
                 }
-                
-                return {
-                    name: folder,
-                    created: backupInfo.created || stats.ctime.toISOString(),
-                    createdBy: backupInfo.createdBy || 'Unknown',
-                    size: getFolderSize(folderPath),
-                    files: backupInfo.files ? backupInfo.files.length : 0
-                };
-            }).sort((a, b) => new Date(b.created) - new Date(a.created));
+                return null; // Skip other file types
+            }).filter(backup => backup !== null) // Remove null entries
+              .sort((a, b) => new Date(b.created) - new Date(a.created));
         }
         
         res.render('data/backups', {
@@ -310,16 +327,40 @@ router.get('/export', requireAdminOrSuper, async (req, res) => {
 
 // Helper function to get folder size
 function getFolderSize(folderPath) {
-    let size = 0;
-    const files = fs.readdirSync(folderPath);
-    
-    for (const file of files) {
-        const filePath = path.join(folderPath, file);
-        const stats = fs.statSync(filePath);
-        size += stats.size;
+    try {
+        const stats = fs.statSync(folderPath);
+        
+        // If it's a file, just return its size
+        if (stats.isFile()) {
+            return (stats.size / 1024).toFixed(2) + ' KB';
+        }
+        
+        // If it's a directory, calculate total size
+        if (stats.isDirectory()) {
+            let size = 0;
+            const files = fs.readdirSync(folderPath);
+            
+            for (const file of files) {
+                const filePath = path.join(folderPath, file);
+                const fileStats = fs.statSync(filePath);
+                
+                if (fileStats.isFile()) {
+                    size += fileStats.size;
+                } else if (fileStats.isDirectory()) {
+                    // Recursively calculate size for subdirectories
+                    const subDirSize = getFolderSize(filePath);
+                    size += parseFloat(subDirSize.replace(' KB', '')) * 1024;
+                }
+            }
+            
+            return (size / 1024).toFixed(2) + ' KB';
+        }
+        
+        return '0 KB';
+    } catch (error) {
+        console.error('Error calculating folder size:', error);
+        return '0 KB';
     }
-    
-    return (size / 1024).toFixed(2) + ' KB';
 }
 
 // Helper function to convert JSON to CSV

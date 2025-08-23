@@ -10,6 +10,7 @@ const bcrypt = require('bcryptjs');
 const { exec } = require('child_process');
 const dataManager = require('./utils/dataManager');
 const pathManager = require('./utils/path-manager');
+const licenseManager = require('./utils/licenseManager');
 const { getCompanyName } = require('./utils/app-config');
 const { checkRoutePermission } = require('./middleware/routePermissions');
 const ConsoleManager = require('./utils/console-manager');
@@ -722,6 +723,7 @@ const usersRouter = require('./routes/users');
 const dataRouter = require('./routes/data');
 const settingsRouter = require('./routes/settings');
 const whatsappRouter = require('./routes/whatsapp');
+const licenseRouter = require('./routes/license');
 
 app.use('/items', (req, res, next) => {
     //console.log(`📋 Items route request: ${req.method} ${req.originalUrl}`);
@@ -736,10 +738,19 @@ app.use('/users', usersRouter);
 app.use('/data', dataRouter);
 app.use('/settings', settingsRouter);
 app.use('/whatsapp', whatsappRouter);
+app.use('/license', licenseRouter);
 
 // Authentication middleware
 const requireAuth = (req, res, next) => {
     if (req.session.user) {
+        // Check license validity for authenticated users
+        const licenseValidation = licenseManager.validateLicense();
+        
+        // If license is expired, redirect to license expired page
+        if (!licenseValidation.isValid && licenseValidation.reason === 'License expired') {
+            return res.redirect('/license-expired');
+        }
+        
         next();
     } else {
         res.redirect('/login');
@@ -756,18 +767,64 @@ app.get('/', (req, res) => {
 });
 
 app.get('/welcome', (req, res) => {
+    // Check license validity before showing welcome page
+    const licenseValidation = licenseManager.validateLicense();
+    
     // Read company name from company.json, fallback to default
+    let companyName;
     try {
         const companyData = dataManager.readData('company');
-        const companyName = (companyData.company && companyData.company.name) || getCompanyName();
-        res.render('welcome', { companyName });
+        companyName = (companyData.company && companyData.company.name) || getCompanyName();
     } catch (error) {
-        const companyName = getCompanyName();
-        res.render('welcome', { companyName });
+        companyName = getCompanyName();
     }
+    
+    // If license is expired, redirect to license expired page
+    if (!licenseValidation.isValid && licenseValidation.reason === 'License expired') {
+        return res.redirect('/license-expired');
+    }
+    
+    // Otherwise show welcome page
+    res.render('welcome', { companyName });
+});
+
+// License expired page - blocks access until valid license is uploaded
+app.get('/license-expired', (req, res) => {
+    // Get license validation info
+    const licenseValidation = licenseManager.validateLicense();
+    
+    // Read company name from company.json, fallback to default
+    let companyName;
+    try {
+        const companyData = dataManager.readData('company');
+        companyName = (companyData.company && companyData.company.name) || getCompanyName();
+    } catch (error) {
+        companyName = getCompanyName();
+    }
+    
+    // If license is actually valid now, redirect to welcome
+    if (licenseValidation.isValid) {
+        return res.redirect('/welcome');
+    }
+    
+    // Show license expired page with current license info
+    res.render('license-expired', { 
+        companyName,
+        licenseInfo: licenseValidation.license,
+        error: req.query.error,
+        success: req.query.success
+    });
 });
 
 app.get('/login', (req, res) => {
+    // Check license validity before allowing login
+    const licenseValidation = licenseManager.validateLicense();
+    
+    // If license is expired, redirect to license expired page
+    if (!licenseValidation.isValid && licenseValidation.reason === 'License expired') {
+        return res.redirect('/license-expired');
+    }
+    
     if (req.session.user) {
         res.redirect('/dashboard');
     } else {
@@ -868,6 +925,29 @@ app.post('/logout', (req, res) => {
         res.redirect('/login');
     });
 });
+
+// ========== LICENSE INITIALIZATION ==========
+// Check and initialize license system
+console.log('🔐 Initializing License System...');
+
+if (!licenseManager.licenseExists()) {
+    console.log('📋 No license found - creating default 45-day license');
+    licenseManager.createDefaultLicense();
+} else {
+    const validation = licenseManager.validateLicense();
+    if (validation.isValid) {
+        console.log(`✅ License valid - ${validation.daysRemaining} days remaining`);
+        if (validation.isExpiringSoon) {
+            console.log(`⚠️  License expires soon! (${validation.daysRemaining} days)`);
+        }
+    } else {
+        console.log(`❌ License issue: ${validation.reason}`);
+        if (validation.needsDefault) {
+            console.log('📋 Creating default license...');
+            licenseManager.createDefaultLicense();
+        }
+    }
+}
 
 // Start server
 app.listen(PORT, () => {

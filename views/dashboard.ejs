@@ -55,15 +55,7 @@
                             <h4>Today's Revenue</h4>
                         </div>
                         <div class="stat-value">₹<%= stats.revenueToday.toLocaleString() %></div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <span class="stat-icon">👥</span>
-                            <h4>Total Customers</h4>
-                        </div>
-                        <div class="stat-value"><%= stats.customersCount %></div>
-                    </div>
+                    </div>  
                     
                     <div class="stat-card">
                         <div class="stat-header">
@@ -74,6 +66,17 @@
                         <% if (stats.lowStockCount > 0) { %>
                             <div class="stat-alert">⚠️ <%= stats.lowStockCount %> low stock</div>
                         <% } %>
+                    </div>
+                    
+                    <!-- License Info Widget -->
+                    <div class="stat-card license-card" id="licenseWidget">
+                        <div class="stat-header">
+                            <span class="stat-icon">🔐</span>
+                            <h4>License Status</h4>
+                        </div>
+                        <div class="license-info">
+                            <div class="loading-spinner">Loading...</div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -185,6 +188,38 @@
                                 </div>
                             </a>                            
                            
+                            <% if (user && user.username === 'superuser' && user.role === 'super') { %>
+                            <!-- Super Admin License Generator -->
+                            <a href="/license/generate" class="mgmt-card" style="border: 2px solid #ff6b6b;">
+                                <span class="mgmt-icon">🎫</span>
+                                <div class="mgmt-info">
+                                    <h5>License Generator</h5>
+                                    <p>Generate license certificates</p>
+                                </div>
+                                <div style="position: absolute; top: 5px; right: 5px; background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7em; font-weight: bold;">
+                                    SUPER ADMIN
+                                </div>
+                            </a>
+                            <% } %>
+                            
+                            <!-- License Upload (All Users) -->
+                            <a href="/license/upload" class="mgmt-card">
+                                <span class="mgmt-icon">📄</span>
+                                <div class="mgmt-info">
+                                    <h5>Upload License</h5>
+                                    <p>Update application license</p>
+                                </div>
+                            </a>
+                            
+                            <!-- Update Company Data (All Admin Users) -->
+                            <a href="/settings/company-upload" class="mgmt-card">
+                                <span class="mgmt-icon">📤</span>
+                                <div class="mgmt-info">
+                                    <h5>Update Company Data</h5>
+                                    <p>Upload encrypted company file</p>
+                                </div>
+                            </a>
+                           
                             <% if (user && user.role === 'super') { %>
                             <a href="/settings/company" class="mgmt-card">
                                 <span class="mgmt-icon">🏢</span>
@@ -221,5 +256,160 @@
     <footer class="main-footer">
         <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
     </footer>
+
+    <!-- License Widget Styles -->
+    <style>
+        .license-card {
+            position: relative;
+        }
+        .license-info {
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .license-status {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .license-status.valid {
+            color: #28a745;
+        }
+        .license-status.warning {
+            color: #ffc107;
+        }
+        .license-status.expired {
+            color: #dc3545;
+        }
+        .license-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .license-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-size: 0.8em;
+            color: #856404;
+        }
+        .license-expired {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-size: 0.8em;
+            color: #721c24;
+        }
+        .loading-spinner {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .license-actions {
+            margin-top: 8px;
+        }
+        .license-btn {
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 3px;
+            font-size: 0.8em;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .license-btn:hover {
+            background: #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+        .license-btn.upload {
+            background: #28a745;
+        }
+        .license-btn.upload:hover {
+            background: #1e7e34;
+        }
+    </style>
+
+    <!-- License Widget Script -->
+    <script>
+        // Load license info on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLicenseInfo();
+        });
+
+        async function loadLicenseInfo() {
+            const widget = document.getElementById('licenseWidget');
+            const infoContainer = widget.querySelector('.license-info');
+            
+            try {
+                const response = await fetch('/license/info');
+                const licenseInfo = await response.json();
+                
+                if (response.ok) {
+                    displayLicenseInfo(licenseInfo, infoContainer);
+                } else {
+                    infoContainer.innerHTML = `
+                        <div class="license-status expired">License Error</div>
+                        <div class="license-details">Failed to load license information</div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading license info:', error);
+                infoContainer.innerHTML = `
+                    <div class="license-status expired">Connection Error</div>
+                    <div class="license-details">Unable to check license status</div>
+                `;
+            }
+        }
+
+        function displayLicenseInfo(info, container) {
+            if (info.status === 'valid') {
+                let statusClass = 'valid';
+                let statusText = 'Active';
+                let warningHtml = '';
+                
+                if (info.isExpiringSoon) {
+                    statusClass = 'warning';
+                    statusText = 'Expiring Soon';
+                    warningHtml = `
+                        <div class="license-warning">
+                            ⚠️ Expires in ${info.daysRemaining} days
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = `
+                    <div class="license-status ${statusClass}">${statusText}</div>
+                    <div class="license-details">
+                        Expires: ${info.expiryDate}<br>
+                        ${info.daysRemaining} days remaining
+                    </div>
+                    ${warningHtml}
+                    <div class="license-actions">
+                        <a href="/license/upload" class="license-btn upload">Update License</a>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="license-status expired">Invalid</div>
+                    <div class="license-details">${info.message || 'License issue detected'}</div>
+                    <div class="license-expired">
+                        🚨 Please upload a valid license
+                    </div>
+                    <div class="license-actions">
+                        <a href="/license/upload" class="license-btn upload">Upload License</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Refresh license info every 5 minutes
+        setInterval(loadLicenseInfo, 5 * 60 * 1000);
+    </script>
 </body>
 </html>

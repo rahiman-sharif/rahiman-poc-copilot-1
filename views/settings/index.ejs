@@ -5,14 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/cuscssall1.min.css">      
 </head>
 <body>
     <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
+    <header class="main-he    <script>
+        // Load license status for settings page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettingsLicenseInfo();
+        });
+
+        async function loadSettingsLicenseInfo() {
+            const statusElement = document.getElementById('settingsLicenseStatus');
+            const expiryElement = document.getElementById('settingsLicenseExpiry');
+            
+            if (!statusElement || !expiryElement) return;
+            
+            try {
+                const response = await fetch('/license/info');
+                const licenseInfo = await response.json();
+                
+                if (response.ok && licenseInfo.status === 'valid') {
+                    let statusText = 'Active';
+                    let statusColor = '#28a745';
+                    
+                    if (licenseInfo.isExpiringSoon) {
+                        statusText = 'Expiring Soon';
+                        statusColor = '#ffc107';
+                    }
+                    
+                    statusElement.innerHTML = `<strong style="color: ${statusColor};">${statusText}</strong>`;
+                    expiryElement.innerHTML = `<strong>${licenseInfo.expiryDate}</strong>`;
+                } else {
+                    statusElement.innerHTML = '<strong style="color: #dc3545;">Invalid</strong>';
+                    expiryElement.innerHTML = '<strong style="color: #dc3545;">N/A</strong>';
+                }
+            } catch (error) {
+                console.error('Error loading license info:', error);
+                statusElement.innerHTML = '<strong style="color: #6c757d;">Unknown</strong>';
+                expiryElement.innerHTML = '<strong style="color: #6c757d;">Unknown</strong>';
+            }
+        }
+
+        // Auto-hide alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>    <div class="header-content">
             <div class="logo-section">
-                <h1><i class="fas fa-cogs"></i> Settings Dashboard</h1>
+                <h1>⚙️ Settings Dashboard</h1>
                 <p>System Configuration & Management</p>
             </div>
             <div class="user-section">
@@ -22,7 +69,7 @@
                 </div>
                 <form action="/logout" method="POST" style="display: inline;">
                     <button type="submit" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                        🚪 Logout
                     </button>
                 </form>
             </div>
@@ -32,7 +79,7 @@
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
-            <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="/dashboard">🏠 Dashboard</a>
             <span class="separator">/</span>
             <span class="current">Settings</span>
         </div>
@@ -43,7 +90,7 @@
         <!-- Page Header -->
         <div class="page-header">
             <div class="header-left">
-                <h2><i class="fas fa-cogs"></i> Settings Dashboard</h2>
+                <h2>⚙️ Settings Dashboard</h2>
                 <p>Configure and manage your billing system</p>
             </div>
             <div class="header-right">
@@ -131,6 +178,48 @@
                 <div class="setting-actions">
                     <a href="/settings/company" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Configure
+                    </a>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- License Management -->
+            <div class="setting-card" style="border: 2px solid #17a2b8;">
+                <div class="setting-icon">
+                    <i class="fas fa-certificate" style="color: #17a2b8;"></i>
+                </div>
+                <div class="setting-content">
+                    <h3>License Management</h3>
+                    <p>Upload and manage your application license certificate</p>
+                    <div class="setting-details">
+                        <small><i class="fas fa-info-circle"></i> Status: <span id="settingsLicenseStatus">Loading...</span></small>
+                        <small><i class="fas fa-calendar"></i> Expiry: <span id="settingsLicenseExpiry">Loading...</span></small>
+                    </div>
+                </div>
+                <div class="setting-actions">
+                    <a href="/license/upload" class="btn btn-info">
+                        <i class="fas fa-upload"></i> Manage License
+                    </a>
+                </div>
+            </div>
+            
+            <% if (user && user.username === 'superuser' && user.role === 'super') { %>
+            <!-- Super Admin License Generator -->
+            <div class="setting-card" style="border: 2px solid #ff6b6b;">
+                <div class="setting-icon">
+                    <i class="fas fa-magic" style="color: #ff6b6b;"></i>
+                </div>
+                <div class="setting-content">
+                    <h3>License Generator</h3>
+                    <p>Generate license certificates for customers</p>
+                    <div class="setting-details">
+                        <small><i class="fas fa-crown"></i> <strong>Super Admin Only</strong></small>
+                        <small><i class="fas fa-certificate"></i> Create .lic files with custom validity</small>
+                    </div>
+                </div>
+                <div class="setting-actions">
+                    <a href="/license/generate" class="btn btn-danger">
+                        <i class="fas fa-plus-circle"></i> Generate License
                     </a>
                 </div>
             </div>

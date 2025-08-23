@@ -136,6 +136,144 @@ router.post('/company', requireAuth, requireSuperUser, (req, res) => {
     }
 });
 
+// GET /settings/company/download - Download company data in encrypted format (Admin+ only)
+router.get('/company/download', requireAuth, requireAdminOrSuper, (req, res) => {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        
+        // Get the absolute path to the company.json file
+        const companyFilePath = path.join(process.cwd(), 'data', 'company.json');
+        
+        if (!fs.existsSync(companyFilePath)) {
+            return res.status(404).send('Company data file not found');
+        }
+        
+        // Read the file as raw buffer/binary to avoid any JSON parsing
+        const fileBuffer = fs.readFileSync(companyFilePath);
+        
+        // Create a filename with timestamp
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
+        const filename = `company-encrypted-${timestamp}.json`;
+        
+        // Set headers for direct file download
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Length', fileBuffer.length);
+        
+        console.log(`📄 Raw encrypted file downloaded by: ${req.session.user.username}`);
+        console.log(`📄 File size: ${fileBuffer.length} bytes`);
+        
+        // Send the raw file buffer directly
+        res.send(fileBuffer);
+        
+    } catch (error) {
+        console.error('Error downloading company data:', error);
+        res.status(500).send('Failed to download company data');
+    }
+});
+
+// GET /settings/company-upload - Company data upload page (Admin+ only)
+router.get('/company-upload', requireAuth, requireAdminOrSuper, (req, res) => {
+    try {
+        res.render('settings/company-upload', {
+            title: `Upload Company Data - ${res.locals.companyName}`,
+            user: req.session.user,
+            success: req.query.success,
+            error: req.query.error
+        });
+    } catch (error) {
+        console.error('Error loading company upload page:', error);
+        res.status(500).render('error', { 
+            message: 'Error loading company upload page',
+            user: req.session.user 
+        });
+    }
+});
+
+// POST /settings/company-upload - Handle company data upload (Admin+ only)
+router.post('/company-upload', requireAuth, requireAdminOrSuper, (req, res) => {
+    const multer = require('multer');
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Configure multer for file upload
+    const upload = multer({
+        storage: multer.memoryStorage(),
+        limits: {
+            fileSize: 5 * 1024 * 1024 // 5MB limit
+        },
+        fileFilter: (req, file, cb) => {
+            if (file.mimetype === 'application/json' || file.originalname.endsWith('.json')) {
+                cb(null, true);
+            } else {
+                cb(new Error('Only JSON files are allowed'));
+            }
+        }
+    }).single('companyFile');
+
+    upload(req, res, (err) => {
+        if (err) {
+            console.error('Upload error:', err);
+            return res.redirect('/settings/company-upload?error=' + encodeURIComponent('Upload failed: ' + err.message));
+        }
+
+        if (!req.file) {
+            return res.redirect('/settings/company-upload?error=' + encodeURIComponent('No file selected'));
+        }
+
+        try {
+            // Get the uploaded file content
+            const uploadedContent = req.file.buffer.toString('utf8');
+            
+            // Create backup of current file
+            const companyFilePath = path.join(process.cwd(), 'data', 'company.json');
+            const backupPath = path.join(process.cwd(), 'backups', `company-backup-${Date.now()}.json`);
+            
+            // Ensure backups directory exists
+            const backupsDir = path.dirname(backupPath);
+            if (!fs.existsSync(backupsDir)) {
+                fs.mkdirSync(backupsDir, { recursive: true });
+            }
+            
+            // Create backup
+            if (fs.existsSync(companyFilePath)) {
+                fs.copyFileSync(companyFilePath, backupPath);
+                console.log(`📄 Backup created: ${backupPath}`);
+            }
+            
+            // Write the new content
+            fs.writeFileSync(companyFilePath, uploadedContent, 'utf8');
+            
+            // Try to decode and read the uploaded company data for verification
+            try {
+                const decodedData = dataManager.getAll('company');
+                const companyName = decodedData?.name || 'Unknown';
+                const gstIn = decodedData?.gst?.gstin || 'N/A';
+                const phone = decodedData?.contact?.phone1 || 'N/A';
+                const city = decodedData?.address?.city || 'N/A';
+                
+                console.log(`📄 Company data updated by: ${req.session.user.username}`);
+                console.log(`📄 File size: ${uploadedContent.length} bytes`);
+                console.log(`📄 Company Name: ${companyName}`);
+                console.log(`📄 GST: ${gstIn}`);
+                
+                const successMessage = `Company data updated successfully!`;
+                
+                res.redirect('/settings/company-upload?success=' + encodeURIComponent(successMessage));
+                
+            } catch (decodeError) {
+                console.error('Error decoding uploaded data:', decodeError);
+                res.redirect('/settings/company-upload?success=' + encodeURIComponent('Company data updated successfully (encrypted format)'));
+            }
+            
+        } catch (error) {
+            console.error('Error processing uploaded file:', error);
+            res.redirect('/settings/company-upload?error=' + encodeURIComponent('Failed to process uploaded file'));
+        }
+    });
+});
+
 // Test route to ensure router works
 router.get('/', requireAuth, requireAdminOrSuper, async (req, res) => {
     try {
@@ -144,10 +282,24 @@ router.get('/', requireAuth, requireAdminOrSuper, async (req, res) => {
         // Get company data for the settings page
         const company = await dataManager.getAll('company');
         
+        // Get system stats
+        const users = await dataManager.getAll('users');
+        const items = await dataManager.getAll('items');
+        const bills = await dataManager.getAll('bills');
+        const customers = await dataManager.getAll('customers');
+        
+        const systemStats = {
+            totalUsers: users ? users.length : 0,
+            totalItems: items ? items.length : 0,
+            totalBills: bills ? bills.length : 0,
+            totalCustomers: customers ? customers.length : 0
+        };
+        
         res.render('settings/index', {
             title: `Settings Dashboard - ${res.locals.companyName}`,
             user: req.session.user,
             company: company,
+            systemStats: systemStats,
             success: req.query.success,
             error: req.query.error
         });

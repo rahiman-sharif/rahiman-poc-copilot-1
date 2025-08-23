@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Expired - <%= companyName %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Animated background particles */
+        .bg-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            display: block;
+            pointer-events: none;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+        
+        .particle:nth-child(1) { top: 20%; left: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { top: 80%; left: 80%; animation-delay: 2s; }
+        .particle:nth-child(3) { top: 40%; left: 40%; animation-delay: 4s; }
+        .particle:nth-child(4) { top: 60%; left: 10%; animation-delay: 1s; }
+        .particle:nth-child(5) { top: 10%; left: 90%; animation-delay: 3s; }
+        .particle:nth-child(6) { top: 90%; left: 50%; animation-delay: 5s; }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            margin: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .expired-icon {
+            font-size: 4rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .license-info {
+            background: linear-gradient(135deg, #ff7675, #fd79a8);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(255, 118, 117, 0.3);
+        }
+        
+        .license-info h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .license-info p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .upload-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .file-input {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .file-name {
+            margin-top: 10px;
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+        }
+        
+        .upload-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.4);
+        }
+        
+        .upload-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .features-list {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .features-list h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+            color: #34495e;
+            display: flex;
+            align-items: center;
+        }
+        
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .features-list li:before {
+            content: '✨';
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+        
+        .footer-note {
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .expired-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+    </div>
+    
+    <div class="container">
+        <div class="expired-icon">🔐</div>
+        <h1>License Expired</h1>
+        <p class="subtitle">Your <%= companyName %> license has expired. Please upload a valid license to continue using the system.</p>
+        
+        <% if (licenseInfo) { %>
+        <div class="license-info">
+            <h3>📋 Current License Information</h3>
+            <p><strong>License ID:</strong> <%= licenseInfo.licenseId %></p>
+            <p><strong>Company:</strong> <%= licenseInfo.companyName %></p>
+            <p><strong>Expired on:</strong> <%= new Date(licenseInfo.expiryDate).toLocaleDateString() %></p>
+            <% if (licenseInfo.daysExpired) { %>
+            <p><strong>Days Expired:</strong> <%= licenseInfo.daysExpired %> days ago</p>
+            <% } %>
+        </div>
+        <% } %>
+        
+        <div class="upload-section">
+            <h3>📤 Upload New License</h3>
+            <form id="licenseForm" action="/license/upload" method="post" enctype="multipart/form-data">
+                <div class="file-input-wrapper">
+                    <input type="file" id="licenseFile" name="licenseFile" class="file-input" accept=".lic,.txt,.json" required>
+                    <label for="licenseFile" class="file-input-button">
+                        📁 Choose License File
+                    </label>
+                </div>
+                <div id="fileName" class="file-name" style="display: none;"></div>
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <button type="submit" class="upload-btn" id="uploadBtn" disabled>
+                    🚀 Upload & Activate License
+                </button>
+            </form>
+        </div>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger">
+            ❌ <%= error %>
+        </div>
+        <% } %>
+        
+        <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success">
+            ✅ <%= success %>
+        </div>
+        <% } %>       
+
+        
+        <div class="footer-note">
+            <p>🔒 <strong>Secure & Offline:</strong> Your data stays on your device. No internet connection required for daily operations.</p>
+            <p>📞 <strong>Need Help?</strong> Contact your system administrator for a new license file.</p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('licenseFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const fileName = document.getElementById('fileName');
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            if (file) {
+                fileName.textContent = `Selected: ${file.name}`;
+                fileName.style.display = 'block';
+                uploadBtn.disabled = false;
+            } else {
+                fileName.style.display = 'none';
+                uploadBtn.disabled = true;
+            }
+        });
+        
+        document.getElementById('licenseForm').addEventListener('submit', function(e) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            progressBar.style.display = 'block';
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ Uploading...';
+            
+            // Simulate upload progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) {
+                    progress = 90;
+                }
+                progressFill.style.width = progress + '%';
+                
+                if (progress >= 90) {
+                    clearInterval(interval);
+                    uploadBtn.textContent = '🔍 Validating License...';
+                }
+            }, 200);
+        });
+        
+        // Add some interactive particle effects
+        document.addEventListener('mousemove', function(e) {
+            const particles = document.querySelectorAll('.particle');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            particles.forEach((particle, index) => {
+                const speed = (index + 1) * 0.5;
+                const xPos = x * speed;
+                const yPos = y * speed;
+                
+                particle.style.transform = `translate(${xPos}px, ${yPos}px)`;
+            });
+        });
+    </script>
+</body>
+</html>

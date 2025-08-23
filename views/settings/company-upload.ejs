@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Company Data - <%= companyName %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .upload-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .upload-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .upload-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2rem;
+        }
+
+        .upload-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .upload-content {
+            padding: 40px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #ff7675, #fd79a8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #e17055;
+        }
+
+        .warning-box h3 {
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-box ul {
+            margin: 15px 0 0 20px;
+            padding: 0;
+        }
+
+        .warning-box li {
+            margin: 8px 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #0984e3;
+        }
+
+        .info-box h3 {
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .upload-section.dragover {
+            border-color: #00b894;
+            background: #d1f2eb;
+            transform: scale(1.02);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .file-input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            font-size: 1.1rem;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .file-info {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #2d3436;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-size {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+        }
+
+        .upload-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.4);
+        }
+
+        .upload-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        /* Breadcrumb Navigation Styles */
+        .breadcrumb-nav {
+            background: #f8f9fa !important;
+            padding: 15px 0 !important;
+            border-bottom: 1px solid #e9ecef !important;
+            margin: 0;
+        }
+
+        .breadcrumb-links {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            font-size: 0.9rem !important;
+        }
+
+        .breadcrumb-links a {
+            color: #6c757d !important;
+            text-decoration: none !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            transition: color 0.2s ease;
+        }
+
+        .breadcrumb-links a:hover {
+            color: #495057 !important;
+            text-decoration: underline !important;
+        }
+
+        .breadcrumb-links span {
+            color: #6c757d !important;
+        }
+
+        .breadcrumb-links span:last-child {
+            color: #495057 !important;
+            font-weight: 500 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <a href="/dashboard" style="text-decoration: none; color: inherit;">
+                    <h1>🏢 <%= companyName %></h1>
+                    <p>Billing Management System</p>
+                </a>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name">Welcome, <%= user.name %></span>
+                    <span class="user-role">(<%= user.role %>)</span>
+                </div>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb-nav" style="background: #f8f9fa; padding: 15px 0; border-bottom: 1px solid #e9ecef;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div class="breadcrumb-links" style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
+                <a href="/dashboard" style="color: #6c757d; text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                    🏠 Dashboard
+                </a>
+                <span style="color: #6c757d;">></span>
+                <span style="color: #495057; font-weight: 500; display: flex; align-items: center; gap: 5px;">
+                    💾 Data Management
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="upload-container">
+            <div class="upload-header">
+                <h1>📤 Update Company Data</h1>
+                <p>Upload encrypted company data file to update system configuration</p>
+            </div>
+
+            <div class="upload-content">
+                <div class="warning-box">
+                    <h3>⚠️ Important Warning</h3>
+                    <p>This action will completely replace your current company configuration. Please ensure you have:</p>
+                    <ul>
+                        <li><strong>Downloaded a backup</strong> of your current company data</li>
+                        <li><strong>Verified the upload file</strong> is the correct encrypted company data</li>
+                        <li><strong>Understood</strong> that this action cannot be undone without a backup</li>
+                        <li><strong>Confirmed</strong> all users are logged out during this process</li>
+                    </ul>
+                </div>                
+
+                <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger">
+                    ❌ <%= error %>
+                </div>
+                <% } %>
+
+                <% if (typeof success !== 'undefined' && success) { %>
+                <div class="alert alert-success">
+                    ✅ <%= success %>
+                </div>
+                <% } %>
+
+                <form id="uploadForm" action="/settings/company-upload" method="post" enctype="multipart/form-data">
+                    <div class="upload-section" id="uploadSection">
+                        <div class="upload-icon" style="font-size: 3rem; margin-bottom: 20px;">📁</div>
+                        <h3>Select Company Data File</h3>
+                        <p style="color: #636e72; margin: 10px 0 20px 0;">
+                            Drag and drop your encrypted company data file here, or click to browse
+                        </p>
+                        
+                        <div class="file-input-wrapper">
+                            <input type="file" id="companyFile" name="companyFile" class="file-input" 
+                                   accept=".json,.txt" required>
+                            <label for="companyFile" class="file-input-button">
+                                📂 Choose File
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="fileInfo" class="file-info">
+                        <div class="file-details">
+                            <div class="file-name" id="fileName">
+                                <span>📄</span>
+                                <span id="fileNameText"></span>
+                            </div>
+                            <div class="file-size" id="fileSize"></div>
+                        </div>
+                        <div id="filePreview" style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 0.9rem; max-height: 300px; overflow-y: auto;">
+                            <div id="companyDetails" style="display: none;">
+                                <h4 style="color: #2563eb; margin: 0 0 15px 0; font-size: 1.1rem;">📋 Company Information Preview</h4>
+                                <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 15px; align-items: start;">
+                                    <strong>Company Name:</strong><span id="companyName">-</span>
+                                    <strong>Address Line 1:</strong><span id="addressLine1">-</span>
+                                    <strong>Address Line 2:</strong><span id="addressLine2">-</span>
+                                    <strong>City:</strong><span id="city">-</span>
+                                    <strong>State:</strong><span id="state">-</span>
+                                    <strong>Pincode:</strong><span id="pincode">-</span>
+                                    <strong>Country:</strong><span id="country">-</span>
+                                    <strong>Phone 1:</strong><span id="phone1">-</span>
+                                    <strong>Phone 2:</strong><span id="phone2">-</span>
+                                    <strong>Email:</strong><span id="email">-</span>
+                                    <strong>Website:</strong><span id="website">-</span>
+                                    <strong>GST Number:</strong><span id="gstNumber">-</span>
+                                    <strong>PAN Number:</strong><span id="panNumber">-</span>
+                                    <strong>Registration Date:</strong><span id="registrationDate">-</span>
+                                    <strong>Invoice Prefix:</strong><span id="invoicePrefix">-</span>
+                                    <strong>Next Invoice Number:</strong><span id="nextInvoiceNumber">-</span>
+                                    <strong>Account Holder:</strong><span id="accountHolder">-</span>
+                                    <strong>Bank Name:</strong><span id="bankName">-</span>
+                                    <strong>Account Number:</strong><span id="accountNumber">-</span>
+                                    <strong>Branch Details:</strong><span id="branchDetails">-</span>
+                                    <strong>Status:</strong><span id="isActive">-</span>
+                                    <strong>Created At:</strong><span id="createdAt">-</span>
+                                    <strong>Updated At:</strong><span id="updatedAt">-</span>
+                                </div>
+                            </div>
+                            <div id="rawPreview" style="font-family: monospace;"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="upload-btn" id="uploadBtn" disabled>
+                            🚀 Update Company Data
+                        </button>                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('companyFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileNameText');
+        const fileSize = document.getElementById('fileSize');
+        const filePreview = document.getElementById('filePreview');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadSection = document.getElementById('uploadSection');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+
+        // Drag and drop functionality
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.add('show');
+            uploadBtn.disabled = false;
+
+            // Read and preview file content
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                console.log('File content length:', content.length);
+                console.log('First 100 chars:', content.substring(0, 100));
+                
+                try {
+                    // Try to decode Base64 and parse company data
+                    const decodedData = atob(content.trim());
+                    console.log('Decoded data:', decodedData.substring(0, 200));
+                    const companyData = JSON.parse(decodedData);
+                    console.log('Parsed company data:', companyData);
+                    
+                    // Display company details
+                    displayCompanyDetails(companyData);
+                } catch (error) {
+                    console.error('Error decoding/parsing:', error);
+                    // If decoding fails, show raw preview
+                    displayRawPreview(content);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function displayCompanyDetails(data) {
+            console.log('displayCompanyDetails called with:', data);
+            const companyDetails = document.getElementById('companyDetails');
+            const rawPreview = document.getElementById('rawPreview');
+            
+            // Hide raw preview and show company details
+            rawPreview.style.display = 'none';
+            companyDetails.style.display = 'block';
+            
+            // Get company data from the nested structure
+            const companyData = data.company || data;
+            console.log('Company data to display:', companyData);
+            
+            // Populate company information
+            document.getElementById('companyName').textContent = companyData.name || '-';
+            document.getElementById('addressLine1').textContent = companyData.address?.line1 || '-';
+            document.getElementById('addressLine2').textContent = companyData.address?.line2 || '-';
+            document.getElementById('city').textContent = companyData.address?.city || '-';
+            document.getElementById('state').textContent = companyData.address?.state || '-';
+            document.getElementById('pincode').textContent = companyData.address?.pincode || '-';
+            document.getElementById('country').textContent = companyData.address?.country || '-';
+            document.getElementById('phone1').textContent = companyData.contact?.phone1 || '-';
+            document.getElementById('phone2').textContent = companyData.contact?.phone2 || '-';
+            document.getElementById('email').textContent = companyData.contact?.email || '-';
+            document.getElementById('website').textContent = companyData.contact?.website || '-';
+            document.getElementById('gstNumber').textContent = companyData.gst?.gstin || '-';
+            document.getElementById('panNumber').textContent = companyData.gst?.panNo || '-';
+            document.getElementById('registrationDate').textContent = companyData.gst?.registrationDate || '-';
+            document.getElementById('invoicePrefix').textContent = companyData.invoice?.prefix || '-';
+            document.getElementById('nextInvoiceNumber').textContent = companyData.invoice?.nextNumber || '-';
+            document.getElementById('accountHolder').textContent = companyData.bankDetails?.accountHolderName || '-';
+            document.getElementById('bankName').textContent = companyData.bankDetails?.bankName || '-';
+            document.getElementById('accountNumber').textContent = companyData.bankDetails?.accountNumber || '-';
+            document.getElementById('branchDetails').textContent = companyData.bankDetails?.branchDetails || '-';
+            document.getElementById('isActive').textContent = companyData.isActive ? 'Active' : 'Inactive';
+            document.getElementById('createdAt').textContent = companyData.createdAt ? new Date(companyData.createdAt).toLocaleString() : '-';
+            document.getElementById('updatedAt').textContent = companyData.updatedAt ? new Date(companyData.updatedAt).toLocaleString() : '-';
+        }
+
+        function displayRawPreview(content) {
+            const companyDetails = document.getElementById('companyDetails');
+            const rawPreview = document.getElementById('rawPreview');
+            
+            // Hide company details and show raw preview
+            companyDetails.style.display = 'none';
+            rawPreview.style.display = 'block';
+            
+            let preview = content.substring(0, 500);
+            if (content.length > 500) {
+                preview += '...';
+            }
+            rawPreview.textContent = preview;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form submission with progress
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            progressBar.style.display = 'block';
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ Uploading...';
+
+            // Simulate progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) {
+                    progress = 90;
+                }
+                progressFill.style.width = progress + '%';
+
+                if (progress >= 90) {
+                    clearInterval(interval);
+                    uploadBtn.textContent = '🔄 Processing...';
+                }
+            }, 200);
+        });
+
+        // Show confirmation dialog
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            if (!confirm('⚠️ WARNING: This will replace all current company data. Are you sure you want to continue? Make sure you have a backup!')) {
+                e.preventDefault();
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '🚀 Update Company Data';
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            }
+        });
+    </script>
+</body>
+</html>

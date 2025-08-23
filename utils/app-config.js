@@ -5,6 +5,7 @@
 
 // ========== CONFIGURATION SETTINGS ==========
 const COMPANY_NAME = "Vikram POC";
+const LICENSE_APP_NAME = "Vikram Steels Management System"; // Used for license validation
 const APP_TYPE = "web"; // Change to "desktop" for desktop mode
 const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
 
@@ -39,6 +40,14 @@ function getCompanyNameFolder() {
 
 
 /**
+ * Get the license app name for validation
+ * @returns {string} The app name used in licenses
+ */
+function getLicenseAppName() {
+    return LICENSE_APP_NAME;
+}
+
+/**
  * Get the app type
  * @returns {string} "web" or "desktop"
  */
@@ -50,5 +59,6 @@ module.exports = {
     getFolderPath,
     getCompanyName,
     getAppType,
-    getCompanyNameFolder
+    getCompanyNameFolder,
+    getLicenseAppName
 };
