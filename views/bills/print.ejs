@@ -617,6 +617,35 @@
             </div>
         </div>
 
+        <!-- Tax Amount in Words -->
+        <div style="padding: 4px 8px; border-top: 1px solid #eee; font-size: 6px;">
+            <div style="margin-bottom: 3px;">
+                <strong>Tax Amount (in words):</strong> <%= bill.totalGstInWords || 'Indian Rupees Sixteen Thousand Nine Hundred Fifty Three and Fifty Six paise Only' %>
+            </div>
+        </div>
+
+        <!-- Company Bank Details and Declaration -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 4px 8px; border-top: 1px solid #eee; font-size: 6px;">
+            <div>
+                <div style="font-weight: bold; color: #007bff; margin-bottom: 3px;">Company's Bank Details</div>
+                <div><strong>A/c Holder's Name:</strong> <%= company && company.bankDetails ? company.bankDetails.accountHolderName : 'MP STEELS CORPORATION' %></div>
+                <div><strong>Bank Name:</strong> <%= company && company.bankDetails ? company.bankDetails.bankName : 'TAMILNAD MERCANTILE BANK LTD.' %></div>
+                <div><strong>A/c No:</strong> <%= company && company.bankDetails ? company.bankDetails.accountNumber : '11870150950104' %></div>
+                <div><strong>Branch:</strong> <%= company && company.bankDetails ? company.bankDetails.branchDetails : 'Chinthamani, Madurai & TMBL0000118' %></div>
+                <div style="margin-top: 5px;"><strong>Company's PAN:</strong> <%= company && company.gst ? company.gst.panNo || 'AFQPD9332R' : 'AFQPD9332R' %></div>
+            </div>
+            
+            <div>
+                <div style="font-weight: bold; color: #007bff; margin-bottom: 3px;">Declaration</div>
+                <div style="line-height: 1.2; margin-bottom: 8px;">
+                    We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.
+                </div>
+                <div style="text-align: right; margin-top: 15px; border-top: 1px solid #ccc; padding-top: 5px;">
+                    <strong>Authorized Signature</strong>
+                </div>
+            </div>
+        </div>
+
         <!-- Print Controls -->
         <div class="print-controls no-print">
             <button onclick="window.print()" class="btn btn-primary">🖨️ Print Bill</button>

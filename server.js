@@ -172,6 +172,12 @@ function initializeFreshSystem() {
                     panNo: '',
                     registrationDate: '2022-04-01'
                 },
+                bankDetails: {
+                    accountHolderName: 'MP STEELS CORPORATION',
+                    bankName: 'TAMILNAD MERCANTILE BANK LTD.',
+                    accountNumber: '11870150950104',
+                    branchDetails: 'Chinthamani, Madurai & TMBL0000118'
+                },
                 invoice: {
                     prefix: 'VS-',
                     nextNumber: 1

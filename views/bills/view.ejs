@@ -14,12 +14,12 @@
         }
         
         .invoice-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 30px auto;
             background: white;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             border-radius: 16px;
-            overflow: hidden;
+            overflow: visible;
             position: relative;
         }
         
@@ -84,12 +84,40 @@
             border-radius: 2px;
         }
         
+        /* GST vs Non-GST Styling */
+        .bill-type-indicator {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .bill-type-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .gst-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: 2px solid #28a745;
+        }
+        
+        .non-gst-badge {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #212529;
+            border: 2px solid #ffc107;
+        }
+        
         .invoice-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
             margin-bottom: 40px;
-            padding: 0 40px;
+            padding: 0 20px;
         }
         
         .bill-to, .bill-details {
@@ -138,6 +166,7 @@
             align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid #f1f3f4;
+            min-height: 20px;
         }
         
         .info-row:last-child {
@@ -148,19 +177,32 @@
             font-weight: 600;
             color: #6c757d;
             font-size: 14px;
+            white-space: nowrap;
         }
         
         .info-value {
             font-weight: 700;
             color: #495057;
             font-size: 14px;
+            text-align: right;
         }
         
         .items-section {
-            padding: 0 40px 40px;
+            padding: 0 20px 40px;
         }
         
-        .items-header {
+        .services-section {
+            padding: 0 20px 40px;
+        }
+        
+        .items-table-wrapper, .services-table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .items-header, .services-header {
             display: flex;
             align-items: center;
             gap: 15px;
@@ -175,31 +217,63 @@
             font-size: 28px;
         }
         
+        .services-header::before {
+            content: '⚙️';
+            font-size: 28px;
+        }
+        
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            min-width: 800px;
+            table-layout: auto;
+        }
+        
+        .items-table th,
+        .items-table td {
+            border: 1px solid #e9ecef;
+            padding: 12px 8px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        
+        .items-table .item-name {
+            white-space: normal;
+            word-wrap: break-word;
+            min-width: 200px;
+            max-width: 300px;
         }
         
         .items-table th {
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: white;
             padding: 18px 15px;
-            text-align: left;
+            text-align: center;
             font-weight: 700;
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            vertical-align: middle;
+            border: 1px solid #0056b3;
         }
         
         .items-table td {
             padding: 16px 15px;
             border-bottom: 1px solid #f1f3f4;
+            border-right: 1px solid #f1f3f4;
             font-size: 14px;
             background: white;
+            vertical-align: middle;
+        }
+        
+        .items-table .text-right {
+            text-align: right;
+        }
+        
+        .items-table .text-center {
+            text-align: center;
         }
         
         .items-table tbody tr:nth-child(even) {
@@ -223,6 +297,72 @@
             font-style: italic;
         }
         
+        /* Services Table Styles */
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            min-width: 600px;
+            table-layout: auto;
+        }
+        
+        .services-table th,
+        .services-table td {
+            border: 1px solid #e9ecef;
+            padding: 12px 8px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        
+        .services-table .service-name {
+            white-space: normal;
+            word-wrap: break-word;
+            min-width: 200px;
+            max-width: 350px;
+            font-weight: 700;
+            color: #495057;
+        }
+        
+        .services-table th {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+            padding: 18px 15px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+            border: 1px solid #1e7e34;
+        }
+        
+        .services-table td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #f1f3f4;
+            border-right: 1px solid #f1f3f4;
+            font-size: 14px;
+            background: white;
+            vertical-align: middle;
+        }
+        
+        .services-table .text-right {
+            text-align: right;
+        }
+        
+        .services-table .text-center {
+            text-align: center;
+        }
+        
+        .services-table tbody tr:nth-child(even) {
+            background: #f0fff4;
+        }
+        
+        .services-table tbody tr:hover {
+            background: #d4edda;
+            transition: background-color 0.3s ease;
+        }
+        
         .text-right {
             text-align: right;
             font-weight: 600;
@@ -233,84 +373,111 @@
             font-weight: 700;
         }
         
+        /* Totals Section - Redesigned */
         .totals-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 40px;
+            background: #f8f9fa;
+            padding: 30px 20px;
             border-top: 3px solid #007bff;
-            position: relative;
         }
         
-        .totals-grid {
+        .totals-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 40px;
-            align-items: start;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
         }
         
-        .payment-info {
+        @media (max-width: 768px) {
+            .totals-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        .payment-card, .totals-card {
             background: white;
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border: 1px solid #e9ecef;
         }
         
-        .payment-title {
+        .card-header {
             font-weight: 700;
             color: #007bff;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-size: 18px;
             display: flex;
             align-items: center;
             gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
         }
         
-        .payment-title::before {
-            content: '💳';
-            font-size: 20px;
-        }
-        
-        .totals-table {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e9ecef;
-            min-width: 350px;
-        }
-        
-        .total-row {
+        .payment-row, .total-row-new {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px solid #f1f3f4;
+            border-bottom: 1px solid #f8f9fa;
         }
         
-        .total-row:last-child {
+        .payment-row:last-child, .total-row-new:last-child {
             border-bottom: none;
-            border-top: 3px solid #007bff;
-            padding-top: 20px;
-            margin-top: 15px;
         }
         
-        .total-label {
+        .row-label {
             font-weight: 600;
             color: #6c757d;
-            font-size: 14px;
+            font-size: 15px;
         }
         
-        .total-amount {
+        .row-value {
             font-weight: 700;
             color: #495057;
-            font-size: 16px;
+            font-size: 15px;
         }
         
-        .final-total .total-label,
-        .final-total .total-amount {
-            font-size: 20px;
-            color: #007bff;
+        .final-amount {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .final-amount .amount-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .final-amount .amount-value {
+            font-size: 28px;
             font-weight: 800;
+            margin: 0;
+        }
+        
+        .thank-you-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .thank-you-section p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .thank-you-section strong {
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
         }
         
         .action-buttons {
@@ -445,14 +612,427 @@
             border: 1px solid #ffeaa7;
         }
         
+        /* Footer Information Styles */
+        .footer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .terms-section h4,
+        .bank-details h4 {
+            color: #007bff;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        
+        .terms-section ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        
+        .terms-section ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .terms-section ul li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .terms-section ul li:last-child {
+            border-bottom: none;
+        }
+        
+        .bank-details p {
+            margin: 8px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .bank-details strong {
+            color: #007bff;
+            font-weight: 600;
+        }
+        
+        
+        /* Comprehensive Print Styles for Bills */
         @media print {
-            .actions, .main-header, nav {
+            /* Reset and basic setup */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                font-size: 11px !important;
+                line-height: 1.3 !important;
+                color: #000 !important;
+            }
+            
+            /* Hide unnecessary elements */
+            .actions, .main-header, nav, .action-buttons, 
+            .status-badge, .hover-effects, .btn,
+            .invoice-container::before {
                 display: none !important;
             }
             
+            /* Container adjustments */
             .invoice-container {
-                box-shadow: none;
-                margin: 0;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+                background: white !important;
+            }
+            
+            /* Header optimization */
+            .invoice-header {
+                background: white !important;
+                padding: 20px 15px 15px 15px !important;
+                border-bottom: 2px solid #3b82f6 !important;
+                page-break-inside: avoid;
+            }
+            
+            .company-info {
+                margin-bottom: 15px !important;
+                text-align: center;
+            }
+            
+            .company-name {
+                font-size: 24px !important;
+                font-weight: bold !important;
+                color: #3b82f6 !important;
+                margin-bottom: 5px !important;
+            }
+            
+            .company-address {
+                font-size: 9px !important;
+                line-height: 1.2 !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .invoice-title {
+                font-size: 18px !important;
+                font-weight: bold !important;
+                color: #3b82f6 !important;
+                text-align: center !important;
+                margin: 10px 0 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1px !important;
+            }
+            
+            /* Invoice info layout */
+            .invoice-info {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 20px !important;
+                padding: 15px !important;
+                background: #f8f9fa !important;
+                border: 1px solid #e9ecef !important;
+                margin-bottom: 15px !important;
+                page-break-inside: avoid;
+            }
+            
+            .bill-to, .bill-details {
+                font-size: 10px !important;
+            }
+            
+            .section-title {
+                font-weight: bold !important;
+                color: #3b82f6 !important;
+                font-size: 11px !important;
+                margin-bottom: 8px !important;
+                border-bottom: 1px solid #3b82f6 !important;
+                padding-bottom: 2px !important;
+            }
+            
+            /* Tables optimization */
+            .items-table, .services-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin-bottom: 15px !important;
+                font-size: 9px !important;
+                page-break-inside: auto;
+            }
+            
+            .items-table th, .services-table th,
+            .items-table td, .services-table td {
+                border: 1px solid #666 !important;
+                padding: 4px 3px !important;
+                text-align: left !important;
+                vertical-align: top !important;
+            }
+            
+            .items-table th, .services-table th {
+                background: #3b82f6 !important;
+                color: white !important;
+                font-weight: bold !important;
+                font-size: 9px !important;
+            }
+            
+            .items-table .amount-cell, .services-table .amount-cell,
+            .items-table .rate-cell, .services-table .rate-cell {
+                text-align: right !important;
+            }
+            
+            /* Section headers */
+            .items-header, .services-header {
+                background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+                color: white !important;
+                padding: 8px 15px !important;
+                font-weight: bold !important;
+                font-size: 11px !important;
+                margin: 15px 0 5px 0 !important;
+                border-radius: 0 !important;
+            }
+            
+            /* Totals section */
+            .invoice-content {
+                padding: 0 15px !important;
+            }
+            
+            .totals-wrapper {
+                display: grid !important;
+                grid-template-columns: 1fr 300px !important;
+                gap: 20px !important;
+                margin-top: 15px !important;
+                page-break-inside: avoid;
+            }
+            
+            .payment-card, .totals-card {
+                border: 1px solid #ddd !important;
+                background: white !important;
+                padding: 10px !important;
+                font-size: 10px !important;
+            }
+            
+            .card-header {
+                background: #3b82f6 !important;
+                color: white !important;
+                font-weight: bold !important;
+                padding: 6px 10px !important;
+                margin: -10px -10px 10px -10px !important;
+                font-size: 10px !important;
+            }
+            
+            .payment-row, .total-row {
+                display: flex !important;
+                justify-content: space-between !important;
+                padding: 3px 0 !important;
+                border-bottom: 1px dotted #ccc !important;
+                font-size: 9px !important;
+            }
+            
+            .total-row.final-total {
+                border-top: 2px solid #3b82f6 !important;
+                font-weight: bold !important;
+                font-size: 11px !important;
+                background: #f8f9fa !important;
+                padding: 6px 0 !important;
+                margin-top: 5px !important;
+            }
+            
+            /* GST-specific styling */
+            .gst-section {
+                background: #e3f2fd !important;
+                border: 1px solid #3b82f6 !important;
+                padding: 8px !important;
+                margin: 10px 0 !important;
+                font-size: 9px !important;
+            }
+            
+            .non-gst-notice {
+                background: #fff3cd !important;
+                border: 1px solid #ffc107 !important;
+                color: #856404 !important;
+                padding: 8px !important;
+                margin: 10px 0 !important;
+                font-size: 9px !important;
+                text-align: center !important;
+            }
+            
+            /* Terms and conditions */
+            .terms-section {
+                margin-top: 15px !important;
+                padding: 10px !important;
+                border: 1px solid #ddd !important;
+                background: #f8f9fa !important;
+                font-size: 8px !important;
+                page-break-inside: avoid;
+            }
+            
+            .terms-section h4 {
+                color: #3b82f6 !important;
+                font-size: 10px !important;
+                margin: 0 0 8px 0 !important;
+                border-bottom: 1px solid #3b82f6 !important;
+                padding-bottom: 2px !important;
+            }
+            
+            .terms-section ul {
+                margin: 0 !important;
+                padding-left: 15px !important;
+            }
+            
+            .terms-section li {
+                margin-bottom: 3px !important;
+                line-height: 1.2 !important;
+            }
+            
+            /* Footer */
+            .footer-info {
+                margin-top: 20px !important;
+                padding: 10px !important;
+                border-top: 2px solid #3b82f6 !important;
+                text-align: center !important;
+                font-size: 8px !important;
+                background: #f8f9fa !important;
+                page-break-inside: avoid;
+                display: block !important;
+            }
+            
+            .footer-info .footer-section {
+                display: inline-block !important;
+                margin: 0 15px !important;
+                vertical-align: top !important;
+            }
+            
+            /* Page breaks */
+            .invoice-header {
+                page-break-after: avoid;
+            }
+            
+            .invoice-info {
+                page-break-after: avoid;
+            }
+            
+            .items-header {
+                page-break-after: avoid;
+            }
+            
+            .services-header {
+                page-break-after: avoid;
+            }
+            
+            .totals-wrapper {
+                page-break-before: avoid;
+                page-break-inside: avoid;
+            }
+            
+            /* Utility classes for print */
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-only {
+                display: block !important;
+            }
+            
+            /* Compact spacing */
+            .invoice-content > * {
+                margin-bottom: 10px !important;
+            }
+            
+            /* Ensure proper colors */
+            .blue-text {
+                color: #3b82f6 !important;
+            }
+            
+            /* Print-specific adjustments */
+            @page {
+                margin: 0.75in 0.5in;
+                size: A4;
+            }
+            
+            /* Force page break before totals if needed */
+            .force-page-break {
+                page-break-before: always;
+            }
+            
+            /* Bill-specific elements */
+            .bill-number {
+                font-weight: bold !important;
+                color: #3b82f6 !important;
+            }
+            
+            .bill-date {
+                font-weight: normal !important;
+                color: #666 !important;
+            }
+            
+            /* Payment information */
+            .payment-info {
+                border: 2px solid #3b82f6 !important;
+                background: #f0f9ff !important;
+                padding: 10px !important;
+                margin: 10px 0 !important;
+                font-size: 9px !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .invoice-container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .invoice-header {
+                padding: 20px;
+            }
+            
+            .company-name {
+                font-size: 28px;
+            }
+            
+            .invoice-title {
+                font-size: 24px;
+            }
+            
+            .invoice-info {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .totals-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .footer-info {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .items-table-wrapper,
+            .services-table-wrapper {
+                overflow-x: auto;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -512,7 +1092,21 @@
                 </div>
             </div>
             
-            <div class="invoice-title">Tax Invoice</div>
+            <div class="invoice-title">
+                <% if (bill.gstEnabled && (bill.documentType === 'GST' || bill.documentType === 'gst')) { %>
+                    Tax Invoice
+                <% } else { %>
+                    Invoice
+                <% } %>
+            </div>
+            
+            <div class="bill-type-indicator">
+                <% if (bill.gstEnabled && (bill.documentType === 'GST' || bill.documentType === 'gst')) { %>
+                    <span class="bill-type-badge gst-badge">🏷️ GST Bill</span>
+                <% } else { %>
+                    <span class="bill-type-badge non-gst-badge">📄 Non-GST Bill</span>
+                <% } %>
+            </div>
         </div>
 
         <!-- Invoice Info -->
@@ -532,6 +1126,7 @@
                 <div class="section-title">Bill Details:</div>
                 <strong>Bill No:</strong> #<%= bill.billNumber %><br>
                 <strong>Date:</strong> <%= new Date(bill.billDate).toLocaleDateString('en-IN') %><br>
+                <strong>Due Date:</strong> <%= new Date(new Date(bill.billDate).getTime() + 30*24*60*60*1000).toLocaleDateString('en-IN') %><br>
                 <strong>Payment:</strong> <%= bill.paymentMethod %><br>
                 <strong>Created By:</strong> <%= user.name %>
             </div>
@@ -540,82 +1135,202 @@
         <!-- Items Section -->
         <div class="items-section">
             <div class="items-header">
-                <h3>🛒 Items & Services</h3>
+                <h3>Items</h3>
                 <div class="items-count"><%= bill.items.length %> item(s)</div>
             </div>
             
-            <table class="items-table">
-                <thead>
-                    <tr>
-                        <th style="width: 8%">S.No</th>
-                        <th style="width: 35%">Description</th>
-                        <th style="width: 12%">HSN</th>
-                        <th style="width: 10%">Qty</th>
-                        <th style="width: 12%">Rate</th>
-                        <th style="width: 12%">Amount</th>
-                        <th style="width: 11%">GST</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% let itemCounter = 1; %>
-                    <% bill.items.forEach(item => { %>
-                        <tr class="item-row">
-                            <td><%= itemCounter++ %></td>
-                            <td class="item-name"><%= item.itemName %></td>
-                            <td><%= item.hsnCode %></td>
-                            <td class="text-right"><%= item.quantity %></td>
-                            <td class="text-right">₹<%= item.rate.toFixed(2) %></td>
-                            <td class="text-right amount-cell">₹<%= item.amount.toFixed(2) %></td>
-                            <td class="text-right"><%= item.gstRate %>%</td>
+            <div class="items-table-wrapper">
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">S.No</th>
+                            <th style="width: auto; text-align: left; min-width: 200px;">Description</th>
+                            <th style="width: 100px; text-align: center;">HSN</th>
+                            <th style="width: 80px; text-align: center;">Qty</th>
+                            <th style="width: 120px; text-align: right;">Rate</th>
+                            <% if (bill.gstEnabled && (bill.documentType === 'GST' || bill.documentType === 'gst')) { %>
+                            <th style="width: 120px; text-align: right;">Amount</th>
+                            <th style="width: 80px; text-align: center;">GST</th>
+                            <% } else { %>
+                            <th style="width: 150px; text-align: right;">Amount</th>
+                            <% } %>
                         </tr>
-                    <% }); %>
-                    
-                    <% if (bill.extraCharges && bill.extraCharges.length > 0) { %>
-                        <% bill.extraCharges.forEach(charge => { %>
-                            <tr class="charge-row">
-                                <td><%= itemCounter++ %></td>
-                                <td class="item-name"><%= charge.description %></td>
-                                <td>9967</td>
-                                <td class="text-right">1</td>
-                                <td class="text-right">₹<%= charge.amount.toFixed(2) %></td>
-                                <td class="text-right amount-cell">₹<%= charge.amount.toFixed(2) %></td>
-                                <td class="text-right"><%= charge.gstRate || 0 %>%</td>
+                    </thead>
+                    <tbody>
+                        <% let itemCounter = 1; %>
+                        <% bill.items.forEach(item => { %>
+                            <tr class="item-row">
+                                <td class="text-center"><%= itemCounter %></td>
+                                <td class="item-name"><%= item.itemName %></td>
+                                <td class="text-center"><%= item.hsnCode %></td>
+                                <td class="text-center"><%= item.quantity %></td>
+                                <td class="text-right">₹<%= item.rate.toFixed(2) %></td>
+                                <% if (bill.gstEnabled && (bill.documentType === 'GST' || bill.documentType === 'gst')) { %>
+                                <td class="text-right amount-cell">₹<%= item.amount.toFixed(2) %></td>
+                                <td class="text-center"><%= item.gstRate %>%</td>
+                                <% } else { %>
+                                <td class="text-right amount-cell">₹<%= item.amount.toFixed(2) %></td>
+                                <% } %>
                             </tr>
+                            <% itemCounter++; %>
                         <% }); %>
-                    <% } %>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Totals Section -->
+        <!-- Services Section -->
+        <% if (bill.extraCharges && bill.extraCharges.length > 0) { %>
+        <div class="services-section">
+            <div class="services-header">
+                <h3>Additional Services</h3>
+                <div class="services-count"><%= bill.extraCharges.length %> service(s)</div>
+            </div>
+            
+            <div class="services-table-wrapper">
+                <table class="services-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">S.No</th>
+                            <th style="width: auto; text-align: left; min-width: 250px;">Service Description</th>
+                            <th style="width: 100px; text-align: center;">SAC Code</th>
+                            <% if (bill.gstEnabled && (bill.documentType === 'GST' || bill.documentType === 'gst')) { %>
+                            <th style="width: 120px; text-align: right;">Amount</th>
+                            <th style="width: 100px; text-align: center;">GST Rate</th>
+                            <% } else { %>
+                            <th style="width: 150px; text-align: right;">Amount</th>
+                            <% } %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% let serviceCounter = 1; %>
+                        <% bill.extraCharges.forEach(charge => { %>
+                            <tr class="service-row">
+                                <td class="text-center"><%= serviceCounter %></td>
+                                <td class="service-name"><%= charge.description || charge.name || 'Service Charge' %></td>
+                                <td class="text-center">9967</td>
+                                <% if (bill.gstEnabled && (bill.documentType === 'GST' || bill.documentType === 'gst')) { %>
+                                <td class="text-right amount-cell">₹<%= parseFloat(charge.amount || 0).toFixed(2) %></td>
+                                <td class="text-center"><%= charge.gstRate || 0 %>%</td>
+                                <% } else { %>
+                                <td class="text-right amount-cell">₹<%= parseFloat(charge.amount || 0).toFixed(2) %></td>
+                                <% } %>
+                            </tr>
+                            <% serviceCounter++; %>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Totals Section - Redesigned -->
         <div class="totals-section">
-            <div class="totals-grid">
-                <div class="total-row">
-                    <span class="total-label">Subtotal:</span>
-                    <span class="total-amount">₹<%= bill.subtotal.toFixed(2) %></span>
+            <div class="totals-wrapper">
+                <!-- Payment Information Card -->
+                <div class="payment-card">
+                    <div class="card-header">
+                        💳 Payment Information
+                    </div>
+                    
+                    <div class="payment-row">
+                        <span class="row-label">Payment Method:</span>
+                        <span class="row-value"><%= bill.paymentMethod %></span>
+                    </div>
+                    
+                    <div class="payment-row">
+                        <span class="row-label">Bill Status:</span>
+                        <span class="row-value">
+                            <span class="status-badge status-paid">PAID</span>
+                        </span>
+                    </div>
+                    
+                    <div class="payment-row">
+                        <span class="row-label">Bill Date:</span>
+                        <span class="row-value"><%= new Date(bill.billDate).toLocaleDateString('en-IN') %></span>
+                    </div>
+                    
+                    <div class="thank-you-section">
+                        <p>
+                            <strong>Thank you for your business!</strong>
+                            This is a computer generated invoice and does not require signature.
+                        </p>
+                    </div>
                 </div>
-                <% if (bill.cgstAmount > 0) { %>
-                    <div class="total-row">
-                        <span class="total-label">CGST:</span>
-                        <span class="total-amount">₹<%= bill.cgstAmount.toFixed(2) %></span>
+                
+                <!-- Totals Card -->
+                <div class="totals-card">
+                    <div class="card-header">
+                        💰 Bill Summary
                     </div>
-                    <div class="total-row">
-                        <span class="total-label">SGST:</span>
-                        <span class="total-amount">₹<%= bill.sgstAmount.toFixed(2) %></span>
+                    
+                    <div class="total-row-new">
+                        <span class="row-label">Subtotal:</span>
+                        <span class="row-value">₹<%= bill.subtotal.toFixed(2) %></span>
                     </div>
-                <% } %>
-                <div class="total-row final-total">
-                    <span class="total-label">Total Amount:</span>
-                    <span class="total-amount">₹<%= bill.finalTotal.toFixed(2) %></span>
+                    
+                    <% if (bill.discount && bill.discount > 0) { %>
+                        <div class="total-row-new">
+                            <span class="row-label">Discount:</span>
+                            <span class="row-value">-₹<%= bill.discount.toFixed(2) %></span>
+                        </div>
+                    <% } %>
+                    
+                    <% if (bill.gstEnabled && (bill.documentType === 'GST' || bill.documentType === 'gst') && bill.cgstAmount > 0) { %>
+                        <div class="total-row-new">
+                            <span class="row-label">CGST:</span>
+                            <span class="row-value">₹<%= bill.cgstAmount.toFixed(2) %></span>
+                        </div>
+                        <div class="total-row-new">
+                            <span class="row-label">SGST:</span>
+                            <span class="row-value">₹<%= bill.sgstAmount.toFixed(2) %></span>
+                        </div>
+                        <div class="total-row-new">
+                            <span class="row-label">Total Tax:</span>
+                            <span class="row-value">₹<%= (bill.cgstAmount + bill.sgstAmount).toFixed(2) %></span>
+                        </div>
+                    <% } %>
+                    
+                    <% if (bill.roundOffAmount && Math.abs(bill.roundOffAmount) > 0) { %>
+                        <div class="total-row-new">
+                            <span class="row-label">Round Off:</span>
+                            <span class="row-value"><%= bill.roundOffAmount >= 0 ? '+' : '' %>₹<%= bill.roundOffAmount.toFixed(2) %></span>
+                        </div>
+                    <% } %>
+                    
+                    <div class="final-amount">
+                        <div class="amount-label">Total Amount</div>
+                        <div class="amount-value">₹<%= bill.finalTotal.toFixed(2) %></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="footer">
-            <strong>Thank you for your business!</strong><br>
-            This is a computer generated invoice and does not require signature.
+        <!-- Terms and Bank Details Section -->
+        <div class="footer-info">
+            <div class="terms-section">
+                <h4>📋 Terms & Conditions</h4>
+                <ul>
+                    <li>Payment due within 30 days of invoice date</li>
+                    <li>Goods once sold cannot be returned or exchanged</li>
+                    <li>Any disputes should be resolved within 7 days</li>
+                    <li>Subject to local jurisdiction only</li>
+                </ul>
+            </div>
+            
+            <% if (company.bankDetails) { %>
+            <div class="bank-details">
+                <h4>🏦 Bank Details</h4>
+                <p><strong>Account Name:</strong> <%= company.bankDetails.accountHolderName || company.name %></p>
+                <p><strong>Bank Name:</strong> <%= company.bankDetails.bankName || 'Bank Details Available on Request' %></p>
+                <p><strong>Account Number:</strong> <%= company.bankDetails.accountNumber || 'XXXX-XXXX-XXXX' %></p>
+                <p><strong>Branch & IFSC Code:</strong> <%= company.bankDetails.branchDetails || 'XXXX0000XXX' %></p>
+            </div>
+            <% } %>
         </div>
+
+        <!-- Footer -->
+        <!-- Footer section removed as content moved to totals section -->
     </div>
 
     <!-- Actions -->
@@ -626,7 +1341,7 @@
                 <span>Back to Bills</span>
             </a>
             
-            <button onclick="window.print()" class="btn btn-primary">
+            <button onclick="printBill()" class="btn btn-primary">
                 <i class="icon">🖨️</i>
                 <span>Print Invoice</span>
             </button>
@@ -653,6 +1368,57 @@
                 setTimeout(() => alert.remove(), 300);
             });
         }, 5000);
+
+        // Enhanced Print Function for Bills
+        function printBill() {
+            // Add print-specific class to body
+            document.body.classList.add('printing');
+            
+            // Optimize for print
+            const originalTitle = document.title;
+            document.title = 'Bill-<%= bill.billNumber %>-<%= new Date().toISOString().split("T")[0] %>';
+            
+            // Add print date for reference
+            const printDate = new Date().toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Create print footer
+            const printFooter = document.createElement('div');
+            printFooter.className = 'print-only';
+            printFooter.style.cssText = `
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 8px;
+                color: #666;
+                background: white;
+                padding: 5px;
+                border-top: 1px solid #ddd;
+                z-index: 1000;
+            `;
+            printFooter.innerHTML = `Printed on: ${printDate} | Bill: <%= bill.billNumber %> | GST: <%= bill.gstEnabled ? 'Enabled' : 'Not Applicable' %>`;
+            
+            document.body.appendChild(printFooter);
+            
+            // Trigger print
+            window.print();
+            
+            // Cleanup after print
+            setTimeout(() => {
+                document.body.classList.remove('printing');
+                document.title = originalTitle;
+                if (printFooter.parentNode) {
+                    printFooter.parentNode.removeChild(printFooter);
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>

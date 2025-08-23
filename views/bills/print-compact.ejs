@@ -85,6 +85,17 @@
             color: #007bff;
         }
         
+        .non-gst-indicator {
+            font-size: 8px;
+            color: #dc3545;
+            font-weight: bold;
+            text-align: center;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 1mm;
+            margin: 1mm 0;
+        }
+        
         /* Bill info section - side by side ultra compact */
         .bill-info-section {
             display: flex;
@@ -290,7 +301,20 @@
                 Cell: <%= company.contact.phone1 %>, <%= company.contact.phone2 %><br>
                 <% if (company.gst.gstin) { %>GSTIN: <%= company.gst.gstin %><% } %>
             </div>
-            <div class="invoice-title">TAX INVOICE</div>
+            <div class="invoice-title">
+                <% if (bill.gstEnabled === false || bill.documentType === "NORMAL") { %>
+                    INVOICE
+                <% } else { %>
+                    TAX INVOICE
+                <% } %>
+            </div>
+            
+            <!-- Non-GST Bill Indicator -->
+            <% if (bill.gstEnabled === false || bill.documentType === "NORMAL") { %>
+                <div class="non-gst-indicator">
+                    📋 NON-GST BILL - This is not a Tax Invoice
+                </div>
+            <% } %>
         </div>
 
         <!-- Bill Information Section -->
@@ -317,18 +341,32 @@
 
         <!-- Items Section -->
         <div class="items-section">
-            <div class="items-header">🛒 Items & Services (<%= bill.items.length %> item<%= bill.items.length !== 1 ? 's' : '' %>)</div>
+            <% 
+                let totalItemCount = bill.items.length;
+                if (bill.extraCharges && bill.extraCharges.length > 0) {
+                    totalItemCount += bill.extraCharges.length;
+                }
+            %>
+            <div class="items-header">🛒 Items & Services (<%= totalItemCount %> item<%= totalItemCount !== 1 ? 's' : '' %>)</div>
             
             <table class="items-table">
                 <thead>
                     <tr>
                         <th style="width: 6%">S.No</th>
-                        <th style="width: 40%" class="desc-col">Description</th>
-                        <th style="width: 10%">HSN</th>
-                        <th style="width: 8%">Qty</th>
-                        <th style="width: 12%">Rate</th>
-                        <th style="width: 12%">Amount</th>
-                        <th style="width: 8%">GST</th>
+                        <% if (bill.gstEnabled === false || bill.documentType === "NORMAL") { %>
+                            <th style="width: 48%" class="desc-col">Description</th>
+                            <th style="width: 12%">HSN</th>
+                            <th style="width: 10%">Qty</th>
+                            <th style="width: 12%">Rate</th>
+                            <th style="width: 12%">Amount</th>
+                        <% } else { %>
+                            <th style="width: 40%" class="desc-col">Description</th>
+                            <th style="width: 10%">HSN</th>
+                            <th style="width: 8%">Qty</th>
+                            <th style="width: 12%">Rate</th>
+                            <th style="width: 12%">Amount</th>
+                            <th style="width: 8%">GST</th>
+                        <% } %>
                     </tr>
                 </thead>
                 <tbody>
@@ -341,7 +379,9 @@
                             <td><%= item.quantity %></td>
                             <td class="amount-col">₹<%= item.rate.toFixed(2) %></td>
                             <td class="amount-col">₹<%= item.amount.toFixed(2) %></td>
-                            <td><%= item.gstRate %>%</td>
+                            <% if (bill.gstEnabled !== false && bill.documentType !== "NORMAL") { %>
+                                <td><%= item.gstRate %>%</td>
+                            <% } %>
                         </tr>
                     <% }); %>
                     
@@ -354,7 +394,9 @@
                                 <td>1</td>
                                 <td class="amount-col">₹<%= charge.amount.toFixed(2) %></td>
                                 <td class="amount-col">₹<%= charge.amount.toFixed(2) %></td>
-                                <td><%= charge.gstRate || 0 %>%</td>
+                                <% if (bill.gstEnabled !== false && bill.documentType !== "NORMAL") { %>
+                                    <td><%= charge.gstRate || 0 %>%</td>
+                                <% } %>
                             </tr>
                         <% }); %>
                     <% } %>
@@ -369,7 +411,7 @@
                     <td class="label">Subtotal:</td>
                     <td class="amount">₹<%= bill.subtotal.toFixed(2) %></td>
                 </tr>
-                <% if (bill.cgstAmount > 0) { %>
+                <% if (bill.gstEnabled !== false && bill.documentType !== "NORMAL" && bill.cgstAmount > 0) { %>
                     <tr>
                         <td class="label">CGST:</td>
                         <td class="amount">₹<%= bill.cgstAmount.toFixed(2) %></td>
@@ -392,6 +434,35 @@
             <% if (bill.paymentDetails && bill.paymentDetails.transactionId) { %>
                 Transaction ID: <%= bill.paymentDetails.transactionId %>
             <% } %>
+        </div>
+
+        <!-- Tax Amount in Words (only for GST bills) -->
+        <% if (bill.gstEnabled !== false && bill.documentType !== "NORMAL" && bill.totalGst > 0) { %>
+            <div style="margin: 2mm 0; padding: 1mm; border: 1px solid #ddd; font-size: 6px;">
+                <strong>Tax Amount (in words):</strong> <%= bill.totalGstInWords || 'Indian Rupees Zero Only' %>
+            </div>
+        <% } %>
+
+        <!-- Company Bank Details and Declaration -->
+        <div style="display: flex; justify-content: space-between; margin: 2mm 0; padding: 1mm; border: 1px solid #ddd; font-size: 6px;">
+            <div style="width: 60%;">
+                <div style="font-weight: bold; color: #007bff; margin-bottom: 1mm;">Company's Bank Details</div>
+                <div><strong>A/c Holder's Name:</strong> <%= company && company.bankDetails ? company.bankDetails.accountHolderName : 'MP STEELS CORPORATION' %></div>
+                <div><strong>Bank Name:</strong> <%= company && company.bankDetails ? company.bankDetails.bankName : 'TAMILNAD MERCANTILE BANK LTD.' %></div>
+                <div><strong>A/c No:</strong> <%= company && company.bankDetails ? company.bankDetails.accountNumber : '11870150950104' %></div>
+                <div><strong>Branch & IFSC Code:</strong> <%= company && company.bankDetails ? company.bankDetails.branchDetails : 'Chinthamani, Madurai & TMBL0000118' %></div>
+                <div style="margin-top: 1mm;"><strong>Company's PAN:</strong> <%= company && company.gst ? company.gst.panNo || 'AFQPD9332R' : 'AFQPD9332R' %></div>
+            </div>
+            
+            <div style="width: 35%;">
+                <div style="font-weight: bold; color: #007bff; margin-bottom: 3mm;">Declaration</div>
+                <div style="line-height: 1.2; margin-bottom: 3mm;">
+                    We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.
+                </div>
+                <div style="text-align: right; margin-top: 5mm; border-top: 1px solid #ccc; padding-top: 1mm;">
+                    <strong>Authorized Signature</strong>
+                </div>
+            </div>
         </div>
 
         <!-- Footer -->

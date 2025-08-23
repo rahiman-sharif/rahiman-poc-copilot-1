@@ -684,10 +684,19 @@ router.get('/:id/print', requireAuth, (req, res) => {
             }
         };
 
+        // Flatten customer info for template compatibility
+        const flattenedQuotation = {
+            ...quotation,
+            customerName: quotation.customerInfo?.name || 'Unknown Customer',
+            customerPhone: quotation.customerInfo?.phone || '',
+            customerGstin: quotation.customerInfo?.gstin || '',
+            validTill: quotation.validUntil // Map validUntil to validTill for template
+        };
+
         res.render('quotations/print-compact', {
             title: `Print Quotation ${quotation.quotationNumber} - Compact`,
             user: req.session.user,
-            quotation: quotation,
+            quotation: flattenedQuotation,
             company: company,
             companyName: company.name || 'Vikram Steels',
             layout: false // No layout for print view

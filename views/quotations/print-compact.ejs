@@ -85,6 +85,17 @@
             color: #8b5cf6;
         }
         
+        .non-gst-indicator {
+            font-size: 8px;
+            color: #dc3545;
+            font-weight: bold;
+            text-align: center;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 1mm;
+            margin: 1mm 0;
+        }
+        
         /* Quote info section - side by side ultra compact */
         .quote-info-section {
             display: flex;
@@ -290,7 +301,20 @@
                 Cell: <%= company.contact.phone1 %>, <%= company.contact.phone2 %><br>
                 <% if (company.gst.gstin) { %>GSTIN: <%= company.gst.gstin %><% } %>
             </div>
-            <div class="quotation-title">QUOTATION</div>
+            <div class="quotation-title">
+                <% if (quotation.gstEnabled === false || quotation.documentType === "NORMAL") { %>
+                    QUOTATION
+                <% } else { %>
+                    GST QUOTATION
+                <% } %>
+            </div>
+            
+            <!-- Non-GST Quotation Indicator -->
+            <% if (quotation.gstEnabled === false || quotation.documentType === "NORMAL") { %>
+                <div class="non-gst-indicator">
+                    📋 NON-GST QUOTATION - GST not applicable
+                </div>
+            <% } %>
         </div>
 
         <!-- Quotation Information Section -->
@@ -323,12 +347,20 @@
                 <thead>
                     <tr>
                         <th style="width: 6%">S.No</th>
-                        <th style="width: 40%" class="desc-col">Description</th>
-                        <th style="width: 10%">HSN</th>
-                        <th style="width: 8%">Qty</th>
-                        <th style="width: 12%">Rate</th>
-                        <th style="width: 12%">Amount</th>
-                        <th style="width: 8%">GST</th>
+                        <% if (quotation.gstEnabled === false || quotation.documentType === "NORMAL") { %>
+                            <th style="width: 48%" class="desc-col">Description</th>
+                            <th style="width: 12%">HSN</th>
+                            <th style="width: 10%">Qty</th>
+                            <th style="width: 12%">Rate</th>
+                            <th style="width: 12%">Amount</th>
+                        <% } else { %>
+                            <th style="width: 40%" class="desc-col">Description</th>
+                            <th style="width: 10%">HSN</th>
+                            <th style="width: 8%">Qty</th>
+                            <th style="width: 12%">Rate</th>
+                            <th style="width: 12%">Amount</th>
+                            <th style="width: 8%">GST</th>
+                        <% } %>
                     </tr>
                 </thead>
                 <tbody>
@@ -341,7 +373,9 @@
                             <td><%= item.quantity %></td>
                             <td class="amount-col">₹<%= item.rate.toFixed(2) %></td>
                             <td class="amount-col">₹<%= item.amount.toFixed(2) %></td>
-                            <td><%= item.gstRate %>%</td>
+                            <% if (quotation.gstEnabled !== false && quotation.documentType !== "NORMAL") { %>
+                                <td><%= item.gstRate %>%</td>
+                            <% } %>
                         </tr>
                     <% }); %>
                     
@@ -354,7 +388,9 @@
                                 <td>1</td>
                                 <td class="amount-col">₹<%= charge.amount.toFixed(2) %></td>
                                 <td class="amount-col">₹<%= charge.amount.toFixed(2) %></td>
-                                <td><%= charge.gstRate || 0 %>%</td>
+                                <% if (quotation.gstEnabled !== false && quotation.documentType !== "NORMAL") { %>
+                                    <td><%= charge.gstRate || 0 %>%</td>
+                                <% } %>
                             </tr>
                         <% }); %>
                     <% } %>
@@ -369,7 +405,7 @@
                     <td class="label">Subtotal:</td>
                     <td class="amount">₹<%= quotation.subtotal.toFixed(2) %></td>
                 </tr>
-                <% if (quotation.cgstAmount > 0) { %>
+                <% if (quotation.gstEnabled !== false && quotation.documentType !== "NORMAL" && quotation.cgstAmount > 0) { %>
                     <tr>
                         <td class="label">CGST:</td>
                         <td class="amount">₹<%= quotation.cgstAmount.toFixed(2) %></td>
@@ -386,10 +422,36 @@
             </table>
         </div>
 
+        <!-- Company Bank Details and Declaration -->
+        <div style="clear: both; display: flex; justify-content: space-between; margin: 2mm 0; padding: 1mm; border: 1px solid #ddd; font-size: 6px;">
+            <div style="width: 60%;">
+                <div style="font-weight: bold; color: #8b5cf6; margin-bottom: 1mm;">Company's Bank Details</div>
+                <div><strong>A/c Holder's Name:</strong> <%= company && company.bankDetails ? company.bankDetails.accountHolderName : 'MP STEELS CORPORATION' %></div>
+                <div><strong>Bank Name:</strong> <%= company && company.bankDetails ? company.bankDetails.bankName : 'TAMILNAD MERCANTILE BANK LTD.' %></div>
+                <div><strong>A/c No:</strong> <%= company && company.bankDetails ? company.bankDetails.accountNumber : '11870150950104' %></div>
+                <div><strong>Branch & IFSC Code:</strong> <%= company && company.bankDetails ? company.bankDetails.branchDetails : 'Chinthamani, Madurai & TMBL0000118' %></div>
+                <div style="margin-top: 1mm;"><strong>Company's PAN:</strong> <%= company && company.gst ? company.gst.panNo || 'AFQPD9332R' : 'AFQPD9332R' %></div>
+            </div>
+            
+            <div style="width: 35%;">
+                <div style="font-weight: bold; color: #8b5cf6; margin-bottom: 1mm;">Declaration</div>
+                <div style="line-height: 1.2; margin-bottom: 2mm;">
+                    We declare that this quotation shows the actual price of the goods described and that all particulars are true and correct.
+                </div>
+                <div style="text-align: right; margin-top: 3mm; border-top: 1px solid #ccc; padding-top: 1mm;">
+                    <strong>Authorized Signature</strong>
+                </div>
+            </div>
+        </div>
+
         <!-- Validity Section -->
         <div class="validity-section">
             <strong>⚠️ Quote Validity: <%= new Date(quotation.validTill).toLocaleDateString('en-IN') %></strong><br>
-            Prices subject to change without notice. GST applicable as per current rates.
+            <% if (quotation.gstEnabled !== false && quotation.documentType !== "NORMAL") { %>
+                Prices subject to change without notice. GST applicable as per current rates.
+            <% } else { %>
+                Prices subject to change without notice. GST not applicable for this quotation.
+            <% } %>
         </div>
 
         <!-- Footer -->

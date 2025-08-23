@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const dataManager = require('../utils/dataManager');
+const { convertAmountToWords } = require('../utils/number-to-words');
 const path = require('path');
 
 // Authentication middleware
@@ -475,6 +476,9 @@ router.get('/:id/print', requireAuth, (req, res) => {
 
         const company = dataManager.getAll('company');
         
+        // Add GST amount in words
+        bill.totalGstInWords = convertAmountToWords(bill.totalGst || 0);
+        
         res.render('bills/print-compact', {
             title: `Bill #${bill.billNumber} - Compact Print`,
             user: req.session.user,
@@ -508,6 +512,9 @@ router.get('/:id/print-original', async (req, res) => {
         }
 
         const company = dataManager.getAll('company');
+        
+        // Add GST amount in words
+        bill.totalGstInWords = convertAmountToWords(bill.totalGst || 0);
         
         res.render('bills/print', {
             title: `Bill #${bill.billNumber} - Original Print`,

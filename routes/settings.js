@@ -78,7 +78,7 @@ router.post('/company', requireAuth, requireSuperUser, (req, res) => {
         const {
             companyName, addressLine1, addressLine2, city, state, pincode, country,
             phone1, phone2, email, website, gstin, panNo, registrationDate,
-            invoicePrefix
+            invoicePrefix, accountHolderName, bankName, accountNumber, branchDetails
         } = req.body;
 
         // Get current company data
@@ -106,6 +106,12 @@ router.post('/company', requireAuth, requireSuperUser, (req, res) => {
                 gstin: gstin.trim(),
                 panNo: panNo.trim(),
                 registrationDate: registrationDate
+            },
+            bankDetails: {
+                accountHolderName: accountHolderName ? accountHolderName.trim() : '',
+                bankName: bankName ? bankName.trim() : '',
+                accountNumber: accountNumber ? accountNumber.trim() : '',
+                branchDetails: branchDetails ? branchDetails.trim() : ''
             },
             invoice: {
                 prefix: invoicePrefix.trim(),
