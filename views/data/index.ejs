@@ -3,9 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - <%= companyName %></title>
+    <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
     <style>
+        /* Content Wrapper for proper container layout */
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .content-wrapper {
+                padding: 10px;
+            }
+        }
+        
         .page-header {
             background: white;
             padding: 30px;
@@ -188,66 +208,179 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 25px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
         
         .quick-actions h3 {
-            margin: 0 0 15px 0;
-            font-size: 20px;
+            margin: 0 0 20px 0;
+            font-size: 22px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .quick-actions-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
         }
         
         .quick-action-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-decoration: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white !important;
+            padding: 18px 5px;
+            border-radius: 10px;
+            text-decoration: none !important;
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             gap: 10px;
             font-weight: 500;
+            font-size: 15px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
+            white-space: nowrap;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            min-height: 30px;
         }
         
         .quick-action-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.25) !important;
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            text-decoration: none !important;
+        }
+        
+        /* Responsive Design for Quick Actions */
+        @media (max-width: 768px) {
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .quick-action-btn {
+                padding: 16px 20px;
+                font-size: 14px;
+                justify-content: center;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .quick-actions {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .quick-actions h3 {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            
+            .quick-action-btn {
+                padding: 14px 16px;
+                font-size: 13px;
+                gap: 6px;
+                justify-content: center;
+            }
+        }
+    
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            transform: translateY(-2px);
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        
+        .close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-warning:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Billing Management System</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.username %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -255,10 +388,8 @@
             <span class="current">💾 Data Management</span>
         </div>
     </nav>
-
-    <!-- Main Data Management Content -->
     <main class="main-content">
-        <div class="container">
+        <div class="content-wrapper">
         
         <!-- Page Header -->
         <div class="page-header">
@@ -283,16 +414,20 @@
             <h3>⚡ Quick Actions</h3>
             <div class="quick-actions-grid">
                 <a href="/data/backup" class="quick-action-btn">
-                    💾 Create Backup
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">Create Backup</span>
                 </a>
                 <a href="/data/backups" class="quick-action-btn">
-                    📁 Manage Backups
+                    <span class="btn-icon">📁</span>
+                    <span class="btn-text">Manage Backups</span>
                 </a>
                 <a href="/data/export?format=json" class="quick-action-btn">
-                    📤 Export JSON
+                    <span class="btn-icon">📤</span>
+                    <span class="btn-text">Export JSON</span>
                 </a>
                 <a href="/data/export?format=csv" class="quick-action-btn">
-                    📊 Export CSV
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">Export CSV</span>
                 </a>
             </div>
         </div>
@@ -413,11 +548,53 @@
             </div>
         </div>
         </div>
-    </main>
 
-    <footer class="main-footer">
-        <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
-    </footer>
+        <div id="restoreModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔄 Restore from Backup</h3>
+                <span class="close" onclick="hideRestoreModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="restore-warning">
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <strong>⚠️ Important:</strong>
+                        <ul style="margin: 10px 0 0 20px;">
+                            <li>This will replace ALL current data</li>
+                            <li>Current data will be automatically backed up first</li>
+                            <li>Only upload ZIP files downloaded from this system</li>
+                            <li>Maximum file size: 50MB</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <form id="restoreForm" action="/data/upload-restore" method="post" enctype="multipart/form-data" onsubmit="return confirmRestore()">
+                    <div class="form-group">
+                        <label for="backupFile">Select Backup ZIP File:</label>
+                        <input type="file" 
+                               id="backupFile" 
+                               name="backupFile" 
+                               accept=".zip" 
+                               required 
+                               onchange="handleFileSelect(event)"
+                               style="width: 100%; padding: 10px; border: 2px dashed #ddd; border-radius: 8px; margin-top: 10px;">
+                    </div>
+                    
+                    <div id="fileInfo" style="margin: 10px 0;"></div>
+                    
+                    <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="hideRestoreModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" id="submitRestore" class="btn btn-warning" disabled>
+                            🔄 Restore Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+    </main>
 
     <script>
         function checkSystemHealth() {
@@ -506,141 +683,6 @@
         }
     </script>
 
-    <!-- Restore Modal -->
-    <div id="restoreModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>🔄 Restore from Backup</h3>
-                <span class="close" onclick="hideRestoreModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="restore-warning">
-                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <strong>⚠️ Important:</strong>
-                        <ul style="margin: 10px 0 0 20px;">
-                            <li>This will replace ALL current data</li>
-                            <li>Current data will be automatically backed up first</li>
-                            <li>Only upload ZIP files downloaded from this system</li>
-                            <li>Maximum file size: 50MB</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <form id="restoreForm" action="/data/upload-restore" method="post" enctype="multipart/form-data" onsubmit="return confirmRestore()">
-                    <div class="form-group">
-                        <label for="backupFile">Select Backup ZIP File:</label>
-                        <input type="file" 
-                               id="backupFile" 
-                               name="backupFile" 
-                               accept=".zip" 
-                               required 
-                               onchange="handleFileSelect(event)"
-                               style="width: 100%; padding: 10px; border: 2px dashed #ddd; border-radius: 8px; margin-top: 10px;">
-                    </div>
-                    
-                    <div id="fileInfo" style="margin: 10px 0;"></div>
-                    
-                    <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                        <button type="button" class="btn btn-secondary" onclick="hideRestoreModal()">
-                            Cancel
-                        </button>
-                        <button type="submit" id="submitRestore" class="btn btn-warning" disabled>
-                            🔄 Restore Data
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .modal {
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 0;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px 12px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h3 {
-            margin: 0;
-            font-size: 18px;
-        }
-        
-        .close {
-            font-size: 24px;
-            cursor: pointer;
-            opacity: 0.8;
-        }
-        
-        .close:hover {
-            opacity: 1;
-        }
-        
-        .modal-body {
-            padding: 20px;
-        }
-        
-        .form-group label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-            display: block;
-        }
-        
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .btn-warning:hover {
-            background: #e0a800;
-        }
-        
-        .btn-warning:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-    </style>
+    <%- include('../partials/scripts') %>
 </body>
 </html>

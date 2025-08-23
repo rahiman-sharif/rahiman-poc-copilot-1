@@ -5,411 +5,1193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('partials/styles') %>
+    
+    <!-- Dashboard Specific Styles -->
+    <style>
+        /* Override any global background styles */
+        html, body {
+            background: transparent !important;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* Dashboard Background */
+        .main-content {
+            background-color: #667eea; /* Fallback color */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 35%, #f093fb 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* Ensure body has no conflicting background */
+        body {
+            background: #f5f7fa !important;
+        }
+
+        /* Dashboard Page Override */
+        body:has(.main-content) {
+            background: transparent !important;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 350px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            z-index: 0;
+            border-radius: 0 0 50px 50px;
+        }
+
+        /* Floating Background Elements */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 8s ease-in-out infinite;
+            backdrop-filter: blur(5px);
+        }
+
+        .circle-1 {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(120, 119, 198, 0.1));
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            right: 10%;
+            animation-delay: 3s;
+            background: linear-gradient(135deg, rgba(255, 119, 198, 0.1), rgba(255, 255, 255, 0.1));
+        }
+
+        .circle-3 {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 6s;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(255, 255, 255, 0.1));
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-30px) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            margin-bottom: 40px;
+            padding: 60px 0 40px 0;
+            position: relative;
+            z-index: 2;
+            background: transparent;
+        }
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            position: relative;
+            z-index: 3;
+            background: transparent;
+        }
+
+        .welcome-header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease-out;
+            color: #ffffff;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.3),
+                0 4px 8px rgba(0,0,0,0.2),
+                0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .welcome-subtitle {
+            font-size: 1.3rem;
+            margin: 0;
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            font-weight: 500;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            padding: 40px 35px;
+            border-radius: 25px;
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.08),
+                0 8px 16px rgba(0,0,0,0.04),
+                inset 0 1px 0 rgba(255,255,255,0.9);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 200% 100%;
+            animation: shimmerTop 3s ease-in-out infinite;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.03) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        @keyframes shimmerTop {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.12),
+                0 15px 30px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        .stat-card:nth-child(5) { animation-delay: 0.5s; }
+
+        .stat-icon-container {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .stat-card:nth-child(1) .stat-icon-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-card:nth-child(2) .stat-icon-container {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 0 8px 25px rgba(17, 153, 142, 0.3);
+        }
+
+        .stat-card:nth-child(3) .stat-icon-container {
+            background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+            box-shadow: 0 8px 25px rgba(252, 70, 107, 0.3);
+        }
+
+        .stat-card:nth-child(4) .stat-icon-container {
+            background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+            box-shadow: 0 8px 25px rgba(253, 187, 45, 0.3);
+        }
+
+        .stat-card:nth-child(5) .stat-icon-container {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: white;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-info h3 {
+            font-size: 2.8rem;
+            margin: 0 0 8px 0;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .stat-info p {
+            color: #718096;
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        }
+
+        /* License Status Card Styles */
+        .license-stat-card::before {
+            background: linear-gradient(90deg, #48bb78, #38a169) !important;
+        }
+
+        .license-stat-card.warning::before {
+            background: linear-gradient(90deg, #f6ad55, #ed8936) !important;
+        }
+
+        .license-stat-card.critical::before {
+            background: linear-gradient(90deg, #f56565, #e53e3e) !important;
+        }
+
+        .license-stat-card.invalid::before {
+            background: linear-gradient(90deg, #e53e3e, #c53030) !important;
+        }
+
+        .license-status {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+
+        .license-status.valid {
+            color: #48bb78;
+        }
+
+        .license-status.warning {
+            color: #f6ad55;
+        }
+
+        .license-status.critical {
+            color: #f56565;
+        }
+
+        .license-status.invalid {
+            color: #e53e3e;
+        }
+
+        .license-details {
+            font-size: 0.95rem;
+            color: #718096;
+            line-height: 1.4;
+        }
+
+        .license-actions {
+            margin-top: 15px;
+        }
+
+        .license-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .license-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .loading-text {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        /* Quick Actions */
+        .quick-actions-section {
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+            position: relative;
+        }
+
+        .quick-actions-section::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
+            opacity: 0.6;
+        }
+
+        .quick-actions-section h2 {
+            font-size: 3rem;
+            color: #1a202c;
+            margin-bottom: 50px;
+            font-weight: 900;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .quick-actions-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .action-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            padding: 45px 35px;
+            border-radius: 28px;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.12),
+                0 15px 30px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.9),
+                0 0 0 1px rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transform-style: preserve-3d;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            opacity: 0;
+            transition: all 0.5s ease;
+            z-index: 1;
+        }
+
+        .action-card::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: rotate(0deg);
+            transition: transform 0.8s ease;
+            z-index: 0;
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .action-card:hover::after {
+            transform: rotate(360deg);
+        }
+
+        .action-card.primary {
+            background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 
+                0 35px 70px rgba(102, 126, 234, 0.3),
+                0 15px 30px rgba(102, 126, 234, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                0 0 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .action-card.secondary {
+            background: linear-gradient(145deg, #764ba2 0%, #f093fb 100%);
+            color: white;
+            box-shadow: 
+                0 35px 70px rgba(118, 75, 162, 0.3),
+                0 15px 30px rgba(118, 75, 162, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                0 0 40px rgba(118, 75, 162, 0.2);
+        }
+
+        .action-card.success {
+            background: linear-gradient(145deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            box-shadow: 
+                0 35px 70px rgba(79, 172, 254, 0.3),
+                0 15px 30px rgba(79, 172, 254, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                0 0 40px rgba(79, 172, 254, 0.2);
+        }
+
+        .action-card.warning {
+            background: linear-gradient(145deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            box-shadow: 
+                0 35px 70px rgba(250, 112, 154, 0.3),
+                0 15px 30px rgba(250, 112, 154, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                0 0 40px rgba(250, 112, 154, 0.2);
+        }
+
+        .action-card:hover {
+            transform: translateY(-20px) scale(1.08) rotateX(10deg) rotateY(5deg);
+            text-decoration: none;
+        }
+
+        .action-card.primary:hover {
+            box-shadow: 
+                0 50px 80px rgba(102, 126, 234, 0.4),
+                0 20px 40px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.4),
+                0 0 60px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-card.secondary:hover {
+            box-shadow: 
+                0 50px 80px rgba(118, 75, 162, 0.4),
+                0 20px 40px rgba(118, 75, 162, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.4),
+                0 0 60px rgba(118, 75, 162, 0.3);
+        }
+
+        .action-card.success:hover {
+            box-shadow: 
+                0 50px 80px rgba(79, 172, 254, 0.4),
+                0 20px 40px rgba(79, 172, 254, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.4),
+                0 0 60px rgba(79, 172, 254, 0.3);
+        }
+
+        .action-card.warning:hover {
+            box-shadow: 
+                0 50px 80px rgba(250, 112, 154, 0.4),
+                0 20px 40px rgba(250, 112, 154, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.4),
+                0 0 60px rgba(250, 112, 154, 0.3);
+        }
+
+        .action-card:nth-child(1) { animation: fadeInUp 0.8s ease-out 0.7s both; }
+        .action-card:nth-child(2) { animation: fadeInUp 0.8s ease-out 0.8s both; }
+        .action-card:nth-child(3) { animation: fadeInUp 0.8s ease-out 0.9s both; }
+        .action-card:nth-child(4) { animation: fadeInUp 0.8s ease-out 1s both; }
+
+        .action-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+            display: block;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+            position: relative;
+            z-index: 3;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .action-card:hover .action-icon {
+            transform: scale(1.2) rotateY(20deg);
+            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.25));
+        }
+
+        /* Strongest possible text color overrides */
+        .actions-grid a.action-card h3,
+        .actions-grid a.action-card p,
+        .actions-grid .action-card h3,
+        .actions-grid .action-card p,
+        a[href].action-card h3,
+        a[href].action-card p {
+            color: #ffffff !important;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6) !important;
+        }
+
+        /* Override any global body color inheritance */
+        body .actions-grid .action-card h3,
+        body .actions-grid .action-card p {
+            color: #ffffff !important;
+        }
+
+        .action-card h3 {
+            font-size: 1.6rem;
+            margin: 0 0 18px 0;
+            font-weight: 800;
+            position: relative;
+            z-index: 3;
+            transition: all 0.4s ease;
+            letter-spacing: -0.5px;
+            color: #ffffff !important;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .action-card p {
+            margin: 0;
+            line-height: 1.6;
+            font-size: 1rem;
+            position: relative;
+            z-index: 3;
+            opacity: 0.95;
+            transition: all 0.4s ease;
+            font-weight: 500;
+            color: #ffffff !important;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+        }
+
+        /* Stronger specificity for link text override */
+        a.action-card h3,
+        a.action-card p {
+            color: #ffffff !important;
+        }
+
+        a.action-card:link h3,
+        a.action-card:visited h3,
+        a.action-card:hover h3,
+        a.action-card:active h3 {
+            color: #ffffff !important;
+        }
+
+        a.action-card:link p,
+        a.action-card:visited p,
+        a.action-card:hover p,
+        a.action-card:active p {
+            color: #ffffff !important;
+        }
+
+        .action-card:hover h3,
+        .action-card:hover p {
+            transform: translateY(-3px);
+        }
+
+        /* Dashboard Row */
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease-out 1.1s both;
+        }
+
+        /* Recent Activity */
+        .recent-activity,
+        .alerts-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .recent-activity h2,
+        .alerts-section h2 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin: 0 0 30px 0;
+            padding-bottom: 20px;
+            border-bottom: 3px solid transparent;
+            background-image: linear-gradient(90deg, rgba(102, 126, 234, 0.2), rgba(240, 147, 251, 0.2));
+            background-repeat: no-repeat;
+            background-size: 100% 3px;
+            background-position: bottom;
+            font-weight: 700;
+        }
+
+        .activity-item,
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(247, 250, 252, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover,
+        .alert-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            margin: 0 -15px;
+            padding: 20px 15px;
+            border-radius: 12px;
+            border-bottom: 1px solid transparent;
+        }
+
+        .activity-item:last-child,
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon,
+        .alert-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .activity-info,
+        .alert-info {
+            flex: 1;
+        }
+
+        .activity-info h4,
+        .alert-info h4 {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin: 0 0 6px 0;
+            font-weight: 600;
+        }
+
+        .activity-info p,
+        .alert-info p {
+            color: #718096;
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .activity-time {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        .activity-action,
+        .alert-action {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .activity-action:hover,
+        .alert-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .alert-item.warning {
+            background: linear-gradient(135deg, rgba(255, 251, 240, 0.8), rgba(255, 251, 240, 0.4));
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(246, 173, 85, 0.2);
+        }
+
+        .alert-item.info {
+            background: linear-gradient(135deg, rgba(240, 248, 255, 0.8), rgba(240, 248, 255, 0.4));
+            border-radius: 8px;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #718096;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .main-content::before {
+                height: 250px;
+                border-radius: 0 0 30px 30px;
+            }
+
+            .welcome-section {
+                padding-top: 30px;
+            }
+
+            .welcome-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 1rem;
+            }
+
+            .dashboard-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stats-grid,
+            .actions-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stat-card,
+            .action-card {
+                padding: 25px;
+            }
+
+            .recent-activity,
+            .alerts-section {
+                padding: 25px;
+            }
+
+            .activity-item:hover,
+            .alert-item:hover {
+                margin: 0 -10px;
+                padding: 20px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .stat-card,
+            .action-card {
+                padding: 20px;
+            }
+
+            .stat-info h3 {
+                font-size: 2rem;
+            }
+
+            .action-icon {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Billing Management System</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-    <!-- Main Dashboard -->
-    <main class="dashboard-main">
-        <div class="dashboard-container">
-            <!-- Welcome Banner -->
-            <div class="welcome-banner">
-                <h2>Welcome back, <%= user.name %>!</h2>
-                <p>Your business overview and quick actions</p>
-            </div>
+    <%- include('partials/header') %>
 
-            <!-- Business Overview -->
-            <section class="overview-section">
-                <h3 class="section-title">📊 Business Overview</h3>
+    <main class="main-content">
+        <!-- Floating Background Elements -->
+        <div class="floating-elements">
+            <div class="floating-circle circle-1"></div>
+            <div class="floating-circle circle-2"></div>
+            <div class="floating-circle circle-3"></div>
+        </div>
+        
+        <div class="container">
+            <!-- Dashboard Welcome Section -->
+            <section class="welcome-section">
+                <div class="welcome-header">
+                    <h1>Welcome back, <%= user.name %>! 👋</h1>
+                    <p class="welcome-subtitle" style="color: white !important;">Here's what's happening with your business today</p>
+                </div>
+            </br>
+                <!-- Quick Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-header">
-                            <span class="stat-icon">📋</span>
-                            <h4>Today's Bills</h4>
+                        <div class="stat-icon-container">
+                            <div class="stat-icon">📋</div>
                         </div>
-                        <div class="stat-value"><%= stats.billsToday %></div>
+                        <div class="stat-info">
+                            <h3><%= stats.totalBills || 0 %></h3>
+                            <p>Total Bills</p>
+                        </div>
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-header">
-                            <span class="stat-icon">💰</span>
-                            <h4>Today's Revenue</h4>
+                        <div class="stat-icon-container">
+                            <div class="stat-icon">💰</div>
                         </div>
-                        <div class="stat-value">₹<%= stats.revenueToday.toLocaleString() %></div>
-                    </div>  
+                        <div class="stat-info">
+                            <h3>₹<%= stats.totalRevenue ? (stats.totalRevenue / 1000).toFixed(1) + 'K' : '0' %></h3>
+                            <p>Revenue</p>
+                        </div>
+                    </div>
                     
                     <div class="stat-card">
-                        <div class="stat-header">
-                            <span class="stat-icon">📦</span>
-                            <h4>Inventory Items</h4>
+                        <div class="stat-icon-container">
+                            <div class="stat-icon">👥</div>
                         </div>
-                        <div class="stat-value"><%= stats.itemsCount %></div>
-                        <% if (stats.lowStockCount > 0) { %>
-                            <div class="stat-alert">⚠️ <%= stats.lowStockCount %> low stock</div>
+                        <div class="stat-info">
+                            <h3><%= stats.totalCustomers || 0 %></h3>
+                            <p>Customers</p>
+                        </div>
+                    </div>
+                    
+                    <!-- <div class="stat-card">
+                        <div class="stat-icon-container">
+                            <div class="stat-icon">📦</div>
+                        </div>
+                        <div class="stat-info">
+                            <h3><%= stats.totalItems || 0 %></h3>
+                            <p>Products</p>
+                        </div>
+                    </div> -->
+                    
+                    <!-- License Status Card -->
+                    <div class="stat-card license-stat-card" id="licenseStatCard">
+                        <div class="stat-icon-container">
+                            <div class="stat-icon">🔐</div>
+                        </div>
+                        <div class="stat-info">
+                            <div class="license-status loading-text" id="licenseStatus">Checking...</div>
+                            <div class="license-details" id="licenseDetails">Loading license information...</div>
+                            <div class="license-actions" id="licenseActions" style="display: none;">
+                                <a href="/license/upload" class="license-btn">Update License</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <center><h2 style="color: white !important;font-size:3rem">⚡ Quick Actions</h2></center>
+        </br>
+            <!-- Quick Actions Section -->
+            <section class="quick-actions-section">
+                
+                
+                <div class="actions-grid">
+                    <a href="/bills/new" class="action-card primary">
+                        <div class="action-icon">📝</div>
+                        <h3 style="color: #ffffff !important;">New Bill</h3>
+                        <p style="color: #ffffff !important;">Create a new bill for customer</p>
+                    </a>
+                    
+                    <a href="/quotations/new" class="action-card secondary">
+                        <div class="action-icon">💜</div>
+                        <h3 style="color: #ffffff !important;">New Quotation</h3>
+                        <p style="color: #ffffff !important;">Generate customer quotation</p>
+                    </a>
+                    
+                    <a href="/customers" class="action-card success">
+                        <div class="action-icon">👥</div>
+                        <h3 style="color: #ffffff !important;">Customers</h3>
+                        <p style="color: #ffffff !important;">Manage customer database</p>
+                    </a>
+                    
+                    <a href="/items" class="action-card warning">
+                        <div class="action-icon">📦</div>
+                        <h3 style="color: #ffffff !important;">Inventory</h3>
+                        <p style="color: #ffffff !important;">Manage products & stock</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Recent Activity & Alerts -->
+            <div class="dashboard-row">
+                <!-- Recent Bills -->
+                <section class="recent-activity">
+                    <h2>📋 Recent Bills</h2>
+                    <div class="activity-list">
+                        <% if (stats.recentBills && stats.recentBills.length > 0) { %>
+                            <% stats.recentBills.slice(0, 5).forEach(bill => { %>
+                            <div class="activity-item">
+                                <div class="activity-icon">📋</div>
+                                <div class="activity-info">
+                                    <h4>Bill #<%= bill.billNumber %></h4>
+                                    <p><%= bill.customerName %> - ₹<%= bill.totalAmount %></p>
+                                    <span class="activity-time"><%= bill.date %></span>
+                                </div>
+                                <a href="/bills/<%= bill._id %>" class="activity-action">View</a>
+                            </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="empty-state">
+                                <p>No recent bills found</p>
+                                <a href="/bills/new" class="btn btn-primary">Create Your First Bill</a>
+                            </div>
                         <% } %>
                     </div>
-                    
-                    <!-- License Info Widget -->
-                    <div class="stat-card license-card" id="licenseWidget">
-                        <div class="stat-header">
-                            <span class="stat-icon">🔐</span>
-                            <h4>License Status</h4>
+                </section>
+
+                <!-- Alerts & Notifications -->
+                <section class="alerts-section">
+                    <h2>🔔 Alerts & Notifications</h2>
+                    <div class="alerts-list">
+                        <!-- Low Stock Alert -->
+                        <% if (stats.lowStockCount > 0) { %>
+                        <div class="alert-item warning">
+                            <div class="alert-icon">⚠️</div>
+                            <div class="alert-info">
+                                <h4>Low Stock Alert</h4>
+                                <p><%= stats.lowStockCount %> items running low</p>
+                            </div>
+                            <a href="/stock" class="alert-action">Check Stock</a>
                         </div>
-                        <div class="license-info">
-                            <div class="loading-spinner">Loading...</div>
+                        <% } %>
+
+                        <!-- License Status -->
+                        <div class="alert-item info">
+                            <div class="alert-icon">📋</div>
+                            <div class="alert-info">
+                                <h4>License Status</h4>
+                                <p id="licenseStatusText">Checking license...</p>
+                            </div>
                         </div>
+
+                        <!-- Backup Reminder -->
+                        <% if (user.role === 'admin' || user.role === 'super') { %>
+                        <div class="alert-item info">
+                            <div class="alert-icon">💾</div>
+                            <div class="alert-info">
+                                <h4>Data Backup</h4>
+                                <p>Keep your data safe with regular backups</p>
+                            </div>
+                            <a href="/data" class="alert-action">Backup Now</a>
+                        </div>
+                        <% } %>
                     </div>
-                </div>
-            </section>
-
-            <!-- Primary Actions -->
-            <section class="actions-section">
-                <h3 class="section-title">⚡ Primary Actions</h3>
-                <div class="primary-actions">
-                    <a href="/bills/new" class="primary-btn create-bill">
-                        <span class="btn-icon">📝</span>
-                        <span class="btn-text">Create New Bill</span>
-                    </a>
-                    
-                    <a href="/quotations/new" class="primary-btn create-quote">
-                        <span class="btn-icon">💜</span>
-                        <span class="btn-text">Create Quotation</span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- Management Grid -->
-            <section class="management-section">
-                <h3 class="section-title">🏢 Business Management</h3>
-                <div class="management-grid">
-                    <!-- Sales & Orders -->
-                    <div class="management-group">
-                        <h4 class="group-title">Sales & Orders</h4>
-                        <div class="management-cards">
-                            <a href="/bills" class="mgmt-card">
-                                <span class="mgmt-icon">📋</span>
-                                <div class="mgmt-info">
-                                    <h5>Bills</h5>
-                                    <p>View & manage invoices</p>
-                                </div>
-                            </a>
-                            
-                            <a href="/quotations" class="mgmt-card">
-                                <span class="mgmt-icon">💜</span>
-                                <div class="mgmt-info">
-                                    <h5>Quotations</h5>
-                                    <p>Manage price quotes</p>
-                                </div>
-                            </a>
-
-                            <a href="/whatsapp" class="mgmt-card">
-                                <span class="mgmt-icon">💬</span>
-                                <div class="mgmt-info">
-                                    <h5>Send Bills via WhatsApp</h5>
-                                    <p>Share bill information</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Inventory -->
-                    <div class="management-group">
-                        <h4 class="group-title">Inventory</h4>
-                        <div class="management-cards">
-                            <a href="/items" class="mgmt-card">
-                                <span class="mgmt-icon">📦</span>
-                                <div class="mgmt-info">
-                                    <h5>Items</h5>
-                                    <p>Product catalog</p>
-                                </div>
-                            </a>
-                            
-                            <a href="/stock" class="mgmt-card">
-                                <span class="mgmt-icon">📊</span>
-                                <div class="mgmt-info">
-                                    <h5>Stock</h5>
-                                    <p>Inventory tracking</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Customer Relations -->
-                    <div class="management-group">
-                        <h4 class="group-title">Customer Relations</h4>
-                        <div class="management-cards">
-                            <a href="/customers" class="mgmt-card">
-                                <span class="mgmt-icon">👥</span>
-                                <div class="mgmt-info">
-                                    <h5>Customers</h5>
-                                    <p>Customer directory</p>
-                                </div>
-                            </a>
-                            
-                            <a href="/reports" class="mgmt-card">
-                                <span class="mgmt-icon">📈</span>
-                                <div class="mgmt-info">
-                                    <h5>Reports</h5>
-                                    <p>Sales analytics</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <% if (user.role === 'admin' || user.role === 'super') { %>
-                    <!-- System Administration -->
-                    <div class="management-group admin-only">
-                        <h4 class="group-title">System Administration</h4>
-                        <div class="management-cards">
-                            <a href="/users" class="mgmt-card">
-                                <span class="mgmt-icon">👤</span>
-                                <div class="mgmt-info">
-                                    <h5>Users</h5>
-                                    <p>Manage system users</p>
-                                </div>
-                            </a>                            
-                           
-                            <% if (user && user.username === 'superuser' && user.role === 'super') { %>
-                            <!-- Super Admin License Generator -->
-                            <a href="/license/generate" class="mgmt-card" style="border: 2px solid #ff6b6b;">
-                                <span class="mgmt-icon">🎫</span>
-                                <div class="mgmt-info">
-                                    <h5>License Generator</h5>
-                                    <p>Generate license certificates</p>
-                                </div>
-                                <div style="position: absolute; top: 5px; right: 5px; background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7em; font-weight: bold;">
-                                    SUPER ADMIN
-                                </div>
-                            </a>
-                            <% } %>
-                            
-                            <!-- License Upload (All Users) -->
-                            <a href="/license/upload" class="mgmt-card">
-                                <span class="mgmt-icon">📄</span>
-                                <div class="mgmt-info">
-                                    <h5>Upload License</h5>
-                                    <p>Update application license</p>
-                                </div>
-                            </a>
-                            
-                            <!-- Update Company Data (All Admin Users) -->
-                            <a href="/settings/company-upload" class="mgmt-card">
-                                <span class="mgmt-icon">📤</span>
-                                <div class="mgmt-info">
-                                    <h5>Update Company Data</h5>
-                                    <p>Upload encrypted company file</p>
-                                </div>
-                            </a>
-                           
-                            <% if (user && user.role === 'super') { %>
-                            <a href="/settings/company" class="mgmt-card">
-                                <span class="mgmt-icon">🏢</span>
-                                <div class="mgmt-info">
-                                    <h5>Company Setup</h5>
-                                    <p>Configure company details</p>
-                                </div>
-                            </a>
-                            
-                            <a href="/settings/route-control" class="mgmt-card route-control-card">
-                                <span class="mgmt-icon">🛣️</span>
-                                <div class="mgmt-info">
-                                    <h5>Route Control Center</h5>
-                                    <p>Manage client demo features</p>
-                                </div>
-                            </a>
-                            <% } %>
-                            
-                            <a href="/data" class="mgmt-card">
-                                <span class="mgmt-icon">💾</span>
-                                <div class="mgmt-info">
-                                    <h5>Data</h5>
-                                    <p>Backup & restore</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <% } %>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     </main>
 
-    <footer class="main-footer">
-        <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
-    </footer>
+    
 
-    <!-- License Widget Styles -->
-    <style>
-        .license-card {
-            position: relative;
-        }
-        .license-info {
-            min-height: 60px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .license-status {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .license-status.valid {
-            color: #28a745;
-        }
-        .license-status.warning {
-            color: #ffc107;
-        }
-        .license-status.expired {
-            color: #dc3545;
-        }
-        .license-details {
-            font-size: 0.9em;
-            color: #666;
-        }
-        .license-warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            padding: 8px;
-            border-radius: 4px;
-            margin-top: 5px;
-            font-size: 0.8em;
-            color: #856404;
-        }
-        .license-expired {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: 8px;
-            border-radius: 4px;
-            margin-top: 5px;
-            font-size: 0.8em;
-            color: #721c24;
-        }
-        .loading-spinner {
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-        }
-        .license-actions {
-            margin-top: 8px;
-        }
-        .license-btn {
-            background: #007bff;
-            color: white;
-            padding: 4px 8px;
-            border: none;
-            border-radius: 3px;
-            font-size: 0.8em;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .license-btn:hover {
-            background: #0056b3;
-            color: white;
-            text-decoration: none;
-        }
-        .license-btn.upload {
-            background: #28a745;
-        }
-        .license-btn.upload:hover {
-            background: #1e7e34;
-        }
-    </style>
-
-    <!-- License Widget Script -->
+    <!-- Dashboard Specific Scripts -->
     <script>
-        // Load license info on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadLicenseInfo();
-        });
-
-        async function loadLicenseInfo() {
-            const widget = document.getElementById('licenseWidget');
-            const infoContainer = widget.querySelector('.license-info');
-            
+        // Comprehensive license status update function
+        async function updateLicenseStatus() {
             try {
                 const response = await fetch('/license/info');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const licenseInfo = await response.json();
                 
-                if (response.ok) {
-                    displayLicenseInfo(licenseInfo, infoContainer);
-                } else {
-                    infoContainer.innerHTML = `
-                        <div class="license-status expired">License Error</div>
-                        <div class="license-details">Failed to load license information</div>
-                    `;
-                }
+                // Update stat card
+                updateLicenseStatCard(licenseInfo);
+                
+                // Update alert notification (for backward compatibility)
+                updateLicenseAlert(licenseInfo);
+                
             } catch (error) {
-                console.error('Error loading license info:', error);
-                infoContainer.innerHTML = `
-                    <div class="license-status expired">Connection Error</div>
-                    <div class="license-details">Unable to check license status</div>
-                `;
-            }
-        }
-
-        function displayLicenseInfo(info, container) {
-            if (info.status === 'valid') {
-                let statusClass = 'valid';
-                let statusText = 'Active';
-                let warningHtml = '';
+                console.log('License check failed:', error);
                 
-                if (info.isExpiringSoon) {
-                    statusClass = 'warning';
-                    statusText = 'Expiring Soon';
-                    warningHtml = `
-                        <div class="license-warning">
-                            ⚠️ Expires in ${info.daysRemaining} days
-                        </div>
-                    `;
+                // Show offline fallback
+                const statCard = document.getElementById('licenseStatCard');
+                const statusElement = document.getElementById('licenseStatus');
+                const detailsElement = document.getElementById('licenseDetails');
+                const actionsElement = document.getElementById('licenseActions');
+                
+                if (statCard && statusElement && detailsElement) {
+                    statCard.className = 'stat-card license-stat-card';
+                    statusElement.className = 'license-status valid';
+                    statusElement.textContent = 'Valid';
+                    detailsElement.textContent = 'Running in offline mode';
+                    actionsElement.style.display = 'none';
                 }
                 
-                container.innerHTML = `
-                    <div class="license-status ${statusClass}">${statusText}</div>
-                    <div class="license-details">
-                        Expires: ${info.expiryDate}<br>
-                        ${info.daysRemaining} days remaining
-                    </div>
-                    ${warningHtml}
-                    <div class="license-actions">
-                        <a href="/license/upload" class="license-btn upload">Update License</a>
-                    </div>
-                `;
-            } else {
-                container.innerHTML = `
-                    <div class="license-status expired">Invalid</div>
-                    <div class="license-details">${info.message || 'License issue detected'}</div>
-                    <div class="license-expired">
-                        🚨 Please upload a valid license
-                    </div>
-                    <div class="license-actions">
-                        <a href="/license/upload" class="license-btn upload">Upload License</a>
-                    </div>
-                `;
+                // Update alert text
+                const alertStatusElement = document.getElementById('licenseStatusText');
+                if (alertStatusElement) {
+                    alertStatusElement.textContent = 'Valid for offline use';
+                }
             }
         }
 
-        // Refresh license info every 5 minutes
-        setInterval(loadLicenseInfo, 5 * 60 * 1000);
+        // Update the license stat card with detailed information
+        function updateLicenseStatCard(licenseInfo) {
+            const statCard = document.getElementById('licenseStatCard');
+            const statusElement = document.getElementById('licenseStatus');
+            const detailsElement = document.getElementById('licenseDetails');
+            const actionsElement = document.getElementById('licenseActions');
+            
+            if (!statCard || !statusElement || !detailsElement || !actionsElement) return;
+            
+            if (licenseInfo.status === 'valid') {
+                // Determine status level based on days remaining
+                let statusClass = 'valid';
+                let cardClass = 'stat-card license-stat-card';
+                let statusText = 'Active';
+                
+                if (licenseInfo.warningLevel === 'critical') {
+                    statusClass = 'critical';
+                    cardClass += ' critical';
+                    statusText = 'Expires Soon';
+                } else if (licenseInfo.warningLevel === 'warning') {
+                    statusClass = 'warning';
+                    cardClass += ' warning';
+                    statusText = 'Expiring Soon';
+                }
+                
+                // Update elements
+                statCard.className = cardClass;
+                statusElement.className = `license-status ${statusClass}`;
+                statusElement.textContent = statusText;
+                
+                // Create detailed information
+                let detailsText = `Expires: ${licenseInfo.expiryDate}`;
+                if (licenseInfo.daysRemaining !== undefined) {
+                    detailsText += `\n${licenseInfo.daysRemaining} days remaining`;
+                }
+                if (licenseInfo.companyName) {
+                    detailsText += `\nLicensed to: ${licenseInfo.companyName}`;
+                }
+                
+                detailsElement.innerHTML = detailsText.replace(/\n/g, '<br>');
+                actionsElement.style.display = licenseInfo.isExpiringSoon ? 'block' : 'none';
+                
+            } else {
+                // Invalid license
+                statCard.className = 'stat-card license-stat-card invalid';
+                statusElement.className = 'license-status invalid';
+                statusElement.textContent = 'Invalid';
+                detailsElement.textContent = licenseInfo.message || 'License verification failed';
+                actionsElement.style.display = 'block';
+            }
+        }
+
+        // Update the license alert notification
+        function updateLicenseAlert(licenseInfo) {
+            const alertStatusElement = document.getElementById('licenseStatusText');
+            if (!alertStatusElement) return;
+            
+            if (licenseInfo.status === 'valid') {
+                if (licenseInfo.daysRemaining !== undefined) {
+                    alertStatusElement.textContent = `Valid (${licenseInfo.daysRemaining} days remaining)`;
+                } else {
+                    alertStatusElement.textContent = 'Valid';
+                }
+            } else {
+                alertStatusElement.textContent = 'Invalid - Please check';
+            }
+        }
+
+        // Load license status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLicenseStatus();
+            
+            // Refresh license info every 5 minutes
+            setInterval(updateLicenseStatus, 5 * 60 * 1000);
+        });
     </script>
 </body>
 </html>

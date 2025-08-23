@@ -1,39 +1,15 @@
-<!DOCTYPE ht            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Stock Management</p>
-                </a>
-            </div>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <h1>🏢 <%= companyName %></h1>
-                <p>Stock Adjustment</p>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
-    <nav class="breadcrumb">
+    <%- include('../partials/header') %>
+     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
             <span class="separator">></span>
@@ -43,8 +19,8 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="form-main">
+    <main class="main-content">
+        <main class="form-main">
         <div class="form-container">
             <!-- Page Header -->
             <div class="page-header">
@@ -291,5 +267,8 @@
             }
         });
     </script>
+    </main>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

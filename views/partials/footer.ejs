@@ -1,0 +1,30 @@
+<!-- Modern Footer -->
+<footer class="modern-footer">
+    <div class="footer-container">
+        <div class="footer-brand">
+            <div class="footer-logo">🏢</div>
+            <div class="footer-info">
+                <h4><%= typeof companyName !== 'undefined' ? companyName : 'Vikram Steels' %></h4>
+                <p>Business Management System</p>
+            </div>
+        </div>
+        
+        <div class="footer-status">
+            <div class="status-item">
+                <div class="status-indicator"></div>
+                <span>System Online</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator"></div>
+                <span>Data Protected</span>
+            </div>
+        </div>
+        
+        <div class="footer-actions">
+            <% if (typeof user !== 'undefined' && (user.role === 'admin' || user.role === 'super')) { %>
+            <a href="/data" class="footer-btn">💾 Backup</a>                
+            <% } %>
+            <a href="/reports" class="footer-btn">📊 Reports</a>
+        </div>
+    </div>
+</footer>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/cuscssall1.min.css">
+    <%- include('../partials/styles') %>
     <style>
         /* License Upload Page Specific Styles */
         .license-container {
@@ -236,28 +236,7 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <h1>📤 Upload License</h1>
-                <p>Replace Current License File</p>
-            </div>
-            <div class="user-section">
-                <div class="user-info">
-                    <div class="user-name"><%= user.fullName %></div>
-                    <div class="user-role"><%= user.role %></div>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">
-                        🚪 Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Breadcrumb -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -266,8 +245,8 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="items-main">
+    <main class="main-content">
+        <main class="items-main">
         <div class="license-container">
             <!-- Page Header -->
             <div class="page-header">
@@ -541,5 +520,8 @@
             }
         }
     </script>
+    </main>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

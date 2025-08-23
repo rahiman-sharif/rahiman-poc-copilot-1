@@ -66,31 +66,10 @@
             font-weight: 600;
         }
     </style>
+    <%- include('../partials/styles') %>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p><%= isEdit ? 'Edit Item' : 'Add New Item' %></p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -101,7 +80,8 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <main class="main-content">
+         <!-- Main Content -->
     <main class="items-main">
         <div class="form-container">
             <!-- Page Header -->
@@ -549,5 +529,8 @@
             document.getElementById('name').focus();
         });
     </script>
+    </main>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

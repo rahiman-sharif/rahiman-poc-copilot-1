@@ -1,0 +1,90 @@
+<!-- Mobile Menu & Header Scripts -->
+<script>
+    // Mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const mobileNavDropdown = document.getElementById('mobileNavDropdown');
+        
+        if (mobileMenuToggle && mobileNavDropdown) {
+            let isMenuOpen = false;
+            
+            mobileMenuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                isMenuOpen = !isMenuOpen;
+                
+                if (isMenuOpen) {
+                    mobileNavDropdown.classList.add('active');
+                    mobileMenuToggle.classList.add('active');
+                } else {
+                    mobileNavDropdown.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                }
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!mobileMenuToggle.contains(e.target) && !mobileNavDropdown.contains(e.target)) {
+                    isMenuOpen = false;
+                    mobileNavDropdown.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                }
+            });
+
+            // Close menu on resize to desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    isMenuOpen = false;
+                    mobileNavDropdown.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                }
+            });
+        }
+    });
+
+    // Global function for mobile menu toggle (backwards compatibility)
+    function toggleMobileMenu() {
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        if (mobileMenuToggle) {
+            mobileMenuToggle.click();
+        }
+    }
+
+    // Update footer license status
+    async function updateFooterLicenseStatus() {
+        try {
+            const response = await fetch('/license/info');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const data = await response.json();
+            const statusElement = document.getElementById('licenseStatus');
+            
+            if (data.isValid && !data.isExpired) {
+                statusElement.innerHTML = `
+                    <div class="status-indicator"></div>
+                    <span>License: Valid (${data.daysRemaining || 'Active'} ${data.daysRemaining ? 'days' : ''})</span>
+                `;
+            } else if (data.isExpired) {
+                statusElement.innerHTML = `
+                    <div class="status-indicator error"></div>
+                    <span>License: Expired</span>
+                `;
+            } else {
+                statusElement.innerHTML = `
+                    <div class="status-indicator warning"></div>
+                    <span>License: Invalid</span>
+                `;
+            }
+        } catch (error) {
+            console.log('License check failed:', error);
+            // Default to valid status for offline use
+            const statusElement = document.getElementById('licenseStatus');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="status-indicator"></div>
+                    <span>License: Valid</span>
+                `;
+            }
+        }
+    }
+</script>

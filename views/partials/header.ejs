@@ -1,0 +1,188 @@
+<!-- Modern Header -->
+<header class="modern-header">
+    <div class="header-container">
+        <a href="/dashboard" class="header-brand">
+            <div class="brand-logo">🏢</div>
+            <div class="brand-content">
+                <h1><%= typeof companyName !== 'undefined' ? companyName : 'Vikram Steels' %></h1>
+                <p>Business Management System</p>
+            </div>
+        </a>
+        
+        <nav class="header-nav">
+            <ul class="nav-links">
+                <!-- Bills Dropdown -->
+                <li class="nav-dropdown">
+                    <a href="/bills" class="nav-link">📋 Bills</a>
+                    <div class="dropdown-menu">
+                        <a href="/bills/new" class="dropdown-item">📝 New Bill</a>
+                        <a href="/bills" class="dropdown-item">📋 View Bills</a>
+                    </div>
+                </li>
+                
+                <!-- Quotations Dropdown -->
+                <li class="nav-dropdown">
+                    <a href="/quotations" class="nav-link">💜 Quotations</a>
+                    <div class="dropdown-menu">
+                        <a href="/quotations/new" class="dropdown-item">📝 New Quotation</a>
+                        <a href="/quotations" class="dropdown-item">💜 View Quotations</a>
+                    </div>
+                </li>
+                
+                <!-- Inventory Dropdown -->
+                <li class="nav-dropdown">
+                    <a href="/items" class="nav-link">📦 Inventory</a>
+                    <div class="dropdown-menu">
+                        <a href="/items" class="dropdown-item">📋 Items</a>
+                        <a href="/stock" class="dropdown-item">📊 Stock</a>
+                    </div>
+                </li>
+                
+                <!-- Customer Relations Dropdown -->
+                <li class="nav-dropdown">
+                    <a href="/customers" class="nav-link">🤝 Customer Relations</a>
+                    <div class="dropdown-menu">
+                        <a href="/customers" class="dropdown-item">👥 Customers</a>
+                        <a href="/reports" class="dropdown-item">📈 Reports</a>
+                    </div>
+                </li>
+                
+                <!-- Admin Dropdown -->
+                <% if (typeof user !== 'undefined' && (user.role === 'admin' || user.role === 'super')) { %>
+                <li class="nav-dropdown">
+                    <a href="/users" class="nav-link">👤 Admin</a>
+                    <div class="dropdown-menu">
+                        <a href="/users" class="dropdown-item">👥 Users</a>
+                        <a href="/license/upload" class="dropdown-item">📄 Upload License</a>
+                        <a href="/settings/company-upload" class="dropdown-item">📤 Update Company Data</a>
+                        <a href="/data" class="dropdown-item">💾 Data</a>
+                        <% if (user.role === 'super') { %>
+                        <div class="dropdown-divider"></div>
+                        <a href="/license/generate" class="dropdown-item">🔑 License Generator</a>
+                        <a href="/settings/company" class="dropdown-item">🏢 Company Setup</a>
+                        <a href="/settings/route-control" class="dropdown-item">🛣️ Route Control Center</a>
+                        <% } %>
+                    </div>
+                </li>
+                <% } %>
+            </ul>
+            
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+        
+        <div class="header-user">
+            <!-- Quick Actions -->
+            <div class="header-quick-actions">
+                <a href="http://localhost:3000/whatsapp" class="whatsapp-link" title="WhatsApp Bill Sharing">
+                    💬 WhatsApp Bills
+                </a>
+                <% if (typeof stats !== 'undefined' && stats && stats.lowStockCount > 0) { %>
+                <a href="/stock" class="quick-action-btn notification" title="Low Stock Alert">⚠️</a>
+                <% } %>
+            </div>
+
+            <!-- User Profile -->
+            <% if (typeof user !== 'undefined' && user) { %>
+            <div class="user-profile">
+                <div class="user-avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+                <div class="user-info">
+                    <h3><%= user.name %></h3>
+                    <p><%= user.role %></p>
+                </div>
+            </div>
+            
+            <!-- Logout Button -->
+            <form action="/logout" method="POST" style="display: inline;">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Header Button Styles -->
+    <style>
+        /* WhatsApp Bills Button - Green */
+        .whatsapp-link {
+            background: linear-gradient(135deg, #25d366, #1da851) !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3) !important;
+            border: none !important;
+        }
+        
+        .whatsapp-link:hover {
+            background: linear-gradient(135deg, #1da851, #25d366) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4) !important;
+            color: white !important;
+        }
+        
+        /* Logout Button - Red */
+        .logout-button {
+            background: linear-gradient(135deg, #dc3545, #c82333) !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            border: none !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3) !important;
+        }
+        
+        .logout-button:hover {
+            background: linear-gradient(135deg, #c82333, #dc3545) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4) !important;
+            color: white !important;
+        }
+    </style>
+    
+    <!-- Mobile Navigation Dropdown -->
+    <div class="mobile-nav-dropdown" id="mobileNavDropdown">
+        <div class="mobile-nav-links">
+            <!-- Bills Section -->
+            <a href="/bills" class="nav-link">📋 Bills</a>
+            <a href="/bills/new" class="nav-link mobile-sub-link">├─ 📝 New Bill</a>
+            <a href="/bills" class="nav-link mobile-sub-link">├─ 📋 View Bills</a>
+            
+            <!-- Quotations Section -->
+            <a href="/quotations" class="nav-link">💜 Quotations</a>
+            <a href="/quotations/new" class="nav-link mobile-sub-link">├─ 📝 New Quotation</a>
+            <a href="/quotations" class="nav-link mobile-sub-link">├─ 💜 View Quotations</a>
+            
+            <!-- Inventory Section -->
+            <a href="/items" class="nav-link">📦 Inventory</a>
+            <a href="/items" class="nav-link mobile-sub-link">├─ 📋 Items</a>
+            <a href="/stock" class="nav-link mobile-sub-link">├─ 📊 Stock</a>
+            
+            <!-- Customer Relations Section -->
+            <a href="/customers" class="nav-link">🤝 Customer Relations</a>
+            <a href="/customers" class="nav-link mobile-sub-link">├─ 👥 Customers</a>
+            <a href="/reports" class="nav-link mobile-sub-link">├─ 📈 Reports</a>
+            
+            <!-- Admin Section -->
+            <% if (typeof user !== 'undefined' && (user.role === 'admin' || user.role === 'super')) { %>
+            <a href="/users" class="nav-link">👤 Admin</a>
+            <a href="/users" class="nav-link mobile-sub-link">├─ 👥 Users</a>
+            <a href="/license/upload" class="nav-link mobile-sub-link">├─ 📄 Upload License</a>
+            <a href="/settings/company-upload" class="nav-link mobile-sub-link">├─ 📤 Update Company Data</a>
+            <a href="/data" class="nav-link mobile-sub-link">├─ 💾 Data</a>
+            <% if (user.role === 'super') { %>
+            <a href="/license/generate" class="nav-link mobile-sub-link">├─ 🔑 License Generator</a>
+            <a href="/settings/setup" class="nav-link mobile-sub-link">├─ 🏢 Company Setup</a>
+            <a href="/settings/route-control" class="nav-link mobile-sub-link">└─ 🛣️ Route Control Center</a>
+            <% } %>
+            <% } %>
+        </div>
+    </div>
+</header>

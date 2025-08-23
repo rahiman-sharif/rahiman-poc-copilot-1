@@ -900,32 +900,11 @@
             }
         }
     </style>
+    <%- include('../partials/styles') %>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Quotation Details</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
-    <nav class="breadcrumb">
+    <%- include('../partials/header') %>
+<nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
             <span class="separator">></span>
@@ -934,8 +913,8 @@
             <span class="current">💜 Quotation #<%= quotation.quotationNumber %></span>
         </div>
     </nav>
-
-    <!-- Alert Messages -->
+    <main class="main-content">
+        <!-- Alert Messages -->
     <% if (typeof query !== 'undefined' && query.success) { %>
         <div class="alert alert-success" style="margin: 20px auto; max-width: 800px;">
             <%= query.success %>
@@ -1363,5 +1342,8 @@
             }
         }
     </script>
+    </main>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

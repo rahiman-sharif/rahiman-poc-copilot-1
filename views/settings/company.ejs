@@ -5,32 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/cuscssall1.min.css">      
+    <%- include('../partials/styles') %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <h1>🏢 Company Settings</h1>
-                <p>Configure Company Information</p>
-            </div>
-            <div class="user-section">
-                <div class="user-info">
-                    <div class="user-name"><%= user.fullName %></div>
-                    <div class="user-role"><%= user.role %></div>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">
-                        🚪 Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb">
+    <%- include('../partials/header') %>
+     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
             <span class="separator">/</span>
@@ -40,8 +20,8 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="items-main">
+    <main class="main-content">
+       <main class="items-main">
         <!-- Page Header -->
         <div class="page-header">
             <div class="header-left">
@@ -294,11 +274,7 @@
             </form>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="main-footer">
-        <p>&copy; 2025 <%= companyName %>. Company Settings Configuration</p>
-    </footer>
+    </main>
 
     <script>
         // Auto-hide alerts
@@ -337,5 +313,7 @@
             e.target.value = value;
         });
     </script>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

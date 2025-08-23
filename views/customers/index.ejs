@@ -5,31 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Customer Management</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
+    <%- include('../partials/header') %>
+ <!-- Navigation -->
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -37,8 +17,8 @@
             <span class="current">👥 Customer Management</span>
         </div>
     </nav>
-
-    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Main Content -->
     <main class="items-main">
         <div class="items-container">
             <!-- Page Header -->
@@ -103,6 +83,8 @@
                     </div>
                 </div>
             </div>
+
+        </br>
 
             <!-- Search and Filter -->
             <div class="search-section">
@@ -297,5 +279,8 @@
             });
         }, 5000);
     </script>
+    </main>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

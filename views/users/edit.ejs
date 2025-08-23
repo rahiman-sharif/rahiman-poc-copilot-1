@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - <%= companyName %></title>
+    <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
     <style>
         .form-container {
             max-width: 600px;
@@ -32,14 +33,14 @@
             margin: 0;
         }
         
-        .user-info {
+        .main-content .user-info {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 5px;
             margin-bottom: 20px;
         }
         
-        .user-info strong {
+        .main-content .user-info strong {
             color: #495057;
         }
         
@@ -225,29 +226,7 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Billing Management System</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.username %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -258,8 +237,8 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main style="max-width: 1200px; margin: 0 auto; padding: 30px 20px;">
+    <div class="content-wrapper">
+        <main class="main-content">
         <% if (success) { %>
             <div class="alert alert-success">
                 <%= success %>
@@ -537,9 +516,9 @@
         });
     </script>
     </main>
+    </div> <!-- Close content-wrapper -->
 
-    <footer class="main-footer">
-        <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
-    </footer>
+    <%- include('../partials/footer') %>
+    <%- include('../partials/scripts') %>
 </body>
 </html>

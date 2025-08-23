@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - <%= companyName %></title>
+    <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
     <style>
         .users-main {
@@ -246,31 +246,10 @@
             border: 1px solid #f5c6cb;
         }
     </style>
+    <%- include('../partials/styles') %>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Billing Management System</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.username %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -279,8 +258,8 @@
         </div>
     </nav>
 
-    <!-- Main Users Content -->
-    <main class="users-main">
+    <main class="main-content">
+        <main class="users-main">
         <div class="page-header">
             <h2>👥 User Management</h2>
             <p>Manage system users, roles and permissions</p>
@@ -395,10 +374,7 @@
             </div>
         <% } %>
     </main>
-
-    <footer class="main-footer">
-        <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
-    </footer>
+    </main>
 
     <script>
         function filterUsers() {
@@ -436,5 +412,6 @@
             }
         });
     </script>
+    <%- include('../partials/scripts') %>
 </body>
 </html>

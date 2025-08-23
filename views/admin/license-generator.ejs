@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/cuscssall1.min.css">
-    <style>
+    <%- include('../partials/styles') %>
+     <style>
         /* License Generator Page Specific Styles */
         .license-container {
             max-width: 1000px;
@@ -249,29 +249,8 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <h1>🔐 License Generator</h1>
-                <p>Super Admin Panel</p>
-            </div>
-            <div class="user-section">
-                <div class="user-info">
-                    <div class="user-name"><%= user.fullName %></div>
-                    <div class="user-role"><%= user.role %></div>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">
-                        🚪 Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb">
+    <%- include('../partials/header') %>
+     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
             <span class="separator">/</span>
@@ -279,8 +258,8 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="items-main">
+    <main class="main-content">
+      <main class="items-main">
         <div class="license-container">
             <!-- Page Header -->
             <div class="page-header">
@@ -392,6 +371,7 @@
             <div id="alertArea"></div>
 
         </div>
+    </main>
     </main>
 
     <script>
@@ -554,5 +534,7 @@
         // Initialize
         updateValidityPreview();
     </script>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

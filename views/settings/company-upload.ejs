@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Company Data - <%= companyName %></title>
+    <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
     <style>
         .upload-container {
             max-width: 800px;
@@ -320,29 +321,7 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Billing Management System</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Breadcrumb Navigation -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb-nav" style="background: #f8f9fa; padding: 15px 0; border-bottom: 1px solid #e9ecef;">
         <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
             <div class="breadcrumb-links" style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem;">
@@ -459,10 +438,6 @@
             </div>
         </div>
     </main>
-
-    <footer class="main-footer">
-        <p>&copy; 2025 <%= companyName %> Billing System. Built for offline use.</p>
-    </footer>
 
     <script>
         const fileInput = document.getElementById('companyFile');
@@ -630,5 +605,7 @@
             }
         });
     </script>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

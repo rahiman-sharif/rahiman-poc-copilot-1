@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
+    
+    <!-- Page Specific Styles -->
+    <style>
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f7fafc;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: #2d3748;
+            margin: 0 0 10px 0;
+        }
+
+        .page-subtitle {
+            color: #718096;
+            margin: 0;
+        }
+
+        .content-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>{{ PAGE_TITLE }}</h1>
+                <p class="page-subtitle">{{ PAGE_DESCRIPTION }}</p>
+            </div>
+
+            <div class="content-card">
+                <!-- Page content goes here -->
+                {{ PAGE_CONTENT }}
+            </div>
+        </div>
+    </main>
+</body>
+</html>

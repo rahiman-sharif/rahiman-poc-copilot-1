@@ -5,182 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/cuscssall1.min.css">    
-</head>
-<body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= company.name || 'Company Name' %></h1>
-                    <p>Route Control Center</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.fullName || user.username %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-<div class="container">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-left">
-                <h1><i class="fas fa-route"></i> Route Control Center</h1>
-                <p>Manage which features are accessible to users</p>
-            </div>
-            <div class="header-actions">
-                <button onclick="toggleAllRoutes(true)" class="btn btn-success">
-                    <i class="fas fa-check-double"></i> Enable All
-                </button>
-                <button onclick="toggleAllRoutes(false)" class="btn btn-warning">
-                    <i class="fas fa-ban"></i> Disable All
-                </button>
-                <button onclick="savePermissions()" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <a href="/dashboard">🏠 Dashboard</a>
-            <a href="/settings">⚙️ Settings</a>
-            <span class="current">Route Control</span>
-        </ol>
-    </nav>
-
-    <% if (success) { %>
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i> <%= success %>
-        </div>
-    <% } %>
-
-    <% if (error) { %>
-        <div class="alert alert-error">
-            <i class="fas fa-exclamation-triangle"></i> <%= error %>
-        </div>
-    <% } %>
-
-    <div class="route-control-container">
-        <div class="info-banner">
-            <div class="info-content">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <h4>Super Admin Route Control</h4>
-                    <p>Control which application features are accessible to regular users. You (super admin) will always have access to all routes regardless of these settings.</p>
-                </div>
-            </div>
-        </div>
-
-        <form id="routePermissionsForm">
-            <% 
-            const categories = {};
-            Object.keys(permissions.permissions).forEach(groupKey => {
-                Object.keys(permissions.permissions[groupKey]).forEach(route => {
-                    const routeData = permissions.permissions[groupKey][route];
-                    if (!categories[routeData.category]) {
-                        categories[routeData.category] = [];
-                    }
-                    categories[routeData.category].push({
-                        route: route,
-                        ...routeData,
-                        groupKey: groupKey
-                    });
-                });
-            });
-            %>
-
-            <% 
-            // Define category icons mapping
-            const categoryIcons = {
-                'Dashboard': 'fas fa-tachometer-alt',
-                'Inventory': 'fas fa-boxes',
-                'Sales & Orders': 'fas fa-receipt',
-                'Customer Relations': 'fas fa-users',
-                'Reports & Analytics': 'fas fa-chart-bar',
-                'System Administration': 'fas fa-cogs'
-            };
-            %>
-
-            <% Object.keys(categories).forEach(category => { %>
-                <div class="route-category">
-                    <div class="category-header">
-                        <h3>
-                            <i class="<%= categoryIcons[category] || 'fas fa-folder' %>"></i>
-                            <%= category %>
-                        </h3>
-                        <div class="category-controls">
-                            <label class="toggle-switch">
-                                <input type="checkbox" onchange="toggleCategory('<%= category %>', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span class="toggle-label">Enable All</span>
-                        </div>
-                    </div>
-
-                    <div class="routes-grid">
-                        <% categories[category].forEach(routeItem => { %>
-                            <div class="route-item">
-                                <div class="route-info">
-                                    <div class="route-path">
-                                        <code><%= routeItem.route %></code>
-                                    </div>
-                                    <div class="route-description">
-                                        <%= routeItem.description %>
-                                    </div>
-                                </div>
-                                <div class="route-control">
-                                    <label class="toggle-switch">
-                                        <input 
-                                            type="checkbox" 
-                                            name="routes[<%= routeItem.groupKey %>][<%= routeItem.route %>]"
-                                            data-category="<%= category %>"
-                                            <%= routeItem.enabled ? 'checked' : '' %>
-                                        >
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                    <span class="route-status <%= routeItem.enabled ? 'enabled' : 'disabled' %>">
-                                        <%= routeItem.enabled ? 'Enabled' : 'Disabled' %>
-                                    </span>
-                                </div>
-                            </div>
-                        <% }); %>
-                    </div>
-                </div>
-            <% }); %>
-        </form>
-
-        <!-- Sticky Floating Save Button -->
-        <div class="sticky-save-button">
-            <button onclick="savePermissions()" class="btn btn-primary btn-floating">
-                <i class="fas fa-save"></i> Save Changes
-            </button>
-        </div>
-
-        <div class="save-section">
-            <div class="save-info">
-                <i class="fas fa-shield-alt"></i>
-                <span>Changes take effect immediately after saving</span>
-            </div>
-            <button onclick="savePermissions()" class="btn btn-primary btn-large">
-                <i class="fas fa-save"></i> Save Route Permissions
-            </button>
-        </div>
-    </div>
-</div>
-
-<style>
+    <%- include('../partials/styles') %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> 
+    <style>
 .route-control-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -521,8 +348,140 @@ input:checked + .toggle-slider:before {
     }
 }
 </style>
+</head>
+<body>
+    <%- include('../partials/header') %>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <a href="/dashboard">🏠 Dashboard</a>
+            <span class="separator">/</span>
+            <span class="current">Route Control</span>
+        </ol>
+    </nav>
+    </br>
 
-<script>
+    <% if (success) { %>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <%= success %>
+        </div>
+    <% } %>
+
+    <% if (error) { %>
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i> <%= error %>
+        </div>
+    <% } %>
+
+    <main class="main-content">
+       <div class="route-control-container">
+        <div class="info-banner">
+            <div class="info-content">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <h4>Super Admin Route Control</h4>
+                    <p>Control which application features are accessible to regular users. You (super admin) will always have access to all routes regardless of these settings.</p>
+                </div>
+            </div>
+        </div>
+
+        <form id="routePermissionsForm">
+            <% 
+            const categories = {};
+            Object.keys(permissions.permissions).forEach(groupKey => {
+                Object.keys(permissions.permissions[groupKey]).forEach(route => {
+                    const routeData = permissions.permissions[groupKey][route];
+                    if (!categories[routeData.category]) {
+                        categories[routeData.category] = [];
+                    }
+                    categories[routeData.category].push({
+                        route: route,
+                        ...routeData,
+                        groupKey: groupKey
+                    });
+                });
+            });
+            %>
+
+            <% 
+            // Define category icons mapping
+            const categoryIcons = {
+                'Dashboard': 'fas fa-tachometer-alt',
+                'Inventory': 'fas fa-boxes',
+                'Sales & Orders': 'fas fa-receipt',
+                'Customer Relations': 'fas fa-users',
+                'Reports & Analytics': 'fas fa-chart-bar',
+                'System Administration': 'fas fa-cogs'
+            };
+            %>
+
+            <% Object.keys(categories).forEach(category => { %>
+                <div class="route-category">
+                    <div class="category-header">
+                        <h3>
+                            <i class="<%= categoryIcons[category] || 'fas fa-folder' %>"></i>
+                            <%= category %>
+                        </h3>
+                        <div class="category-controls">
+                            <label class="toggle-switch">
+                                <input type="checkbox" onchange="toggleCategory('<%= category %>', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Enable All</span>
+                        </div>
+                    </div>
+
+                    <div class="routes-grid">
+                        <% categories[category].forEach(routeItem => { %>
+                            <div class="route-item">
+                                <div class="route-info">
+                                    <div class="route-path">
+                                        <code><%= routeItem.route %></code>
+                                    </div>
+                                    <div class="route-description">
+                                        <%= routeItem.description %>
+                                    </div>
+                                </div>
+                                <div class="route-control">
+                                    <label class="toggle-switch">
+                                        <input 
+                                            type="checkbox" 
+                                            name="routes[<%= routeItem.groupKey %>][<%= routeItem.route %>]"
+                                            data-category="<%= category %>"
+                                            <%= routeItem.enabled ? 'checked' : '' %>
+                                        >
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="route-status <%= routeItem.enabled ? 'enabled' : 'disabled' %>">
+                                        <%= routeItem.enabled ? 'Enabled' : 'Disabled' %>
+                                    </span>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% }); %>
+        </form>
+
+        <!-- Sticky Floating Save Button -->
+        <div class="sticky-save-button">
+            <button onclick="savePermissions()" class="btn btn-primary btn-floating">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </div>
+
+        <div class="save-section">
+            <div class="save-info">
+                <i class="fas fa-shield-alt"></i>
+                <span>Changes take effect immediately after saving</span>
+            </div>
+            <button onclick="savePermissions()" class="btn btn-primary btn-large">
+                <i class="fas fa-save"></i> Save Route Permissions
+            </button>
+        </div>
+    </div>
+    </main>
+
+    <script>
 function getCategoryIcon(category) {
     const icons = {
         'Dashboard': 'fas fa-tachometer-alt',
@@ -642,9 +601,6 @@ async function savePermissions() {
 }
 </script>
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <p>&copy; 2024 <%= company.name || 'Company Name' %>. Route Control Center - Feature Management System</p>
-    </footer>
+    <%- include('../partials/scripts') %>
 </body>
 </html>

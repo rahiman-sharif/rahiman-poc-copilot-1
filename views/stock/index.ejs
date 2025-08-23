@@ -5,31 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
+    <style>
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 30px;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 15px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-wrapper {
+                padding: 10px 15px;
+            }
+        }
+
+        /* Ensure table doesn't overflow container */
+        .data-table {
+            width: 100%;
+            table-layout: auto;
+            overflow-x: auto;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 0;
+        }
+
+        /* Fix stats grid layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Ensure page header doesn't overflow */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Stock Management</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -37,7 +72,6 @@
             <span class="current">📦 Stock Management</span>
         </div>
     </nav>
-
     <!-- Main Content -->
     <main class="main-content">
         <div class="content-wrapper">
@@ -105,6 +139,8 @@
                     </div>
                 </div>
             </div>
+
+        </br>
 
             <!-- Stock Table -->
             <div class="table-container">
@@ -245,5 +281,7 @@
             }
         }, 30000);
     </script>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>

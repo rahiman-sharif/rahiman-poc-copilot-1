@@ -5,31 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p><%= isEdit ? 'Edit Customer' : 'Add New Customer' %></p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -39,8 +18,8 @@
             <span class="current"><%= isEdit ? '✏️ Edit Customer' : '👤➕ Add Customer' %></span>
         </div>
     </nav>
-
-    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Main Content -->
     <main class="form-main">
         <div class="form-container">
             <!-- Page Header -->
@@ -223,5 +202,8 @@
             this.value = this.value.replace(/\D/g, '').substring(0, 6);
         });
     </script>
+    </main>
+
+    <%- include('../partials/scripts') %>
 </body>
 </html>
