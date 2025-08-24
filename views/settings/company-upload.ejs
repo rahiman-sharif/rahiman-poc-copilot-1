@@ -429,6 +429,34 @@
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
 
+                    <!-- Verification Key Input Section -->
+                    <div class="verification-section" style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin: 20px 0;">
+                        <h4 style="color: #856404; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+                            🔑 Data Verification Required
+                        </h4>
+                        <p style="color: #856404; margin: 0 0 15px 0; font-size: 0.95rem;">
+                            Enter the 5-character verification key that was provided when you downloaded this company data file. 
+                            This ensures the data has not been tampered with or corrupted.
+                        </p>
+                        <div class="form-group">
+                            <label for="verificationKey" style="display: block; margin-bottom: 8px; font-weight: 600; color: #856404;">
+                                Verification Key: <span style="color: #dc3545;">*</span>
+                            </label>
+                            <input type="text" 
+                                   id="verificationKey" 
+                                   name="verificationKey" 
+                                   class="form-control" 
+                                   placeholder="Enter 5-character key (e.g., ZXdvZ)"
+                                   maxlength="5"
+                                   pattern="[A-Za-z0-9]{5}"
+                                   required
+                                   style="padding: 12px; font-size: 16px; border: 2px solid #ffc107; border-radius: 8px; width: 200px; text-transform: uppercase; font-family: monospace; letter-spacing: 2px;">
+                            <small style="display: block; margin-top: 5px; color: #856404;">
+                                The key file was downloaded separately when you exported the company data.
+                            </small>
+                        </div>
+                    </div>
+
                     <div class="action-buttons">
                         <button type="submit" class="upload-btn" id="uploadBtn" disabled>
                             🚀 Update Company Data
@@ -449,6 +477,29 @@
         const uploadSection = document.getElementById('uploadSection');
         const progressBar = document.getElementById('progressBar');
         const progressFill = document.getElementById('progressFill');
+        const verificationKeyInput = document.getElementById('verificationKey');
+
+        // Function to check if form is ready for submission
+        function checkFormReady() {
+            const hasFile = fileInput.files && fileInput.files.length > 0;
+            const hasKey = verificationKeyInput.value.trim().length === 5;
+            uploadBtn.disabled = !(hasFile && hasKey);
+        }
+
+        // Add event listener for verification key input
+        verificationKeyInput.addEventListener('input', (e) => {
+            // Auto-uppercase and limit to 5 characters
+            e.target.value = e.target.value.toUpperCase().substring(0, 5);
+            checkFormReady();
+        });
+
+        // Add event listener for verification key paste
+        verificationKeyInput.addEventListener('paste', (e) => {
+            setTimeout(() => {
+                e.target.value = e.target.value.toUpperCase().substring(0, 5);
+                checkFormReady();
+            }, 0);
+        });
 
         // Drag and drop functionality
         uploadSection.addEventListener('dragover', (e) => {
@@ -483,7 +534,7 @@
             fileName.textContent = file.name;
             fileSize.textContent = formatFileSize(file.size);
             fileInfo.classList.add('show');
-            uploadBtn.disabled = false;
+            checkFormReady(); // Use the new validation function
 
             // Read and preview file content
             const reader = new FileReader();

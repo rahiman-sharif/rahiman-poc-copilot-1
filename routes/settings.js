@@ -173,6 +173,88 @@ router.get('/company/download', requireAuth, requireAdminOrSuper, (req, res) => 
     }
 });
 
+// Helper function to generate a 5-character key from company data
+function generateCompanyKey(companyData) {
+    try {
+        // Parse the decrypted company data to get actual JSON
+        const company = JSON.parse(companyData);
+        
+        // Create a string from key company details for consistent key generation
+        const keyData = [
+            company.company.name || '',
+            company.company.id || '',
+            company.company.gst?.gstin || '',
+            company.company.address?.pincode || '',
+            company.company.contact?.phone1 || ''
+        ].join('|');
+        
+        // Create hash and convert to base64, then take first 5 characters
+        const crypto = require('crypto');
+        const hash = crypto.createHash('md5').update(keyData).digest('hex');
+        const base64Hash = Buffer.from(hash).toString('base64');
+        const key = base64Hash.substring(0, 5).toUpperCase();
+        
+        console.log(`🔑 Generated key from company data: ${key}`);
+        return key;
+        
+    } catch (error) {
+        console.error('Error generating company key:', error);
+        // Fallback key generation if parsing fails
+        const crypto = require('crypto');
+        const hash = crypto.createHash('md5').update(companyData).digest('hex');
+        const base64Hash = Buffer.from(hash).toString('base64');
+        return base64Hash.substring(0, 5).toUpperCase();
+    }
+}
+
+// GET /settings/company/download-key - Download verification key file (Admin+ only)
+router.get('/company/download-key', requireAuth, requireAdminOrSuper, (req, res) => {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        const jsonProtection = require('../utils/json-protection');
+        
+        // Get the absolute path to the company.json file
+        const companyFilePath = path.join(process.cwd(), 'data', 'company.json');
+        
+        if (!fs.existsSync(companyFilePath)) {
+            return res.status(404).send('Company data file not found');
+        }
+        
+        // Read and decode the encrypted company file
+        const encryptedData = fs.readFileSync(companyFilePath, 'utf8');
+        const decryptedData = jsonProtection.decodeJsonContent(encryptedData);
+        
+        // Generate the 5-character key
+        const verificationKey = generateCompanyKey(decryptedData);
+        
+        // Create key file content
+        const keyFileContent = {
+            key: verificationKey,
+            generated: new Date().toISOString(),
+            purpose: "Company data verification key - Required for data upload validation"
+        };
+        
+        // Create a filename with timestamp
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
+        const filename = `company-key-${timestamp}.txt`;
+        
+        // Set headers for file download
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Type', 'text/plain');
+        
+        console.log(`🔑 Verification key file downloaded by: ${req.session.user.username}`);
+        console.log(`🔑 Key: ${verificationKey}`);
+        
+        // Send the key file
+        res.send(JSON.stringify(keyFileContent, null, 2));
+        
+    } catch (error) {
+        console.error('Error downloading verification key:', error);
+        res.status(500).send('Failed to download verification key');
+    }
+});
+
 // GET /settings/company-upload - Company data upload page (Admin+ only)
 router.get('/company-upload', requireAuth, requireAdminOrSuper, (req, res) => {
     try {
@@ -223,8 +305,33 @@ router.post('/company-upload', requireAuth, requireAdminOrSuper, (req, res) => {
         }
 
         try {
+            // Get the verification key from form
+            const verificationKey = req.body.verificationKey;
+            
+            if (!verificationKey) {
+                return res.redirect('/settings/company-upload?error=' + encodeURIComponent('Verification key is required'));
+            }
+
             // Get the uploaded file content
             const uploadedContent = req.file.buffer.toString('utf8');
+            
+            // Verify the uploaded data with the provided key
+            try {
+                const jsonProtection = require('../utils/json-protection');
+                const decryptedData = jsonProtection.decodeJsonContent(uploadedContent);
+                const expectedKey = generateCompanyKey(decryptedData);
+                
+                if (verificationKey.toUpperCase() !== expectedKey.toUpperCase()) {
+                    console.log(`🔑 Key verification failed. Expected: ${expectedKey}, Provided: ${verificationKey}`);
+                    return res.redirect('/settings/company-upload?error=' + encodeURIComponent('Invalid verification key. The data may be tampered with or corrupted.'));
+                }
+                
+                console.log(`🔑 Key verification successful: ${verificationKey}`);
+                
+            } catch (keyError) {
+                console.error('Key verification error:', keyError);
+                return res.redirect('/settings/company-upload?error=' + encodeURIComponent('Failed to verify data integrity. Invalid file format or corrupted data.'));
+            }
             
             // Create backup of current file
             const companyFilePath = path.join(process.cwd(), 'data', 'company.json');
@@ -257,8 +364,9 @@ router.post('/company-upload', requireAuth, requireAdminOrSuper, (req, res) => {
                 console.log(`📄 File size: ${uploadedContent.length} bytes`);
                 console.log(`📄 Company Name: ${companyName}`);
                 console.log(`📄 GST: ${gstIn}`);
+                console.log(`🔑 Verification key used: ${verificationKey}`);
                 
-                const successMessage = `Company data updated successfully!`;
+                const successMessage = `Company data updated successfully! Data integrity verified with key: ${verificationKey}`;
                 
                 res.redirect('/settings/company-upload?success=' + encodeURIComponent(successMessage));
                 

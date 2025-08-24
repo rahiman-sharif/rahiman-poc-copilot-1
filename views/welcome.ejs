@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to <%= companyName %></title>
+    <title>Welcome to Kanakkar - Professional Billing Solutions</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,45 +14,179 @@
         }
 
         .welcome-body {
-            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
             background-size: 400% 400%;
-            animation: gradientShift 12s ease infinite;
+            animation: gradientFlow 15s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Advanced CSS enhancements */
+            background-attachment: fixed;
         }
 
-        @keyframes gradientShift {
+        /* Enhanced background with multiple layers */
+        .welcome-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: backgroundShift 20s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes backgroundShift {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+            100% { transform: scale(1.1) rotate(2deg); opacity: 0.6; }
+        }
+
+        @keyframes gradientFlow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+
+        /* Enhanced floating particles animation */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+            filter: blur(0.5px);
+        }
+
+        /* Create varied particle effects */
+        .particle:nth-child(1) { 
+            width: 6px; height: 6px; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(102, 126, 234, 0.4));
+            left: 10%; animation-delay: 0s; animation-duration: 25s; 
+        }
+        .particle:nth-child(2) { 
+            width: 4px; height: 4px; 
+            background: radial-gradient(circle, rgba(240, 147, 251, 0.7), rgba(118, 75, 162, 0.3));
+            left: 20%; animation-delay: 5s; animation-duration: 30s; 
+        }
+        .particle:nth-child(3) { 
+            width: 8px; height: 8px; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6), rgba(79, 172, 254, 0.4));
+            left: 30%; animation-delay: 10s; animation-duration: 22s; 
+        }
+        .particle:nth-child(4) { 
+            width: 3px; height: 3px; 
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.8), rgba(102, 126, 234, 0.3));
+            left: 40%; animation-delay: 15s; animation-duration: 28s; 
+        }
+        .particle:nth-child(5) { 
+            width: 5px; height: 5px; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(240, 147, 251, 0.4));
+            left: 50%; animation-delay: 2s; animation-duration: 26s; 
+        }
+        .particle:nth-child(6) { 
+            width: 7px; height: 7px; 
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.6), rgba(102, 126, 234, 0.3));
+            left: 60%; animation-delay: 8s; animation-duration: 24s; 
+        }
+        .particle:nth-child(7) { 
+            width: 4px; height: 4px; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.7), rgba(79, 172, 254, 0.5));
+            left: 70%; animation-delay: 12s; animation-duration: 32s; 
+        }
+        .particle:nth-child(8) { 
+            width: 6px; height: 6px; 
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.6), rgba(240, 147, 251, 0.3));
+            left: 80%; animation-delay: 18s; animation-duration: 27s; 
+        }
+        .particle:nth-child(9) { 
+            width: 5px; height: 5px; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(118, 75, 162, 0.4));
+            left: 90%; animation-delay: 6s; animation-duration: 29s; 
+        }
+
+        @keyframes float {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) rotate(360deg);
+            }
         }
 
         .welcome-container {
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             padding: 20px;
         }
 
         .welcome-card {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
             overflow: hidden;
-            animation: slideUp 1s ease-out;
+            animation: slideUp 1.2s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        /* Advanced card glow effect */
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                rgba(102, 126, 234, 0.2), 
+                rgba(118, 75, 162, 0.2), 
+                rgba(240, 147, 251, 0.2), 
+                rgba(79, 172, 254, 0.2));
+            border-radius: 32px;
+            z-index: -1;
+            animation: borderGlow 4s ease-in-out infinite alternate;
+            filter: blur(4px);
+        }
+
+        @keyframes borderGlow {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(1.01); }
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(50px) scale(0.95);
+                transform: translateY(80px) scale(0.9);
             }
             to {
                 opacity: 1;
@@ -61,132 +196,220 @@
 
         .welcome-header {
             text-align: center;
-            padding: 60px 40px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            padding: 60px 40px 40px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.03));
+            position: relative;
         }
 
         .logo-container {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             position: relative;
         }
 
         .logo-icon {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 30px;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
             position: relative;
-            animation: logoFloat 3s ease-in-out infinite;
+            animation: logoFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 15px 35px rgba(102, 126, 234, 0.3));
         }
 
-        .building-icon {
+        /* Enhanced logo glow effect */
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: radial-gradient(circle, 
+                rgba(102, 126, 234, 0.2) 0%, 
+                rgba(118, 75, 162, 0.1) 30%, 
+                transparent 70%);
+            border-radius: 50%;
+            animation: logoGlow 3s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes logoGlow {
+            0% { 
+                opacity: 0.5; 
+                transform: scale(1); 
+            }
+            100% { 
+                opacity: 0.8; 
+                transform: scale(1.1); 
+            }
+        }
+
+        .logo-icon img {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            border-radius: 15px;
-            position: relative;
+            object-fit: contain;
+            border-radius: 20px;
+            background: white;
+            padding: 10px;
             box-shadow: 
-                0 10px 30px rgba(102, 126, 234, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            overflow: hidden;
+                0 10px 30px rgba(0, 0, 0, 0.1),
+                0 0 20px rgba(102, 126, 234, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
         }
 
-        .building-icon::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 15px;
-            right: 15px;
-            height: 80px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
-            border-radius: 8px;
-        }
-
-        .building-windows {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: grid;
-            grid-template-columns: repeat(3, 12px);
-            grid-template-rows: repeat(4, 12px);
-            gap: 6px;
-        }
-
-        .window {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 2px;
-            animation: windowGlow 4s ease-in-out infinite;
-        }
-
-        .window:nth-child(odd) {
-            animation-delay: 0.5s;
-        }
-
-        .window:nth-child(3n) {
-            animation-delay: 1s;
-        }
-
-        @keyframes windowGlow {
-            0%, 100% { background: rgba(255, 255, 255, 0.6); }
-            50% { background: rgba(255, 255, 255, 1); box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); }
-        }
-
-        .building-door {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 25px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 3px 3px 0 0;
-        }
-
-        .building-door::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            right: 3px;
-            width: 2px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
+        .logo-icon:hover img {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.15),
+                0 0 30px rgba(102, 126, 234, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
         @keyframes logoFloat {
             0%, 100% { 
                 transform: translateY(0px) rotate(0deg); 
-                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
             }
             50% { 
-                transform: translateY(-15px) rotate(1deg); 
-                box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+                transform: translateY(-20px) rotate(2deg); 
             }
         }
 
         .welcome-title {
-            font-size: 24px;
-            color: #6c757d;
-            margin-bottom: 15px;
-            font-weight: 300;
-            letter-spacing: 2px;
+            font-size: 18px;
+            color: #8892b0;
+            margin-bottom: 10px;
+            font-weight: 400;
+            letter-spacing: 3px;
             text-transform: uppercase;
+            opacity: 0.8;
         }
 
         .company-name {
-            font-size: 48px;
+            font-size: 64px;
             font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe);
+            background-size: 300% 300%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            animation: textShimmer 6s ease-in-out infinite;
+            position: relative;
+            text-shadow: 
+                0 0 30px rgba(102, 126, 234, 0.3),
+                0 0 60px rgba(118, 75, 162, 0.2);
+        }
+
+        /* Advanced text shimmer animation */
+        @keyframes textShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Text glow effect */
+        .company-name::after {
+            content: 'Kanakkar';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: blur(15px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: glowPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            0% { opacity: 0.2; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.05); }
+        }
+
+        .tagline {
+            font-size: 24px;
+            background: linear-gradient(135deg, #64748b, #475569);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 500;
+            margin-bottom: 20px;
+            letter-spacing: 1.2px;
+            text-align: center;
+            position: relative;
+            line-height: 1.4;
+            animation: subtleGlow 3s ease-in-out infinite alternate;
+        }
+
+        .tagline::before {
+            content: '✨';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            opacity: 0.7;
+            animation: gentlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes subtleGlow {
+            0% { 
+                filter: drop-shadow(0 2px 8px rgba(100, 116, 139, 0.2));
+            }
+            100% { 
+                filter: drop-shadow(0 4px 12px rgba(100, 116, 139, 0.3));
+            }
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { opacity: 0.5; transform: translateY(-50%) scale(1); }
+            50% { opacity: 0.8; transform: translateY(-50%) scale(1.1); }
+        }
+
+        .client-info {
+            font-size: 17px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
+            font-weight: 600;
+            margin-bottom: 35px;
+            text-align: center;
+            position: relative;
+            letter-spacing: 0.8px;
+            line-height: 1.4;
+            animation: textShine 4s ease-in-out infinite;
         }
 
-        .subtitle {
-            font-size: 18px;
-            color: #6c757d;
-            font-weight: 500;
+        .client-info::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+            animation: lineExpand 3s ease-in-out infinite;
+        }
+
+        @keyframes textShine {
+            0%, 100% { 
+                filter: drop-shadow(0 1px 6px rgba(102, 126, 234, 0.2));
+            }
+            50% { 
+                filter: drop-shadow(0 2px 10px rgba(102, 126, 234, 0.3));
+            }
+        }
+
+        @keyframes lineExpand {
+            0%, 100% { width: 30px; opacity: 0.5; }
+            50% { width: 60px; opacity: 1; }
         }
 
         .welcome-content {
@@ -195,152 +418,525 @@
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
         }
 
         .feature-card {
             text-align: center;
-            padding: 25px 20px;
-            border-radius: 15px;
-            background: rgba(102, 126, 234, 0.05);
+            padding: 35px 25px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.7);
             border: 1px solid rgba(102, 126, 234, 0.1);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
-            background: rgba(102, 126, 234, 0.1);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.3);
         }
 
         .feature-icon {
-            font-size: 40px;
-            margin-bottom: 15px;
+            font-size: 48px;
+            margin-bottom: 20px;
             display: block;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
         }
 
         .feature-card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
         }
 
         .feature-card p {
-            font-size: 14px;
-            color: #6c757d;
-            line-height: 1.5;
+            font-size: 15px;
+            color: #64748b;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .contact-section {
+            text-align: center;
+            padding: 40px 30px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+            border-radius: 25px;
+            margin: 30px 0;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .contact-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .contact-title {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .contact-subtitle {
+            color: #64748b;
+            font-size: 16px;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .business-contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .business-contact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .business-contact:hover::before {
+            left: 100%;
+        }
+
+        .business-contact:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .phone-icon {
+            font-size: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Contact Info Badge */
+        .contact-info {
+            margin-top: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .contact-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+            border: 2px dashed rgba(102, 126, 234, 0.3);
+            padding: 15px 25px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin: 0 auto;
+            max-width: 280px;
+            width: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+        }
+
+        .contact-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.05), transparent);
+            transition: left 0.8s;
+        }
+
+        .contact-badge:hover::before {
+            left: 100%;
+        }
+
+        .contact-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.5);
+            background: linear-gradient(45deg, #ffffff, #f1f5f9);
+        }
+
+        .contact-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .contact-badge:hover::before {
+            left: 100%;
+        }
+
+        .contact-badge:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.25);
+            border-color: rgba(102, 126, 234, 0.4);
+        }
+
+        .contact-icon {
+            font-size: 24px;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .contact-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+            text-align: left;
+        }
+
+        .contact-phone {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1e293b;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            display: block;
+            text-align: left;
+        }
+
+        .contact-phone:hover {
+            color: #667eea;
+            text-decoration: none;
+            transform: scale(1.02);
+        }
+
+        .contact-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .contact-phone:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.05);
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
 
         .welcome-footer {
             text-align: center;
-            padding: 40px;
-            background: rgba(248, 249, 250, 0.8);
+            padding: 50px 40px;
+            background: rgba(248, 250, 252, 0.8);
             border-top: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .continue-btn {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            gap: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            background-size: 200% 200%;
             color: white;
-            padding: 16px 32px;
+            padding: 20px 40px;
             border-radius: 50px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            margin-bottom: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 
+                0 15px 35px rgba(102, 126, 234, 0.3),
+                0 5px 15px rgba(118, 75, 162, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            animation: buttonPulse 4s ease-in-out infinite;
+        }
+
+        /* Advanced button animations */
+        @keyframes buttonPulse {
+            0%, 100% { 
+                background-position: 0% 50%; 
+                box-shadow: 
+                    0 15px 35px rgba(102, 126, 234, 0.3),
+                    0 5px 15px rgba(118, 75, 162, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+            50% { 
+                background-position: 100% 50%; 
+                box-shadow: 
+                    0 20px 40px rgba(102, 126, 234, 0.4),
+                    0 8px 20px rgba(118, 75, 162, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .continue-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                rgba(255, 255, 255, 0.1), 
+                transparent);
+            transition: left 0.8s ease;
+        }
+
+        /* Secondary shine effect */
+        .continue-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.6s ease;
+        }
+
+        .continue-btn:hover::before {
+            left: 100%;
+        }
+
+        .continue-btn:hover::after {
+            transform: scale(1);
         }
 
         .continue-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 
+                0 30px 60px rgba(102, 126, 234, 0.5),
+                0 15px 30px rgba(118, 75, 162, 0.3),
+                inset 0 2px 0 rgba(255, 255, 255, 0.4);
             text-decoration: none;
             color: white;
+            background-size: 150% 150%;
         }
 
         .btn-arrow {
-            font-size: 18px;
-            transition: transform 0.3s ease;
+            font-size: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            position: relative;
         }
 
         .continue-btn:hover .btn-arrow {
-            transform: translateX(5px);
+            transform: translateX(8px) rotate(10deg) scale(1.1);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Arrow trail effect */
+        .btn-arrow::after {
+            content: '→';
+            position: absolute;
+            left: -15px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            transform: translateX(-10px);
+        }
+
+        .continue-btn:hover .btn-arrow::after {
+            opacity: 0.3;
+            transform: translateX(0px);
         }
 
         .version-info {
-            font-size: 12px;
-            color: #6c757d;
+            font-size: 14px;
+            color: #8892b0;
             opacity: 0.8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
+        /* Responsive Design */
         @media (max-width: 768px) {
             .welcome-header {
-                padding: 40px 20px;
+                padding: 40px 20px 30px;
             }
+            
             .company-name {
-                font-size: 36px;
+                font-size: 48px;
             }
+            
             .logo-icon {
-                width: 90px;
-                height: 90px;
+                width: 120px;
+                height: 120px;
             }
-            .building-windows {
-                grid-template-columns: repeat(2, 10px);
-                grid-template-rows: repeat(3, 10px);
-                gap: 4px;
-            }
+            
             .welcome-content {
                 padding: 30px 20px;
             }
+            
             .features-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .feature-card {
+                padding: 25px 20px;
+            }
+            
+            .contact-section {
+                padding: 30px 20px;
+                margin: 20px 0;
+            }
+            
+            .business-contact {
+                padding: 15px 25px;
+                font-size: 16px;
+            }
+            
+            .continue-btn {
+                padding: 18px 35px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .company-name {
+                font-size: 40px;
+            }
+            
+            .tagline {
+                font-size: 18px;
+            }
+            
+            .logo-icon {
+                width: 100px;
+                height: 100px;
             }
         }
     </style>
 </head>
 <body class="welcome-body">
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
     <div class="welcome-container">
         <div class="welcome-card">
             <div class="welcome-header">
                 <div class="logo-container">
                     <div class="logo-icon">
-                        <div class="building-icon">
-                            <div class="building-windows">
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                                <div class="window"></div>
-                            </div>
-                            <div class="building-door"></div>
+                        <img src="/images/logo.png" alt="Kanakkar Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="building-icon" style="display: none;">
+                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 60px; color: white;">🏢</div>
                         </div>
                     </div>
                 </div>
-                <h1 class="welcome-title">Welcome to</h1>
-                <h2 class="company-name"><%= companyName %></h2>
-                <p class="subtitle">Billing Management System</p>
-            </div>
-
-            
+                <h2 class="company-name">Kanakkar</h2>
+                <p class="tagline">✨ நம்ம கணக்கு பிள்ளை – உங்கள் கணக்குகள் நம்பிக்கையுடன்</p>
+                <p class="client-info">Professional Billing Solutions for <%= companyName %></p>
+            </div>           
 
             <div class="welcome-footer">
                 <a href="/login" class="continue-btn">
                     <span>Continue to Login</span>
                     <span class="btn-arrow">→</span>
                 </a>
+                <div class="version-info">
+                    © 2025 Kanakkar Technology Solutions | Professional Billing Software v2.0
+                </div>
+                
+                <div class="contact-info">
+                    <div class="contact-badge">
+                        <span class="contact-icon">📞</span>
+                        <div class="contact-content">
+                            <span class="contact-label">Contact for Business</span>
+                            <a href="tel:9003399858" class="contact-phone">9003399858</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

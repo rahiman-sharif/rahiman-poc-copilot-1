@@ -681,9 +681,11 @@ app.use(express.json());
 if (process.pkg) {
     // When running as packaged executable, use path relative to executable
     app.use(express.static(path.join(__dirname, 'public')));
+    app.use('/assets', express.static(path.join(__dirname, 'assets')));
 } else {
     // When running in development, use relative path
     app.use(express.static('public'));
+    app.use('/assets', express.static('assets'));
 }
 
 // Session configuration

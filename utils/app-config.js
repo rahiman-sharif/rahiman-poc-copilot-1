@@ -6,7 +6,7 @@
 // ========== CONFIGURATION SETTINGS ==========
 const COMPANY_NAME = "Vikram Steels"; // Used for folder naming and display
 const LICENSE_APP_NAME = "Vikram Steels Management System"; // Used for license validation
-const APP_TYPE = "desktop"; // Change to "desktop" for desktop mode
+const APP_TYPE = "web"; // Change to "desktop" for desktop mode
 const LICENSE_SECRET = "25c940c9046913b04d1ed2f580d29eed3478881b9e36e722f88ee1a62595f3ca";
 const UNLIMITED_LICENSE = false; // Set to true to auto-generate 10-year license on startup
 const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
