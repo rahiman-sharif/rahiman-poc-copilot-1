@@ -1,39 +1,139 @@
-<!DOCTYPE ht            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Stock Management</p>
-                </a>
-            </div>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
+    <style>
+        /* Sticky Table Enhancements */
+        .table-container {
+            position: relative;
+            max-height: 70vh;
+            overflow: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+        }
+
+        /* Sticky Header */
+        .data-table thead th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-bottom: 2px solid #357abd;
+            padding: 12px 8px;
+            font-weight: 600;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        /* Sticky First Column (Date) */
+        .data-table th:first-child,
+        .data-table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            background: white;
+            border-right: 2px solid #e9ecef;
+            min-width: 120px;
+        }
+
+        /* Header first column needs higher z-index */
+        .data-table thead th:first-child {
+            z-index: 15;
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        }
+
+        /* Sticky Second Column (Type) */
+        .data-table th:nth-child(2),
+        .data-table td:nth-child(2) {
+            position: sticky;
+            left: 120px; /* Width of first column */
+            z-index: 4;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            min-width: 100px;
+        }
+
+        /* Header second column */
+        .data-table thead th:nth-child(2) {
+            z-index: 14;
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        }
+
+        /* Table body styling */
+        .data-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .data-table tbody tr:hover td:first-child,
+        .data-table tbody tr:hover td:nth-child(2) {
+            background-color: #f8f9fa;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+
+        /* Enhance scrollbar */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .table-container {
+                max-height: 60vh;
+            }
+            
+            .data-table th:nth-child(2),
+            .data-table td:nth-child(2) {
+                left: 100px; /* Smaller first column on mobile */
+            }
+            
+            .data-table th:first-child,
+            .data-table td:first-child {
+                min-width: 100px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <h1>🏢 <%= companyName %></h1>
-                <p>Stock Movements</p>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.name %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
-    <nav class="breadcrumb">
+    <%- include('../partials/header') %>
+     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
             <span class="separator">></span>
@@ -43,7 +143,6 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="content-wrapper">
             <!-- Page Header -->
@@ -175,7 +274,6 @@
         </div>
     </main>
 
-    <!-- JavaScript -->
     <script>
         // Auto-hide alerts
         setTimeout(() => {
@@ -217,5 +315,7 @@
             });
         });
     </script>
+    
+    <%- include('../partials/scripts') %>
 </body>
 </html>

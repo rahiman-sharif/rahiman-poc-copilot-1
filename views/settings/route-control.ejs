@@ -584,8 +584,8 @@ async function savePermissions() {
             alertDiv.className = 'alert alert-success';
             alertDiv.innerHTML = '<i class="fas fa-check-circle"></i> Route permissions saved successfully!';
             
-            const container = document.querySelector('.container');
-            container.insertBefore(alertDiv, container.querySelector('.route-control-container'));
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(alertDiv, mainContent.querySelector('.route-control-container'));
             
             // Remove alert after 3 seconds
             setTimeout(() => {

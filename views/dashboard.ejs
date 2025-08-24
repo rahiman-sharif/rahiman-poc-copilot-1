@@ -310,6 +310,10 @@
         }
 
         /* License Status Card Styles */
+        .license-stat-card {
+            position: relative;
+        }
+        
         .license-stat-card::before {
             background: linear-gradient(90deg, #48bb78, #38a169) !important;
         }
@@ -327,9 +331,15 @@
         }
 
         .license-status {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin: 0 0 8px 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            letter-spacing: -0.5px;
+            line-height: 1;
+            position: absolute;
+            top: 15px;
+            right: 15px;
         }
 
         .license-status.valid {
@@ -349,9 +359,19 @@
         }
 
         .license-details {
-            font-size: 0.95rem;
-            color: #718096;
-            line-height: 1.4;
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-top: 0;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            text-align: left;
+        }
+
+        .license-details br {
+            display: block;
+            margin: 4px 0;
+            content: "";
         }
 
         .license-actions {
@@ -921,7 +941,7 @@
                         </div>
                         <div class="stat-info">
                             <h3><%= stats.totalBills || 0 %></h3>
-                            <p>Total Bills</p>
+                            <p>Today's Bills</p>
                         </div>
                     </div>
                     
@@ -931,7 +951,7 @@
                         </div>
                         <div class="stat-info">
                             <h3>₹<%= stats.totalRevenue ? (stats.totalRevenue / 1000).toFixed(1) + 'K' : '0' %></h3>
-                            <p>Revenue</p>
+                            <p>Today's Revenue</p>
                         </div>
                     </div>
                     
@@ -941,7 +961,7 @@
                         </div>
                         <div class="stat-info">
                             <h3><%= stats.totalCustomers || 0 %></h3>
-                            <p>Customers</p>
+                            <p>Total Customers</p>
                         </div>
                     </div>
                     
@@ -1010,7 +1030,7 @@
                     <h2>📋 Recent Bills</h2>
                     <div class="activity-list">
                         <% if (stats.recentBills && stats.recentBills.length > 0) { %>
-                            <% stats.recentBills.slice(0, 5).forEach(bill => { %>
+                            <% stats.recentBills.slice(0, 2).forEach(bill => { %>
                             <div class="activity-item">
                                 <div class="activity-icon">📋</div>
                                 <div class="activity-info">
@@ -1130,33 +1150,47 @@
                 // Determine status level based on days remaining
                 let statusClass = 'valid';
                 let cardClass = 'stat-card license-stat-card';
-                let statusText = 'Active';
+                let statusText = '●'; // Simple dot indicator
+                let tooltipText = 'Licensed & Active';
                 
                 if (licenseInfo.warningLevel === 'critical') {
                     statusClass = 'critical';
                     cardClass += ' critical';
-                    statusText = 'Expires Soon';
+                    statusText = '●'; // Red dot for critical
+                    tooltipText = 'License Expires Soon';
                 } else if (licenseInfo.warningLevel === 'warning') {
                     statusClass = 'warning';
                     cardClass += ' warning';
-                    statusText = 'Expiring Soon';
+                    statusText = '●'; // Orange dot for warning
+                    tooltipText = 'License Expiring Soon';
                 }
                 
                 // Update elements
                 statCard.className = cardClass;
                 statusElement.className = `license-status ${statusClass}`;
                 statusElement.textContent = statusText;
+                statusElement.title = tooltipText; // Add hover tooltip
                 
-                // Create detailed information
-                let detailsText = `Expires: ${licenseInfo.expiryDate}`;
+                // Create detailed information with better formatting
+                let detailsHTML = '';
+                
+                if (licenseInfo.expiryDate) {
+                    detailsHTML += `<div style="display: flex; align-items: center; margin-bottom: 6px;">
+                        <span style="font-weight: 600; color: #4a5568; margin-right: 8px;">📅</span>
+                        <span>Expires: <strong>${licenseInfo.expiryDate}</strong></span>
+                    </div>`;
+                }
+                
                 if (licenseInfo.daysRemaining !== undefined) {
-                    detailsText += `\n${licenseInfo.daysRemaining} days remaining`;
-                }
-                if (licenseInfo.companyName) {
-                    detailsText += `\nLicensed to: ${licenseInfo.companyName}`;
+                    const daysColor = licenseInfo.warningLevel === 'critical' ? '#f56565' : 
+                                    licenseInfo.warningLevel === 'warning' ? '#f6ad55' : '#48bb78';
+                    detailsHTML += `<div style="display: flex; align-items: center;">
+                        <span style="font-weight: 600; color: #4a5568; margin-right: 8px;">⏰</span>
+                        <span><strong style="color: ${daysColor};">${licenseInfo.daysRemaining} days</strong> remaining</span>
+                    </div>`;
                 }
                 
-                detailsElement.innerHTML = detailsText.replace(/\n/g, '<br>');
+                detailsElement.innerHTML = detailsHTML;
                 actionsElement.style.display = licenseInfo.isExpiringSoon ? 'block' : 'none';
                 
             } else {
@@ -1164,7 +1198,15 @@
                 statCard.className = 'stat-card license-stat-card invalid';
                 statusElement.className = 'license-status invalid';
                 statusElement.textContent = 'Invalid';
-                detailsElement.textContent = licenseInfo.message || 'License verification failed';
+                statusElement.title = 'License Invalid or Expired'; // Add hover tooltip
+                
+                // Format invalid license message with icon
+                const errorMessage = licenseInfo.message || 'License verification failed';
+                detailsElement.innerHTML = `<div style="display: flex; align-items: center;">
+                    <span style="font-weight: 600; color: #e53e3e; margin-right: 8px;">⚠️</span>
+                    <span style="color: #e53e3e; font-weight: 500;">${errorMessage}</span>
+                </div>`;
+                
                 actionsElement.style.display = 'block';
             }
         }

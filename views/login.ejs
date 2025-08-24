@@ -307,7 +307,6 @@
                         required 
                         placeholder="Enter your username"
                         autocomplete="username"
-                        value="admin"
                     >
                 </div>
                 
@@ -317,7 +316,6 @@
                         type="password" 
                         id="password" 
                         name="password" 
-                        value="admin123"
                         required 
                         placeholder="Enter your password"
                         autocomplete="current-password"
@@ -334,14 +332,15 @@
             </form>
             
             <div class="login-footer">                
-                <p><small>&copy; 2025 <%= companyName || 'Company Name' %>. All rights reserved.</small></p>
+                <p><small>&copy; <span id="currentYear"></span> <%= companyName || 'Company Name' %>. All rights reserved.</small></p>
             </div>
         </div>
     </div>
 
     <script>
-        // Focus on username field when page loads
+        // Set current year
         document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
             document.getElementById('username').focus();
         });
 

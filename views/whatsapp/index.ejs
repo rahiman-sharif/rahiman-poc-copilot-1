@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/style.css">
+    <%- include('../partials/styles') %>
     <style>
         .whatsapp-container {
             padding: 20px;
@@ -273,29 +274,7 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <a href="/dashboard" style="text-decoration: none; color: inherit;">
-                    <h1>🏢 <%= companyName %></h1>
-                    <p>Billing Management System</p>
-                </a>
-            </div>
-            
-            <div class="user-section">
-                <div class="user-info">
-                    <span class="user-name">Welcome, <%= user.fullName || user.username %></span>
-                    <span class="user-role">(<%= user.role %>)</span>
-                </div>                
-                <form action="/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
+    <%- include('../partials/header') %>
     <nav class="breadcrumb">
         <div class="breadcrumb-content">
             <a href="/dashboard">🏠 Dashboard</a>
@@ -304,8 +283,7 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
+     <main class="main-content">
         <div class="whatsapp-container">
             <h2>📱 Send Sales Summary via WhatsApp</h2>
             <p>Generate and send sales summary with filtered bill data to any WhatsApp number.</p>
@@ -373,7 +351,7 @@
                     </div>
 
                     <!-- WhatsApp Message Preview -->
-                    <h4>📝 WhatsApp Message Preview</h4>
+                    <h4>WhatsApp Message Preview</h4>
                     <div class="message-preview" id="messagePreview">
                         <!-- Message content will be generated here -->
                     </div>
@@ -403,11 +381,6 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <p>&copy; <%= new Date().getFullYear() %> <%= companyName %> - Billing Management System</p>
-    </footer>
-
     <script>
         let whatsappUrl = '';
         
@@ -423,79 +396,96 @@
                 return '';
             }
             
-            let message = `*═══════════════════════*\n`;
-            message += `*    ${companyName}    *\n`;
-            message += `*    SALES SUMMARY     *\n`;
-            message += `*═══════════════════════*\n\n`;
+            // Start message with simple header
+            let message = `================================\n`;
+            message += `SALES SUMMARY\n`;
+            message += `================================\n\n`;
             
             // Add date range info
             const today = new Date();
             if (dateRange === 'today') {
-                message += `📆 *Date:* ${today.toLocaleDateString()}\n`;
+                message += `Date: ${today.toLocaleDateString()}\n`;
             } else if (dateRange === 'month') {
-                message += `📆 *Period:* This Month\n`;
+                message += `Period: This Month\n`;
             } else if (dateRange === 'custom') {
-                message += `📆 *Period:* ${fromDate} to ${toDate}\n`;
+                message += `Period: ${fromDate} to ${toDate}\n`;
             } else {
-                message += `📆 *Period:* All Time\n`;
+                message += `Period: All Time\n`;
             }
             
-            message += `⏰ *Generated:* ${today.toLocaleDateString()} ${today.toLocaleTimeString()}\n\n`;
+            // Separate GST and Non-GST bills
+            const gstBills = bills.filter(bill => bill.billNumber && bill.billNumber.includes('GST'));
+            const nonGstBills = bills.filter(bill => bill.billNumber && !bill.billNumber.includes('GST'));
             
-            // Statistics
+            // Calculate totals
             const totalRevenue = bills.reduce((sum, bill) => sum + parseFloat(bill.finalTotal || 0), 0);
-            const totalGst = bills.reduce((sum, bill) => sum + parseFloat(bill.totalGst || 0), 0);
+            const gstRevenue = gstBills.reduce((sum, bill) => sum + parseFloat(bill.finalTotal || 0), 0);
+            const nonGstRevenue = nonGstBills.reduce((sum, bill) => sum + parseFloat(bill.finalTotal || 0), 0);
             const uniqueCustomers = new Set(bills.map(bill => bill.customerName)).size;
             
-            // Simple card-style formatting without complex boxes
-            message += `🔸 *SUMMARY* 🔸\n`;
-            message += `▪️ 📊 *Bills:* ${bills.length}\n`;
-            message += `▪️ 💰 *Revenue:* Rs.${totalRevenue.toFixed(2)}\n`;
-            message += `▪️ 📈 *GST:* Rs.${totalGst.toFixed(2)}\n`;
-            message += `▪️ 👥 *Customers:* ${uniqueCustomers}\n`;
-            message += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+            // Overall summary
+            message += `--------------------------------\n`;
+            message += `OVERALL SUMMARY\n`;
+            message += `--------------------------------\n`;
+            message += `Total Revenue: Rs.${totalRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            if (gstRevenue > 0 && nonGstRevenue > 0) {
+                message += ` (GST: Rs.${gstRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} + Non-GST: Rs.${nonGstRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})})`;
+            }
+            message += `\n`;            
+            message += `Total Bills: ${bills.length}\n\n`;
             
-            // Bill details
-            message += `*════ BILL DETAILS ════*\n\n`;
+            // GST Bills section
+            if (gstBills.length > 0) {
+                message += `--------------------------------\n`;
+                message += `GST BILLS\n`;
+                message += `--------------------------------\n`;
+                
+                let gstSubtotal = 0;
+                let totalGstAmount = 0;
+                
+                gstBills.forEach((bill) => {
+                    const finalTotal = parseFloat(bill.finalTotal || 0);
+                    const gstAmount = parseFloat(bill.totalGst || 0);
+                    const baseAmount = finalTotal - gstAmount;
+                    
+                    gstSubtotal += baseAmount;
+                    totalGstAmount += gstAmount;
+                    
+                    message += `• ${bill.billNumber} = Rs.${baseAmount.toLocaleString('en-IN', {minimumFractionDigits: 0, maximumFractionDigits: 2})} + GST: Rs.${gstAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} = Rs.${finalTotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+                });
+
+                message += `\nGST Section Total: Rs.${gstSubtotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} + Rs.${totalGstAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} = Rs.${gstRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+
+            //     message += `\n GST Section Total:\n`;
+            //     message += `   Base: Rs.${gstSubtotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+            //     message += `   + GST: Rs.${totalGstAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+            //     message += `   = Rs.${gstRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n\n`;
+            }
             
-            bills.forEach((bill, index) => {
-                message += `🧾 *${index + 1}. ${bill.billNumber}*\n`;
-                message += `┣━ 📅 Date: ${new Date(bill.billDate).toLocaleDateString()}\n`;
-                message += `┣━ 👤 Customer: ${bill.customerName}\n`;
+            // Non-GST Bills section
+            if (nonGstBills.length > 0) {
+                message += `\n--------------------------------\n`;
+                message += `NON-GST BILLS\n`;
+                message += `--------------------------------\n`;
                 
-                if (bill.items && bill.items.length > 0) {
-                    message += `┣━ 📦 Items (${bill.items.length}):\n`;
-                    bill.items.forEach((item, i) => {
-                        const itemName = item.name || item.itemName || 'Item';
-                        const itemQuantity = item.quantity || 0;
-                        const itemUnit = item.unit || 'pcs';
-                        const itemRate = item.rate || 0;
-                        message += `┃  • ${itemName}\n`;
-                        message += `┃    ${itemQuantity} ${itemUnit} × Rs.${itemRate}\n`;
-                    });
-                }
+                nonGstBills.forEach((bill) => {
+                    const finalTotal = parseFloat(bill.finalTotal || 0);
+                    message += `• ${bill.billNumber} = Rs.${finalTotal.toLocaleString('en-IN', {minimumFractionDigits: 0, maximumFractionDigits: 2})}\n`;
+                });
                 
-                if (bill.extraCharges && bill.extraCharges.length > 0) {
-                    message += `┣━ ⚡ Charges (${bill.extraCharges.length}):\n`;
-                    bill.extraCharges.forEach((charge, i) => {
-                        const chargeName = charge.name || charge.chargeName || 'Charge';
-                        const chargeAmount = charge.amount || 0;
-                        message += `┃  • ${chargeName}: Rs.${chargeAmount}\n`;
-                    });
-                }
-                
-                message += `┣━ 💵 *Total: Rs.${bill.finalTotal}*\n`;
-                message += `┗━ 💳 Payment: ${bill.paymentMethod}\n`;
-                
-                if (index < bills.length - 1) {
-                    message += `\n`;
-                }
-            });
+                message += `\nNon-GST Section Total: Rs.${nonGstRevenue.toLocaleString('en-IN', {minimumFractionDigits: 0, maximumFractionDigits: 2})}\n\n`;
+            }
             
-            message += `\n*═══════════════════════*\n`;
-            message += `🏢 *${companyName}*\n`;
-            message += `📱 Billing Management System\n`;
-            message += `*═══════════════════════*`;
+            // Grand total
+            message += `================================\n`;
+            message += `GRAND TOTAL: Rs.${totalRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+            message += `================================\n\n`;
+            
+            // Footer
+            message += `***********************************\n`;
+            message += `${companyName}\n`;
+            message += `Billing Management System\n`;
+            message += `***********************************`;
             
             return message;
         }
@@ -588,5 +578,7 @@
             
         });
     </script>
+    
+    <%- include('../partials/scripts') %>
 </body>
 </html>

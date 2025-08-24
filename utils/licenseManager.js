@@ -51,11 +51,19 @@ function generateLicense(options) {
     const {
         companyName = appConfig.getLicenseAppName(),
         validityDays = 45,
-        licenseType = 'generated'
+        licenseType = 'generated',
+        expiryDate = null  // Optional pre-calculated expiry date
     } = options;
     
     const now = new Date();
-    const expiryDate = new Date(now.getTime() + (validityDays * 24 * 60 * 60 * 1000));
+    
+    // Use provided expiry date if available, otherwise calculate from validity days
+    let calculatedExpiryDate;
+    if (expiryDate) {
+        calculatedExpiryDate = new Date(expiryDate);
+    } else {
+        calculatedExpiryDate = new Date(now.getTime() + (validityDays * 24 * 60 * 60 * 1000));
+    }
     
     const licenseData = {
         licenseId: `LIC-${Date.now()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
@@ -63,7 +71,7 @@ function generateLicense(options) {
         companyName: companyName,
         licenseType: licenseType,
         issuedDate: now.toISOString(),
-        expiryDate: expiryDate.toISOString(),
+        expiryDate: calculatedExpiryDate.toISOString(),
         validityDays: validityDays,
         version: '1.0',
         features: ['billing', 'inventory', 'customers', 'reports', 'settings']
@@ -214,8 +222,8 @@ function validateLicense() {
             };
         }
         
-        // Calculate days remaining
-        const daysRemaining = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+        // Calculate days remaining - use Math.floor to show actual completed days remaining
+        const daysRemaining = Math.floor((expiryDate - now) / (1000 * 60 * 60 * 24));
         
         return {
             isValid: true,

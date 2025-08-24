@@ -472,6 +472,9 @@
             try {
                 const response = await fetch('/license/upload', {
                     method: 'POST',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
                     body: formData
                 });
                 

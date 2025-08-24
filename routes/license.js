@@ -83,17 +83,30 @@ router.post('/generate', requireSuperAdmin, (req, res) => {
             });
         }
         
-        // Calculate validity days
+        // Calculate validity days using proper date arithmetic
         let validityDays;
+        let expiryDate;
+        const now = new Date();
+        
         switch (validityType) {
             case 'days':
                 validityDays = parseInt(validityValue);
+                expiryDate = new Date(now);
+                expiryDate.setDate(now.getDate() + validityDays);
                 break;
             case 'months':
-                validityDays = parseInt(validityValue) * 30;
+                const months = parseInt(validityValue);
+                expiryDate = new Date(now);
+                expiryDate.setMonth(now.getMonth() + months);
+                // Calculate actual days between dates for validityDays field
+                validityDays = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
                 break;
             case 'years':
-                validityDays = parseInt(validityValue) * 365;
+                const years = parseInt(validityValue);
+                expiryDate = new Date(now);
+                expiryDate.setFullYear(now.getFullYear() + years);
+                // Calculate actual days between dates for validityDays field
+                validityDays = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
                 break;
             default:
                 return res.status(400).json({ error: 'Invalid validity type' });
@@ -112,7 +125,8 @@ router.post('/generate', requireSuperAdmin, (req, res) => {
         const licenseData = licenseManager.generateLicense({
             companyName: companyName.trim(),
             validityDays: validityDays,
-            licenseType: 'generated'
+            licenseType: 'generated',
+            expiryDate: expiryDate  // Pass the properly calculated expiry date
         });
         
         console.log(`📋 Super Admin generated license for: ${companyName} (${validityDays} days)`);
@@ -144,17 +158,30 @@ router.post('/download', requireSuperAdmin, (req, res) => {
     try {
         const { companyName, validityType, validityValue } = req.body;
         
-        // Calculate validity days
+        // Calculate validity days using proper date arithmetic
         let validityDays;
+        let expiryDate;
+        const now = new Date();
+        
         switch (validityType) {
             case 'days':
                 validityDays = parseInt(validityValue);
+                expiryDate = new Date(now);
+                expiryDate.setDate(now.getDate() + validityDays);
                 break;
             case 'months':
-                validityDays = parseInt(validityValue) * 30;
+                const months = parseInt(validityValue);
+                expiryDate = new Date(now);
+                expiryDate.setMonth(now.getMonth() + months);
+                // Calculate actual days between dates for validityDays field
+                validityDays = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
                 break;
             case 'years':
-                validityDays = parseInt(validityValue) * 365;
+                const years = parseInt(validityValue);
+                expiryDate = new Date(now);
+                expiryDate.setFullYear(now.getFullYear() + years);
+                // Calculate actual days between dates for validityDays field
+                validityDays = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
                 break;
             default:
                 return res.status(400).json({ error: 'Invalid validity type' });
@@ -164,7 +191,8 @@ router.post('/download', requireSuperAdmin, (req, res) => {
         const licenseData = licenseManager.generateLicense({
             companyName: companyName.trim(),
             validityDays: validityDays,
-            licenseType: 'generated'
+            licenseType: 'generated',
+            expiryDate: expiryDate  // Pass the properly calculated expiry date
         });
         
         // Create JWT token for the license
@@ -352,11 +380,28 @@ router.post('/upload', upload.single('licenseFile'), (req, res) => {
                 return res.redirect('/?success=' + encodeURIComponent('License uploaded and activated successfully! Welcome back to the system.'));
             }
         } else {
-            // Valid license uploaded - redirect to dashboard instead of JSON
-            if (isExpired) {
-                return res.redirect('/license-expired?error=' + encodeURIComponent('The uploaded license is expired. Please upload a valid license.'));
+            // Check if this is an AJAX request (expects JSON response)
+            const isAjaxRequest = req.get('Accept') && req.get('Accept').includes('application/json');
+            
+            if (isAjaxRequest) {
+                // Return JSON for AJAX requests
+                if (isExpired) {
+                    return res.status(400).json({
+                        error: 'The uploaded license is expired. Please upload a valid license.'
+                    });
+                } else {
+                    return res.json({
+                        success: true,
+                        message: 'License uploaded and activated successfully!'
+                    });
+                }
             } else {
-                return res.redirect('/?success=' + encodeURIComponent('License uploaded and activated successfully!'));
+                // Redirect for form submissions
+                if (isExpired) {
+                    return res.redirect('/license-expired?error=' + encodeURIComponent('The uploaded license is expired. Please upload a valid license.'));
+                } else {
+                    return res.redirect('/?success=' + encodeURIComponent('License uploaded and activated successfully!'));
+                }
             }
         }
         
@@ -364,6 +409,7 @@ router.post('/upload', upload.single('licenseFile'), (req, res) => {
         console.error('Error uploading license:', error);
         
         const isFromExpiredPage = req.get('Referer') && req.get('Referer').includes('/license-expired');
+        const isAjaxRequest = req.get('Accept') && req.get('Accept').includes('application/json');
         const errorMessage = error.message.includes('already activated') ? 
             'License already in use - This license is already activated on a different machine' :
             `Failed to upload license - ${error.message}`;
@@ -372,17 +418,33 @@ router.post('/upload', upload.single('licenseFile'), (req, res) => {
             return res.redirect('/license-expired?error=' + encodeURIComponent(errorMessage));
         }
         
-        if (error.message.includes('already activated')) {
-            return res.status(400).json({
-                error: 'License already in use',
-                details: 'This license is already activated on a different machine'
+        if (isAjaxRequest) {
+            // Return JSON for AJAX requests
+            if (error.message.includes('already activated')) {
+                return res.status(400).json({
+                    error: 'License already in use',
+                    details: 'This license is already activated on a different machine'
+                });
+            }
+            
+            return res.status(500).json({
+                error: 'Failed to upload license',
+                details: error.message
+            });
+        } else {
+            // Redirect for form submissions
+            if (error.message.includes('already activated')) {
+                return res.status(400).json({
+                    error: 'License already in use',
+                    details: 'This license is already activated on a different machine'
+                });
+            }
+            
+            res.status(500).json({
+                error: 'Failed to upload license',
+                details: error.message
             });
         }
-        
-        res.status(500).json({
-            error: 'Failed to upload license',
-            details: error.message
-        });
     }
 });
 
