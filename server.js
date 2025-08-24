@@ -66,19 +66,19 @@ function initializeFreshSystem() {
             lastLogin: null
         });       
        
-        const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
-        dataManager.add('users', {
-            id: 'user_super',
-            username: 'superuser',
-            password: hashedSuperPassword,
-            role: 'super',
-            fullName: 'Super Administrator',
-            email: '',
-            status: 'active',
-            isHidden: true,
-            createdAt: new Date().toISOString(),
-            lastLogin: null
-        });
+        // const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
+        // dataManager.add('users', {
+        //     id: 'user_super',
+        //     username: 'superuser',
+        //     password: hashedSuperPassword,
+        //     role: 'super',
+        //     fullName: 'Super Administrator',
+        //     email: '',
+        //     status: 'active',
+        //     isHidden: true,
+        //     createdAt: new Date().toISOString(),
+        //     lastLogin: null
+        // });
         
         //console.log('✅ Default users created (including hidden super user)');
     }

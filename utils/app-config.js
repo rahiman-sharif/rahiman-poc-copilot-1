@@ -4,9 +4,9 @@
  */
 
 // ========== CONFIGURATION SETTINGS ==========
-const COMPANY_NAME = "Vikram Steels";
+const COMPANY_NAME = "Vikram Steels"; // Used for folder naming and display
 const LICENSE_APP_NAME = "Vikram Steels Management System"; // Used for license validation
-const APP_TYPE = "web"; // Change to "desktop" for desktop mode
+const APP_TYPE = "desktop"; // Change to "desktop" for desktop mode
 const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
 
 // ========== FUNCTIONS ==========
