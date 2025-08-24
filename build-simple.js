@@ -216,5 +216,21 @@ console.log('  • Place logo.png in assets/ folder');
 console.log('  • Logo will be automatically embedded in the executable');
 console.log('  • For best results, install rcedit: npm install -g rcedit');
 console.log('');
-
+/**node -e "const rcedit = require('rcedit'); console.log('🔧 Adding logo to executable...'); rcedit('dist/Kanakkar_2025-08-24T14-48_x64.exe', { icon: 'assets/logo.ico' }).then(() => { console.log('✅ Logo added successfully!'); console.log('📁 File modified:', new Date().toLocaleString()); }).catch(err => { console.error('❌ Error:', err.message); console.error('📋 Full error:', err); });" */
+/**Write-Host "🔄 Refreshing Windows icon cache..."; ie4uinit.exe -show */
+/**Write-Host "📋 To verify logo:"; Write-Host "1. Right-click on 'dist/Kanakkar_2025-08-24T14-48_x64.exe'"; Write-Host "2. Select 'Properties'"; Write-Host "3. Check the icon at the top of the Properties dialog"; Write-Host "4. Your custom logo should appear there"; Write-Host ""; Write-Host "📁 Opening folder for you..."; explorer.exe "dist" */
 buildNext();
+/**npm run createexe && node -e "const rcedit = require('rcedit'); const fs = require('fs'); const files = fs.readdirSync('dist').filter(f => f.endsWith('.exe')); files.forEach(f => rcedit('dist/' + f, { icon: 'assets/logo.ico' }).then(() => console.log('✅ Logo added to', f)));" && ie4uinit.exe -show */
+/*# Quick cache refresh
+ie4uinit.exe -show
+
+# Full cache clear
+ie4uinit.exe -ClearIconCache
+
+# Restart explorer (if needed)
+taskkill /f /im explorer.exe; Start-Sleep 2; explorer.exe*/
+
+
+//or
+//build-with-logo.bat 
+//.\build-with-logo.ps1
