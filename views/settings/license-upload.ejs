@@ -233,6 +233,69 @@
                 padding: 20px;
             }
         }
+        
+        /* Alert styles for success/error messages */
+        .alert {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            position: relative;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .alert-dismissible {
+            padding-right: 50px;
+        }
+        
+        .btn-close {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.7;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .btn-close::before {
+            content: '×';
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        
+        .fade {
+            transition: opacity 0.15s linear;
+        }
+        
+        .show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -324,7 +387,7 @@
         <div class="license-card">
             <h3>☁️ Upload New License</h3>
             
-            <form id="licenseUploadForm" enctype="multipart/form-data">
+            <form id="licenseUploadForm" enctype="multipart/form-data" action="#" onsubmit="return false;">
                 <!-- Company Name -->
                 <div class="form-group">
                     <label for="companyName">
@@ -388,6 +451,21 @@
 
         <!-- Alert Area -->
         <div id="alertArea"></div>
+
+        <!-- Server-side messages -->
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            ⚠️ <%= error %>
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        </div>
+        <% } %>
+
+        <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            ✅ <%= success %>
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        </div>
+        <% } %>
 
         </div>
     </main>
@@ -470,6 +548,7 @@
             submitBtn.disabled = true;
             
             try {
+                console.log('Submitting license upload...');
                 const response = await fetch('/license/upload', {
                     method: 'POST',
                     headers: {
@@ -478,7 +557,11 @@
                     body: formData
                 });
                 
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
+                
                 const result = await response.json();
+                console.log('Response data:', result);
                 
                 if (response.ok) {
                     showAlert('success', result.message);
@@ -490,7 +573,7 @@
                 }
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Fetch error:', error);
                 showAlert('error', 'Failed to upload license. Please try again.');
             } finally {
                 // Reset button
@@ -508,7 +591,7 @@
             alertArea.innerHTML = `
                 <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
                     ${icon} ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
                 </div>
             `;
             
@@ -521,6 +604,9 @@
                     }
                 }, 5000);
             }
+            
+            // Scroll to alert if it's not visible
+            alertArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     </script>
     </main>

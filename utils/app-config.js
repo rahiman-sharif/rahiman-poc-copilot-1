@@ -7,7 +7,10 @@
 const COMPANY_NAME = "Vikram Steels"; // Used for folder naming and display
 const LICENSE_APP_NAME = "Vikram Steels Management System"; // Used for license validation
 const APP_TYPE = "desktop"; // Change to "desktop" for desktop mode
+const LICENSE_SECRET = "25c940c9046913b04d1ed2f580d29eed3478881b9e36e722f88ee1a62595f3ca";
+const UNLIMITED_LICENSE = false; // Set to true to auto-generate 10-year license on startup
 const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
+const NEED_SUPER_USER = false;
 
 // ========== FUNCTIONS ==========
 
@@ -48,6 +51,30 @@ function getLicenseAppName() {
 }
 
 /**
+ * Get the license secret for JWT signing/verification
+ * @returns {string} The license secret key
+ */
+function getLicenseSecret() {
+    return LICENSE_SECRET;
+}
+
+/**
+ * Check if unlimited license is enabled
+ * @returns {boolean} True if unlimited license should be auto-generated
+ */
+function isUnlimitedLicenseEnabled() {
+    return UNLIMITED_LICENSE;
+}
+
+/**
+ * Check if super user is needed
+ * @returns {boolean} True if super user should be created
+ */
+function needSuperUser() {
+    return NEED_SUPER_USER;
+}
+
+/**
  * Get the app type
  * @returns {string} "web" or "desktop"
  */
@@ -60,5 +87,8 @@ module.exports = {
     getCompanyName,
     getAppType,
     getCompanyNameFolder,
-    getLicenseAppName
+    getLicenseAppName,
+    getLicenseSecret,
+    isUnlimitedLicenseEnabled,
+    needSuperUser
 };

@@ -11,7 +11,7 @@ const { exec } = require('child_process');
 const dataManager = require('./utils/dataManager');
 const pathManager = require('./utils/path-manager');
 const licenseManager = require('./utils/licenseManager');
-const { getCompanyName } = require('./utils/app-config');
+const { getCompanyName,needSuperUser, isUnlimitedLicenseEnabled, getLicenseAppName } = require('./utils/app-config');
 const { checkRoutePermission } = require('./middleware/routePermissions');
 const ConsoleManager = require('./utils/console-manager');
 
@@ -64,21 +64,25 @@ function initializeFreshSystem() {
             status: 'active',
             createdAt: new Date().toISOString(),
             lastLogin: null
-        });       
+        });   
+        
+        if (needSuperUser()) {
+            const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
+            dataManager.add('users', {
+                id: 'user_super',
+                username: 'superuser',
+                password: hashedSuperPassword,
+                role: 'super',
+                fullName: 'Super Administrator',
+                email: '',
+                status: 'active',
+                isHidden: true,
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            });
+        }
        
-        // const hashedSuperPassword = "$2b$10$GCa4iJEiCr/djxDdWahbpO5SS5PZMci9zKNGvX8mbTpoJqbl5ZjFy"
-        // dataManager.add('users', {
-        //     id: 'user_super',
-        //     username: 'superuser',
-        //     password: hashedSuperPassword,
-        //     role: 'super',
-        //     fullName: 'Super Administrator',
-        //     email: '',
-        //     status: 'active',
-        //     isHidden: true,
-        //     createdAt: new Date().toISOString(),
-        //     lastLogin: null
-        // });
+        
         
         //console.log('✅ Default users created (including hidden super user)');
     }
@@ -1068,7 +1072,44 @@ if (!licenseManager.licenseExists()) {
             blockAccess: true
         };
     } else {
-        console.log('�📋 No license found');
+        console.log('📋 No license found');
+        
+        // Check if unlimited license is enabled in config
+        if (isUnlimitedLicenseEnabled()) {
+            console.log('🚀 UNLIMITED_LICENSE enabled - Generating 10-year license...');
+            
+            try {
+                // Generate unlimited license data
+                const licenseData = licenseManager.generateLicense({
+                    companyName: getLicenseAppName(),
+                    validityDays: 3650, // 10 years
+                    licenseType: 'unlimited',
+                    expiryDate: new Date(Date.now() + (3650 * 24 * 60 * 60 * 1000)) // 10 years from now
+                });
+                
+                // Save the license
+                const licenseSaved = licenseManager.saveLicense(licenseData, 'current.lic');
+                
+                if (licenseSaved) {
+                    console.log('✅ Unlimited license generated and saved successfully!');
+                    console.log(`📅 Valid until: ${new Date(licenseData.expiryDate).toLocaleDateString()}`);
+                    console.log('🔓 Application will run without license restrictions');
+                    
+                    // Update license state
+                    licenseManager.saveLicenseState('activated');
+                    
+                    // Verify the newly created license
+                    const validation = licenseManager.validateLicense();
+                    if (validation.isValid) {
+                        console.log(`✅ License verification successful - ${validation.daysRemaining} days remaining`);
+                    }
+                } else {
+                    console.log('❌ Failed to save unlimited license');
+                }
+            } catch (error) {
+                console.error('❌ Error generating unlimited license:', error);
+            }
+        }
     }
 } else {
     const validation = licenseManager.validateLicense();

@@ -197,7 +197,10 @@ router.post('/download', requireSuperAdmin, (req, res) => {
         
         // Create JWT token for the license
         const jwt = require('jsonwebtoken');
-        const LICENSE_SECRET = 'vikram-steels-license-secret-2025';
+        const LICENSE_SECRET = appConfig.getLicenseSecret();
+        
+        console.log('✅ Using LICENSE_SECRET from app-config.js');
+        console.log('📝 License secret configured in application settings');
         
         // Handle JWT signing for negative validity days (expired licenses for testing)
         let jwtOptions = { algorithm: 'HS256' };
@@ -285,7 +288,7 @@ router.post('/upload', upload.single('licenseFile'), (req, res) => {
         const jwt = require('jsonwebtoken');
         const fs = require('fs');
         const path = require('path');
-        const LICENSE_SECRET = 'vikram-steels-license-secret-2025';
+        const LICENSE_SECRET = appConfig.getLicenseSecret();
         
         let licenseData;
         try {

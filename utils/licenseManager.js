@@ -11,7 +11,10 @@ const jwt = require('jsonwebtoken');
 const appConfig = require('./app-config');
 
 // License configuration
-const LICENSE_SECRET = 'vikram-steels-license-secret-2025'; // In production, use environment variable
+const LICENSE_SECRET = appConfig.getLicenseSecret();
+
+console.log('✅ License Manager: Using LICENSE_SECRET from app-config.js');
+console.log('📝 License secret configured in application settings');
 
 // Dynamic license directory based on app type
 function getLicenseDir() {

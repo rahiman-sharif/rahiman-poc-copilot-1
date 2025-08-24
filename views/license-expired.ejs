@@ -330,7 +330,7 @@
         
         <div class="upload-section">
             <h3>📤 Upload New License</h3>
-            <form id="licenseForm" action="/license/upload" method="post" enctype="multipart/form-data">
+            <form id="licenseForm" action="#" onsubmit="return false;" enctype="multipart/form-data">
                 <div class="file-input-wrapper">
                     <input type="file" id="licenseFile" name="licenseFile" class="file-input" accept=".lic,.txt,.json" required>
                     <label for="licenseFile" class="file-input-button">
@@ -347,6 +347,9 @@
                     🚀 Upload & Activate License
                 </button>
             </form>
+            
+            <!-- Alert container for dynamic messages -->
+            <div id="alertContainer"></div>
         </div>
         
         <% if (typeof error !== 'undefined' && error) { %>
@@ -385,6 +388,19 @@
         });
         
         document.getElementById('licenseForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('licenseFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('Please select a license file', 'danger');
+                return;
+            }
+            
+            formData.append('licenseFile', file);
+            
             const progressBar = document.getElementById('progressBar');
             const progressFill = document.getElementById('progressFill');
             const uploadBtn = document.getElementById('uploadBtn');
@@ -407,7 +423,72 @@
                     uploadBtn.textContent = '🔍 Validating License...';
                 }
             }, 200);
+            
+            // Send AJAX request
+            fetch('/license/upload', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(interval);
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                    progressFill.style.width = '0%';
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '🚀 Upload & Activate License';
+                    
+                    if (data.success) {
+                        showAlert(data.message || 'License uploaded successfully!', 'success');
+                        // Redirect to main application after success
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 2000);
+                    } else {
+                        showAlert(data.error || 'Failed to upload license', 'danger');
+                    }
+                }, 500);
+            })
+            .catch(error => {
+                console.error('Upload error:', error);
+                clearInterval(interval);
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '🚀 Upload & Activate License';
+                showAlert('An error occurred while uploading the license', 'danger');
+            });
         });
+        
+        // Function to show alerts
+        function showAlert(message, type) {
+            console.log('showAlert called:', message, type);
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = type === 'success' ? `✅ ${message}` : `❌ ${message}`;
+            
+            // Clear previous alerts
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-hide after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.parentNode.removeChild(alertDiv);
+                        }
+                    }, 300);
+                }, 5000);
+            }
+        }
         
         // Add some interactive particle effects
         document.addEventListener('mousemove', function(e) {
