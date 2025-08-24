@@ -11,7 +11,7 @@ const { exec } = require('child_process');
 const dataManager = require('./utils/dataManager');
 const pathManager = require('./utils/path-manager');
 const licenseManager = require('./utils/licenseManager');
-const { getCompanyName,needSuperUser, isUnlimitedLicenseEnabled, getLicenseAppName } = require('./utils/app-config');
+const { getCompanyName,needSuperUser, isUnlimitedLicenseEnabled, getLicenseAppName, useOldWelcomeScreen } = require('./utils/app-config');
 const { checkRoutePermission } = require('./middleware/routePermissions');
 const ConsoleManager = require('./utils/console-manager');
 
@@ -835,8 +835,11 @@ app.get('/welcome', (req, res) => {
         return res.redirect('/license-expired');
     }
     
+    // Choose welcome template based on config
+    const welcomeTemplate = useOldWelcomeScreen() ? 'welcome-old' : 'welcome';
+    
     // Otherwise show welcome page
-    res.render('welcome', { companyName });
+    res.render(welcomeTemplate, { companyName });
 });
 
 // License expired page - blocks access until valid license is uploaded

@@ -11,7 +11,8 @@
     "electron": "electron electron-main.js",
     "createexe": "node build-simple.js",
     "createexe-x32": "node build-simple.js --x32",
-    "createexe-both": "node build-simple.js --both"
+    "createexe-both": "node build-simple.js --both",
+    "setup-logo": "node setup-logo.js"
   },
   "pkg": {
     "assets": [
@@ -21,7 +22,8 @@
       "utils/**/*",
       "middleware/**/*",
       "routes/**/*",
-      "public/css/**/*"
+      "public/css/**/*",
+      "assets/**/*"
     ],
     "targets": [
       "node16-win-x64"
@@ -53,6 +55,7 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
-    "pkg": "^5.8.1"
+    "pkg": "^5.8.1",
+    "rcedit": "^4.0.1"
   }
 }

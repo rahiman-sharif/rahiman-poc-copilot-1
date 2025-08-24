@@ -6,9 +6,10 @@
 // ========== CONFIGURATION SETTINGS ==========
 const COMPANY_NAME = "Vikram Steels"; // Used for folder naming and display
 const LICENSE_APP_NAME = "Vikram Steels Management System"; // Used for license validation
-const APP_TYPE = "web"; // Change to "desktop" for desktop mode
+const APP_TYPE = "desktop"; // Change to "desktop" for desktop mode
 const LICENSE_SECRET = "25c940c9046913b04d1ed2f580d29eed3478881b9e36e722f88ee1a62595f3ca";
 const UNLIMITED_LICENSE = false; // Set to true to auto-generate 10-year license on startup
+const USE_OLD_WELCOME_SCREEN = true; // Set to true to use welcome-old.ejs instead of welcome.ejs
 const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
 const NEED_SUPER_USER = false;
 
@@ -67,6 +68,14 @@ function isUnlimitedLicenseEnabled() {
 }
 
 /**
+ * Check if old welcome screen should be used
+ * @returns {boolean} True if welcome-old.ejs should be used instead of welcome.ejs
+ */
+function useOldWelcomeScreen() {
+    return USE_OLD_WELCOME_SCREEN;
+}
+
+/**
  * Check if super user is needed
  * @returns {boolean} True if super user should be created
  */
@@ -90,5 +99,6 @@ module.exports = {
     getLicenseAppName,
     getLicenseSecret,
     isUnlimitedLicenseEnabled,
+    useOldWelcomeScreen,
     needSuperUser
 };
