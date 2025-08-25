@@ -552,6 +552,24 @@
                     <td class="total-amount">₹<%= (quotation.sgstAmount || 0).toLocaleString('en-IN') %></td>
                 </tr>
                 <% } %>
+                
+                <!-- Round Off Section -->
+                <% if (quotation.roundOffEnabled !== false) { %>
+                    <% const totalBeforeRoundOff = quotation.totalBeforeRoundOff || (quotation.subtotal + (quotation.cgstAmount || 0) + (quotation.sgstAmount || 0)); %>
+                    <tr>
+                        <td class="total-label">Total Before Round Off:</td>
+                        <td class="total-amount">₹<%= totalBeforeRoundOff.toLocaleString('en-IN') %></td>
+                    </tr>
+                    
+                    <% const roundOffAmount = quotation.roundOffAmount || 0; %>
+                    <tr>
+                        <td class="total-label">Round Off:</td>
+                        <td class="total-amount <% if (roundOffAmount >= 0) { %>text-success<% } else { %>text-danger<% } %>">
+                            <%= roundOffAmount >= 0 ? '+' : '' %>₹<%= Math.abs(roundOffAmount).toLocaleString('en-IN') %>
+                        </td>
+                    </tr>
+                <% } %>
+                
                 <tr class="final-total">
                     <td>Total Amount:</td>
                     <td>₹<%= (quotation.finalTotal || 0).toLocaleString('en-IN') %></td>

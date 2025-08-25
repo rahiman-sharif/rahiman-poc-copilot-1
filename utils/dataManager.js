@@ -380,6 +380,26 @@ class DataManager {
         }
     }
 
+    // Calculate round off amount
+    calculateRoundOff(totalBeforeRoundOff, enabled = true) {
+        if (!enabled || !totalBeforeRoundOff) {
+            return {
+                roundOffAmount: 0,
+                finalTotal: totalBeforeRoundOff || 0,
+                totalBeforeRoundOff: totalBeforeRoundOff || 0
+            };
+        }
+        
+        const rounded = Math.round(totalBeforeRoundOff);
+        const roundOffAmount = rounded - totalBeforeRoundOff;
+        
+        return {
+            roundOffAmount: roundOffAmount,
+            finalTotal: rounded,
+            totalBeforeRoundOff: totalBeforeRoundOff
+        };
+    }
+
     // Add bill with GST support
     addBillWithGST(billData) {
         try {
@@ -389,6 +409,22 @@ class DataManager {
             billData.gstEnabled = billData.gstEnabled || false;
             billData.documentType = billData.gstEnabled ? 'GST' : 'NORMAL';
             billData.id = billData.id || this.generateNextBillId(billData.gstEnabled);
+            
+            // Set round off defaults if not provided
+            billData.roundOffEnabled = billData.roundOffEnabled !== undefined ? billData.roundOffEnabled : true; // Default enabled
+            billData.roundOffAmount = billData.roundOffAmount || 0;
+            billData.totalBeforeRoundOff = billData.totalBeforeRoundOff || billData.finalTotal;
+            
+            // If round off is enabled, calculate it
+            if (billData.roundOffEnabled && billData.totalBeforeRoundOff) {
+                const rounded = Math.round(billData.totalBeforeRoundOff);
+                billData.roundOffAmount = rounded - billData.totalBeforeRoundOff;
+                billData.finalTotal = rounded;
+            } else {
+                billData.roundOffAmount = 0;
+                billData.finalTotal = billData.totalBeforeRoundOff || billData.finalTotal;
+            }
+            
             billData.createdAt = billData.createdAt || new Date().toISOString();
             
             data.bills.push(billData);
@@ -529,6 +565,22 @@ class DataManager {
             quotationData.gstEnabled = quotationData.gstEnabled || false;
             quotationData.documentType = quotationData.gstEnabled ? 'GST' : 'NORMAL';
             quotationData.id = quotationData.id || this.generateNextQuotationId(quotationData.gstEnabled);
+            
+            // Set round off defaults if not provided
+            quotationData.roundOffEnabled = quotationData.roundOffEnabled !== undefined ? quotationData.roundOffEnabled : true; // Default enabled
+            quotationData.roundOffAmount = quotationData.roundOffAmount || 0;
+            quotationData.totalBeforeRoundOff = quotationData.totalBeforeRoundOff || quotationData.finalTotal;
+            
+            // If round off is enabled, calculate it
+            if (quotationData.roundOffEnabled && quotationData.totalBeforeRoundOff) {
+                const rounded = Math.round(quotationData.totalBeforeRoundOff);
+                quotationData.roundOffAmount = rounded - quotationData.totalBeforeRoundOff;
+                quotationData.finalTotal = rounded;
+            } else {
+                quotationData.roundOffAmount = 0;
+                quotationData.finalTotal = quotationData.totalBeforeRoundOff || quotationData.finalTotal;
+            }
+            
             quotationData.createdAt = quotationData.createdAt || new Date().toISOString();
             
             data.quotations.push(quotationData);

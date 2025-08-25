@@ -258,7 +258,8 @@ router.post('/', requireAuth, (req, res) => {
             sgstAmount,
             finalTotal,
             gstEnabled, // NEW: GST toggle field
-            gstEnabledValue // NEW: GST hidden field
+            gstEnabledValue, // NEW: GST hidden field
+            roundOffEnabled, roundOffAmount, totalBeforeRoundOff // NEW: Round-off fields
         } = req.body;
 
         // Parse GST enabled status - check both checkbox and hidden field
@@ -420,7 +421,11 @@ router.post('/', requireAuth, (req, res) => {
             finalTotal: parseFloat(finalTotal) || 0,
             status: 'active',
             createdBy: req.session.user.id,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            // Round-off fields
+            roundOffEnabled: roundOffEnabled === 'true' || roundOffEnabled === true,
+            roundOffAmount: parseFloat(roundOffAmount) || 0,
+            totalBeforeRoundOff: parseFloat(totalBeforeRoundOff) || parseFloat(finalTotal)
         };
 
         // Save quotation using new GST-aware method
@@ -525,7 +530,11 @@ router.post('/:id/convert', requireAuth, (req, res) => {
             createdBy: req.session.user.id,
             createdAt: new Date().toISOString(),
             convertedFromQuotation: quotationId,
-            convertedFromQuotationNumber: quotation.quotationNumber
+            convertedFromQuotationNumber: quotation.quotationNumber,
+            // Round-off fields from quotation
+            roundOffEnabled: quotation.roundOffEnabled || false,
+            roundOffAmount: quotation.roundOffAmount || 0,
+            totalBeforeRoundOff: quotation.totalBeforeRoundOff || quotation.finalTotal
         };
 
         // Add bill to database using GST-aware method

@@ -415,6 +415,24 @@
                         <td class="amount">₹<%= quotation.sgstAmount.toFixed(2) %></td>
                     </tr>
                 <% } %>
+                
+                <!-- Round Off Section -->
+                <% if (quotation.roundOffEnabled !== false) { %>
+                    <% const totalBeforeRoundOff = quotation.totalBeforeRoundOff || (quotation.subtotal + (quotation.cgstAmount || 0) + (quotation.sgstAmount || 0)); %>
+                    <tr>
+                        <td class="label">Total Before Round Off:</td>
+                        <td class="amount">₹<%= totalBeforeRoundOff.toFixed(2) %></td>
+                    </tr>
+                    
+                    <% const roundOffAmount = quotation.roundOffAmount || 0; %>
+                    <tr>
+                        <td class="label">Round Off:</td>
+                        <td class="amount <% if (roundOffAmount >= 0) { %>text-success<% } else { %>text-danger<% } %>">
+                            <%= roundOffAmount >= 0 ? '+' : '' %>₹<%= Math.abs(roundOffAmount).toFixed(2) %>
+                        </td>
+                    </tr>
+                <% } %>
+                
                 <tr class="final-total">
                     <td class="label">Total Amount:</td>
                     <td class="amount">₹<%= quotation.finalTotal.toFixed(2) %></td>

@@ -1048,6 +1048,15 @@
                 gap: 10px;
             }
         }
+        
+        /* Round Off Color Classes */
+        .text-danger {
+            color: #dc3545 !important;
+        }
+        
+        .text-success {
+            color: #28a745 !important;
+        }
     </style>
 </head>
 <body>
@@ -1283,10 +1292,28 @@
                         </div>
                     <% } %>
                     
-                    <% if (bill.roundOffAmount && Math.abs(bill.roundOffAmount) > 0) { %>
+                    <!-- Round Off Section -->
+                    <% if (bill.roundOffEnabled !== false) { %>
+                        <% 
+                            // Calculate extra charges total
+                            let extraChargesTotal = 0;
+                            if (bill.extraCharges && Array.isArray(bill.extraCharges)) {
+                                extraChargesTotal = bill.extraCharges.reduce((sum, charge) => sum + (parseFloat(charge.amount) || 0), 0);
+                            }
+                            
+                            const totalBeforeRoundOff = bill.totalBeforeRoundOff || (bill.subtotal + (bill.cgstAmount || 0) + (bill.sgstAmount || 0) + extraChargesTotal);
+                        %>
+                        <div class="total-row-new">
+                            <span class="row-label">Total Before Round Off:</span>
+                            <span class="row-value">₹<%= totalBeforeRoundOff.toFixed(2) %></span>
+                        </div>
+                        
+                        <% const roundOffAmount = bill.roundOffAmount || 0; %>
                         <div class="total-row-new">
                             <span class="row-label">Round Off:</span>
-                            <span class="row-value"><%= bill.roundOffAmount >= 0 ? '+' : '' %>₹<%= bill.roundOffAmount.toFixed(2) %></span>
+                            <span class="row-value <% if (roundOffAmount >= 0) { %>text-success<% } else { %>text-danger<% } %>">
+                                <%= roundOffAmount >= 0 ? '+' : '' %>₹<%= roundOffAmount.toFixed(2) %>
+                            </span>
                         </div>
                     <% } %>
                     

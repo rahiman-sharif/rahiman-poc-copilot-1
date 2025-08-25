@@ -899,6 +899,15 @@
                 gap: 10px;
             }
         }
+        
+        /* Round Off Color Classes */
+        .text-danger {
+            color: #dc3545 !important;
+        }
+        
+        .text-success {
+            color: #28a745 !important;
+        }
     </style>
     <%- include('../partials/styles') %>
 </head>
@@ -1156,11 +1165,28 @@
                         </div>
                     <% } %>
                     
-                    <% if (quotation.roundOffAmount && Math.abs(quotation.roundOffAmount) > 0) { %>
+                    <!-- Round Off Section -->
+                    <% if (quotation.roundOffEnabled !== false) { %>
+                        <% const totalBeforeRoundOff = quotation.totalBeforeRoundOff || (quotation.subtotal + (quotation.cgstAmount || 0) + (quotation.sgstAmount || 0)); %>
                         <div class="total-row-new">
-                            <span class="row-label">Round Off:</span>
-                            <span class="row-value"><%= quotation.roundOffAmount >= 0 ? '+' : '' %>₹<%= quotation.roundOffAmount.toFixed(2) %></span>
+                            <span class="row-label">Total Before Round Off:</span>
+                            <span class="row-value">₹<%= totalBeforeRoundOff.toFixed(2) %></span>
                         </div>
+                        
+                        <% const roundOffAmount = quotation.roundOffAmount || 0; %>
+                        <% if (Math.abs(roundOffAmount) > 0.01) { %>
+                            <div class="total-row-new">
+                                <span class="row-label">Round Off:</span>
+                                <span class="row-value <% if (roundOffAmount >= 0) { %>text-success<% } else { %>text-danger<% } %>">
+                                    <%= roundOffAmount >= 0 ? '+' : '' %>₹<%= roundOffAmount.toFixed(2) %>
+                                </span>
+                            </div>
+                        <% } else { %>
+                            <div class="total-row-new">
+                                <span class="row-label">Round Off:</span>
+                                <span class="row-value">₹0.00</span>
+                            </div>
+                        <% } %>
                     <% } %>
                     
                     <div class="final-amount">

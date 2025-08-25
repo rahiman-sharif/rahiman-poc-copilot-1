@@ -553,6 +553,40 @@
             background: #dcfce7;
             color: #16a34a;
         }
+        
+        /* Round Off Styles */
+        .round-off-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .round-off-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
+        
+        .round-off-text {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        #roundOffAmount {
+            font-style: italic;
+            color: #6b7280;
+        }
+        
+        #roundOffAmount.positive {
+            color: #059669;
+        }
+        
+        #roundOffAmount.negative {
+            color: #dc2626;
+        }
     </style>
     <%- include('../partials/styles') %>
 </head>
@@ -782,6 +816,20 @@
                             <div class="total-amount" id="sgstAmount">₹0.00</div>
                         </div>
                         <div class="total-row">
+                            <div class="total-label">Total Before Round Off:</div>
+                            <div class="total-amount" id="totalBeforeRoundOff">₹0.00</div>
+                        </div>
+                        <!-- Round Off Row -->
+                        <div class="total-row">
+                            <div class="total-label">
+                                <label class="round-off-toggle">
+                                    <input type="checkbox" id="roundOffEnabled" checked onchange="calculateGrandTotal()">
+                                    <span class="round-off-text">Round Off:</span>
+                                </label>
+                            </div>
+                            <div class="total-amount" id="roundOffAmount">₹0.00</div>
+                        </div>
+                        <div class="total-row">
                             <div class="total-label final-total">Total:</div>
                             <div class="total-amount final-total" id="finalTotal">₹0.00</div>
                         </div>
@@ -796,6 +844,10 @@
                 <input type="hidden" name="sgstAmount" id="sgstValue">
                 <input type="hidden" name="finalTotal" id="finalTotalValue">
                 <input type="hidden" name="gstEnabledValue" id="gstEnabledValue" value="false">
+                <!-- Round Off Hidden Fields -->
+                <input type="hidden" name="roundOffEnabled" id="roundOffEnabledValue" value="true">
+                <input type="hidden" name="roundOffAmount" id="roundOffAmountValue" value="0">
+                <input type="hidden" name="totalBeforeRoundOff" id="totalBeforeRoundOffValue" value="0">
 
                 <!-- Form Actions -->
                 <div class="form-actions">
@@ -1054,12 +1106,38 @@
                 }
             });
 
-            const finalTotal = subtotal + totalCgst + totalSgst;
+            const totalBeforeRoundOff = subtotal + totalCgst + totalSgst;
+            
+            // Calculate Round Off
+            const roundOffEnabled = document.getElementById('roundOffEnabled').checked;
+            let roundOffAmount = 0;
+            let finalTotal = totalBeforeRoundOff;
+            
+            if (roundOffEnabled) {
+                const rounded = Math.round(totalBeforeRoundOff);
+                roundOffAmount = rounded - totalBeforeRoundOff;
+                finalTotal = rounded;
+            }
 
             // Update display
             document.getElementById('subtotalAmount').textContent = `₹${subtotal.toFixed(2)}`;
             document.getElementById('cgstAmount').textContent = `₹${totalCgst.toFixed(2)}`;
             document.getElementById('sgstAmount').textContent = `₹${totalSgst.toFixed(2)}`;
+            document.getElementById('totalBeforeRoundOff').textContent = `₹${totalBeforeRoundOff.toFixed(2)}`;
+            
+            // Update round off display
+            const roundOffDisplay = document.getElementById('roundOffAmount');
+            if (roundOffAmount === 0) {
+                roundOffDisplay.textContent = '₹0.00';
+                roundOffDisplay.className = 'total-amount';
+            } else if (roundOffAmount > 0) {
+                roundOffDisplay.textContent = '+₹' + roundOffAmount.toFixed(2);
+                roundOffDisplay.className = 'total-amount positive';
+            } else {
+                roundOffDisplay.textContent = '₹' + roundOffAmount.toFixed(2);
+                roundOffDisplay.className = 'total-amount negative';
+            }
+            
             document.getElementById('finalTotal').textContent = `₹${finalTotal.toFixed(2)}`;
 
             // Update hidden fields
@@ -1067,6 +1145,9 @@
             document.getElementById('cgstValue').value = totalCgst.toFixed(2);
             document.getElementById('sgstValue').value = totalSgst.toFixed(2);
             document.getElementById('finalTotalValue').value = finalTotal.toFixed(2);
+            document.getElementById('roundOffEnabledValue').value = roundOffEnabled;
+            document.getElementById('roundOffAmountValue').value = roundOffAmount.toFixed(2);
+            document.getElementById('totalBeforeRoundOffValue').value = totalBeforeRoundOff.toFixed(2);
         }
 
         // Form submission
@@ -1219,10 +1300,18 @@
         }
 
         // Initialize customer selection on page load
-        document.addEventListener('DOMContentLoaded', initializeCustomerSelection);
-
-        // Initialize with one item row
-        addItemRow();
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCustomerSelection();
+            
+            // Add round-off checkbox event listener
+            document.getElementById('roundOffEnabled').addEventListener('change', calculateGrandTotal);
+            
+            // Initialize with one item row
+            addItemRow();
+            
+            // Initial calculation to set correct values (delayed to ensure DOM is ready)
+            setTimeout(calculateGrandTotal, 100);
+        });
     </script>
     </main>
 

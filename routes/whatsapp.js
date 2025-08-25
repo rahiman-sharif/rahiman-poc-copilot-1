@@ -175,12 +175,17 @@ router.post('/send', requireAuth, (req, res) => {
         // Statistics
         const totalRevenue = selectedBills.reduce((sum, bill) => sum + parseFloat(bill.finalTotal || 0), 0);
         const totalGst = selectedBills.reduce((sum, bill) => sum + parseFloat(bill.totalGst || 0), 0);
+        const totalRoundOff = selectedBills.reduce((sum, bill) => sum + parseFloat(bill.roundOffAmount || 0), 0);
         const uniqueCustomers = new Set(selectedBills.map(bill => bill.customerName)).size;
         
         message += `📊 *SUMMARY*\n`;
         message += `• Total Bills: ${selectedBills.length}\n`;
-        message += `• Total Revenue: ₹${totalRevenue.toFixed(2)}\n`;
-        message += `• Total GST: ₹${totalGst.toFixed(2)}\n`;
+        message += `• Total Revenue: Rs.${totalRevenue.toFixed(2)}\n`;
+        message += `• Total GST: Rs.${totalGst.toFixed(2)}\n`;
+        if (Math.abs(totalRoundOff) > 0.01) {
+            const roundOffPrefix = totalRoundOff >= 0 ? '+' : '';
+            message += `• Total Round Off: ${roundOffPrefix}Rs.${totalRoundOff.toFixed(2)}\n`;
+        }
         message += `• Unique Customers: ${uniqueCustomers}\n\n`;
         
         // Bill details
@@ -216,14 +221,34 @@ router.post('/send', requireAuth, (req, res) => {
             const billSubtotal = parseFloat(bill.subtotal || 0);
             const billCgst = parseFloat(bill.cgstAmount || 0);
             const billSgst = parseFloat(bill.sgstAmount || 0);
+            const billRoundOff = parseFloat(bill.roundOffAmount || 0);
+            const billTotalBeforeRoundOff = parseFloat(bill.totalBeforeRoundOff || (billSubtotal + billCgst + billSgst));
             
             if (billTotalGst > 0) {
-                message += `┣━ 💰 Subtotal: Rs.${billSubtotal}\n`;
-                message += `┣━ 📊 CGST: Rs.${billCgst}\n`;
-                message += `┣━ 📊 SGST: Rs.${billSgst}\n`;
-                message += `┣━ 💵 *Total: Rs.${bill.finalTotal}*\n`;
+                message += `┣━ 💰 Subtotal: Rs.${billSubtotal.toFixed(2)}\n`;
+                message += `┣━ 📊 CGST: Rs.${billCgst.toFixed(2)}\n`;
+                message += `┣━ 📊 SGST: Rs.${billSgst.toFixed(2)}\n`;
+                
+                // Show round-off if enabled and not zero
+                if (bill.roundOffEnabled !== false) {
+                    message += `┣━ 🧮 Total Before Round Off: Rs.${billTotalBeforeRoundOff.toFixed(2)}\n`;
+                    if (Math.abs(billRoundOff) > 0.01) {
+                        const roundOffPrefix = billRoundOff >= 0 ? '+' : '';
+                        message += `┣━ ⚡ Round Off: ${roundOffPrefix}Rs.${billRoundOff.toFixed(2)}\n`;
+                    } else {
+                        message += `┣━ ⚡ Round Off: Rs.0.00\n`;
+                    }
+                }
+                
+                message += `┣━ 💵 *Final Total: Rs.${parseFloat(bill.finalTotal).toFixed(2)}*\n`;
             } else {
-                message += `┣━ 💵 *Total: Rs.${bill.finalTotal}*\n`;
+                // For non-GST bills, still show round-off if applicable
+                if (bill.roundOffEnabled !== false && Math.abs(billRoundOff) > 0.01) {
+                    message += `┣━ 🧮 Total Before Round Off: Rs.${billTotalBeforeRoundOff.toFixed(2)}\n`;
+                    const roundOffPrefix = billRoundOff >= 0 ? '+' : '';
+                    message += `┣━ ⚡ Round Off: ${roundOffPrefix}Rs.${billRoundOff.toFixed(2)}\n`;
+                }
+                message += `┣━ 💵 *Final Total: Rs.${parseFloat(bill.finalTotal).toFixed(2)}*\n`;
             }
             
             message += `┗━ 💳 Payment: ${bill.paymentMethod}\n`;

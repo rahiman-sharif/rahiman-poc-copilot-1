@@ -421,6 +421,15 @@
                 padding: 8px 12px;
             }
         }
+        
+        /* Round Off Color Classes */
+        .text-danger {
+            color: #dc3545;
+        }
+        
+        .text-success {
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -609,6 +618,32 @@
                         <td class="label">Total GST:</td>
                         <td>₹<%= bill.totalGst.toLocaleString() %></td>
                     </tr>
+                    
+                    <!-- Round Off Section -->
+                    <% if (bill.roundOffEnabled !== false) { %>
+                        <% 
+                            // Calculate extra charges total
+                            let extraChargesTotal = 0;
+                            if (bill.extraCharges && Array.isArray(bill.extraCharges)) {
+                                extraChargesTotal = bill.extraCharges.reduce((sum, charge) => sum + (parseFloat(charge.amount) || 0), 0);
+                            }
+                            
+                            const totalBeforeRoundOff = bill.totalBeforeRoundOff || (bill.subtotal + (bill.cgstAmount || 0) + (bill.sgstAmount || 0) + extraChargesTotal);
+                        %>
+                        <tr>
+                            <td class="label">Total Before Round Off:</td>
+                            <td>₹<%= totalBeforeRoundOff.toLocaleString() %></td>
+                        </tr>
+                        
+                        <% const roundOffAmount = bill.roundOffAmount || 0; %>
+                        <tr>
+                            <td class="label">Round Off:</td>
+                            <td class="<% if (roundOffAmount >= 0) { %>text-success<% } else { %>text-danger<% } %>">
+                                <%= roundOffAmount >= 0 ? '+' : '' %>₹<%= Math.abs(roundOffAmount).toLocaleString() %>
+                            </td>
+                        </tr>
+                    <% } %>
+                    
                     <tr class="final-total">
                         <td class="label">Grand Total:</td>
                         <td>₹<%= bill.finalTotal.toLocaleString() %></td>

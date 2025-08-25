@@ -169,7 +169,7 @@ router.get('/new', requireAuth, (req, res) => {
             customers: customers,
             items: itemsWithCategories,
             company: company,
-            billNumber: `BILL-${String(nextNormalBillNumber).padStart(3, '0')}`,
+            billNumber: `BOS-BILL-${String(nextNormalBillNumber).padStart(3, '0')}`,
             gstBillNumber: `GST-BILL-${String(nextGSTBillNumber).padStart(3, '0')}`,
             isEdit: false,
             bill: null
@@ -191,7 +191,8 @@ router.post('/', requireAuth, (req, res) => {
             billItems, extraCharges, subtotal, cgstAmount, sgstAmount, finalTotal,
             paymentMethod, upiTransactionId, bankReference, bankName,
             chequeNumber, chequeBankName, chequeDate, cardLast4, cardType,
-            creditDueDate, creditTerms, gstEnabled, gstEnabledValue // NEW: GST toggle fields
+            creditDueDate, creditTerms, gstEnabled, gstEnabledValue, // NEW: GST toggle fields
+            roundOffEnabled, roundOffAmount, totalBeforeRoundOff // NEW: Round-off fields
         } = req.body;
 
         // Parse GST enabled status - check both checkbox and hidden field
@@ -365,7 +366,11 @@ router.post('/', requireAuth, (req, res) => {
             paymentMethod: paymentDetails.method,
             paymentDetails: paymentDetails,
             createdBy: req.session.user.id,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            // Round-off fields
+            roundOffEnabled: roundOffEnabled === 'true' || roundOffEnabled === true,
+            roundOffAmount: parseFloat(roundOffAmount) || 0,
+            totalBeforeRoundOff: parseFloat(totalBeforeRoundOff) || parseFloat(finalTotal)
         };
 
         // Add bill using new GST-aware method
