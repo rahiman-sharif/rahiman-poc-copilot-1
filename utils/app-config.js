@@ -20,7 +20,7 @@ const LICENSE_SECRET = "25c940c9046913b04d1ed2f580d29eed3478881b9e36e722f88ee1a6
     let data_NEED_SUPER_USER;
     let data_LIMITEDACCESS;
 
-let TypeBuild = Types.kanakkardesktop;
+let TypeBuild = Types.kanakkarweb;
 
 console.log('🔧 Configuration Debug:', {
     TypeBuild: TypeBuild,

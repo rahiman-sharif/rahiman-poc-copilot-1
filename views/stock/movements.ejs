@@ -235,9 +235,24 @@
                                 </td>
                                 <td>
                                     <% if (movement.type === 'sale') { %>
-                                        <a href="/bills/<%= movement.reference.split('#')[1] ? 'bill_' + movement.reference.split('#')[1].padStart(3, '0') : '#' %>" class="reference-link">
+                                        <% 
+                                            // Extract bill ID from reference - handles both old and new formats
+                                            let billId = '';
+                                            if (movement.reference.includes('#')) {
+                                                const refPart = movement.reference.split('#')[1];
+                                                if (refPart) {
+                                                    // Use the actual bill ID from the reference
+                                                    billId = refPart.trim();
+                                                }
+                                            }
+                                        %>
+                                        <% if (billId) { %>
+                                            <a href="/bills/<%= billId %>" class="reference-link">
+                                                <%= movement.reference %>
+                                            </a>
+                                        <% } else { %>
                                             <%= movement.reference %>
-                                        </a>
+                                        <% } %>
                                     <% } else { %>
                                         <%= movement.reference %>
                                     <% } %>

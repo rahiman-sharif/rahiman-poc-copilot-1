@@ -163,10 +163,7 @@ router.post('/', requireAuth, (req, res) => {
             // Update stock for non-service items
             if (!item.isServiceItem) {
                 const newQuantity = item.stock.quantity - quantity;
-                itemsDb.get('items')
-                    .find({ id: item.id })
-                    .set('stock.quantity', newQuantity)
-                    .write();
+                dataManager.updateNestedProperty('items', item.id, 'stock.quantity', newQuantity);
             }
         }
 
@@ -180,15 +177,16 @@ router.post('/', requireAuth, (req, res) => {
             }
         }
 
-        // Generate bill number
-        const nextBillNumber = dataManager.getAll('nextBillNumber');
-        const company = dataManager.getAll('company');
-        const billNumber = `${company.invoice.prefix}${String(nextBillNumber).padStart(4, '0')}`;
+        // Generate bill ID using the same system as bills.js
+        const billId = dataManager.generateNextBillId(false); // Assuming non-GST for legacy billing
+        if (!billId) {
+            return res.redirect('/billing/new?error=Failed to generate bill number. Please try again.');
+        }
 
         // Create bill object
         const newBill = {
-            id: `bill_${String(nextBillNumber).padStart(3, '0')}`,
-            billNumber: billNumber,
+            id: billId,
+            billNumber: billId,
             customerId: customer.id,
             billDate: billDate,
             items: validatedItems,
@@ -204,24 +202,17 @@ router.post('/', requireAuth, (req, res) => {
 
         // Save bill
         dataManager.add('bills', newBill);
-        billsDb.set('nextBillNumber', nextBillNumber + 1).write();
 
         // Update customer outstanding and total purchases
         if (customer.paymentTerms !== 'Cash') {
-            customersDb.get('customers')
-                .find({ id: customer.id })
-                .assign({
-                    outstandingAmount: customer.outstandingAmount + grandTotal,
-                    totalPurchases: (customer.totalPurchases || 0) + grandTotal
-                })
-                .write();
+            dataManager.updateById('customers', customer.id, {
+                outstandingAmount: customer.outstandingAmount + grandTotal,
+                totalPurchases: (customer.totalPurchases || 0) + grandTotal
+            });
         } else {
-            customersDb.get('customers')
-                .find({ id: customer.id })
-                .assign({
-                    totalPurchases: (customer.totalPurchases || 0) + grandTotal
-                })
-                .write();
+            dataManager.updateById('customers', customer.id, {
+                totalPurchases: (customer.totalPurchases || 0) + grandTotal
+            });
         }
 
         res.redirect(`/billing/${newBill.id}?success=Bill created successfully`);
@@ -248,24 +239,20 @@ router.post('/:id/payment', requireAuth, (req, res) => {
 
         // Update bill status
         if (payment >= bill.grandTotal) {
-            billsDb.get('bills')
-                .find({ id: bill.id })
-                .assign({ 
-                    status: 'paid',
-                    paidDate: new Date().toISOString(),
-                    paidAmount: payment
-                })
-                .write();
+            dataManager.updateById('bills', bill.id, { 
+                status: 'paid',
+                paidDate: new Date().toISOString(),
+                paidAmount: payment
+            });
         }
 
         // Update customer outstanding
         const customer = dataManager.findBy('customers', { id: bill.customerId  })[0];
         if (customer) {
             const newOutstanding = Math.max(0, customer.outstandingAmount - payment);
-            customersDb.get('customers')
-                .find({ id: customer.id })
-                .assign({ outstandingAmount: newOutstanding })
-                .write();
+            dataManager.updateById('customers', customer.id, {
+                outstandingAmount: newOutstanding
+            });
         }
 
         res.redirect(`/billing/${bill.id}?success=Payment recorded successfully`);
