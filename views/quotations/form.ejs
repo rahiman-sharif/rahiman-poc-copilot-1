@@ -587,6 +587,21 @@
         #roundOffAmount.negative {
             color: #dc2626;
         }
+        
+        /* Price editable styling */
+        .price-locked {
+            background-color: #f8f9fa !important;
+            color: #6c757d !important;
+            opacity: 0.7;
+            cursor: not-allowed !important;
+            border-color: #e9ecef !important;
+        }
+        
+        .price-editable {
+            background-color: white !important;
+            color: #333 !important;
+            cursor: text !important;
+        }
     </style>
     <%- include('../partials/styles') %>
 </head>
@@ -947,7 +962,8 @@
                                      data-unit="${item.unit}" 
                                      data-hsn="${item.hsnCode}" 
                                      data-gst="${item.gstRate}"
-                                     data-bundle="${bundleDisplay}">
+                                     data-bundle="${bundleDisplay}"
+                                     data-price-editable="${item.priceEditableAtBilling}">
                                 ${item.name} (${item.unit})
                             </option>`;
                         }).join('')}
@@ -970,12 +986,26 @@
             const row = select.closest('tr');
             
             if (option.value) {
+                const priceEditable = option.dataset.priceEditable === 'true';
+                
                 // Fill HSN code
                 row.cells[2].querySelector('input').value = option.dataset.hsn;
                 // Fill Size/Weight (Bundle info)
                 row.cells[3].querySelector('input').value = option.dataset.bundle || '';
-                // Set default price
-                row.cells[5].querySelector('input').value = option.dataset.price;
+                
+                // Set price and handle editability
+                const rateInput = row.cells[5].querySelector('input');
+                rateInput.value = option.dataset.price;
+                
+                if (priceEditable) {
+                    rateInput.readonly = false;
+                    rateInput.className = 'price-editable';
+                    rateInput.title = 'Price is editable for this item';
+                } else {
+                    rateInput.readonly = true;
+                    rateInput.className = 'price-locked';
+                    rateInput.title = 'Price is fixed for this item';
+                }
                 
                 // Calculate total
                 calculateRowTotal(row.cells[4].querySelector('input'));
@@ -983,7 +1013,11 @@
                 // Clear fields
                 row.cells[2].querySelector('input').value = '';
                 row.cells[3].querySelector('input').value = '';
-                row.cells[5].querySelector('input').value = '';
+                const rateInput = row.cells[5].querySelector('input');
+                rateInput.value = '';
+                rateInput.readonly = false;
+                rateInput.className = 'price-editable';
+                rateInput.title = '';
                 row.cells[6].querySelector('input').value = '₹0.00';
             }
         }

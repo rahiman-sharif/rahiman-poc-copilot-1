@@ -397,32 +397,32 @@ function initializeFreshSystem() {
                             "description": "Edit Item"
                         },
                         "/items/test/stock/:id": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Test Stock Data"
                         },
                         "/stock": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Stock Management"
                         },
                         "/stock/adjust/:id": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Stock Adjustments"
                         },
                         "/stock/movements": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Stock Movements"
                         },
                         "/stock/api/item/:id": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Stock API Endpoints"
                         },
                         "/stock/debug/items": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Inventory",
                             "description": "Debug Stock Items"
                         }
@@ -439,7 +439,7 @@ function initializeFreshSystem() {
                             "description": "Create New Bill"
                         },
                         "/bills/api/fresh-stock": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "Fresh Stock API"
                         },
@@ -454,22 +454,22 @@ function initializeFreshSystem() {
                             "description": "Print Bill"
                         },
                         "/quotations": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "Quotations Management"
                         },
                         "/quotations/new": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "Create New Quotation"
                         },
                         "/quotations/:id": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "View Quotation"
                         },
                         "/quotations/:id/print": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Sales & Orders",
                             "description": "Print Quotation"
                         }
@@ -493,104 +493,104 @@ function initializeFreshSystem() {
                     },
                     "reports": {
                         "/reports": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Reports & Analytics",
                             "description": "Reports Dashboard"
                         },
                         "/reports/sales": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Reports & Analytics",
                             "description": "Sales Reports"
                         },
                         "/reports/inventory": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Reports & Analytics",
                             "description": "Inventory Reports"
                         },
                         "/reports/customers": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Reports & Analytics",
                             "description": "Customer Reports"
                         },
                         "/reports/gst": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "Reports & Analytics",
                             "description": "GST Reports"
                         }
                     },
                     "administration": {
                         "/users": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "User Management"
                         },
                         "/users/add": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Add New User"
                         },
                         "/users/:id/edit": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Edit User"
                         },
                         "/users/:id/delete": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Delete User"
                         },
                         "/users/:id/toggle-status": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Toggle User Status"
                         },
                         "/data": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Data Management"
                         },
                         "/data/backup": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Create Backup"
                         },
                         "/data/backups": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "View Backups"
                         },
                         "/data/restore/:backupName": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Restore Data"
                         },
                         "/data/export": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Export Data"
                         },
                         "/data/download/:backupName": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Download Backups"
                         },
                         "/data/upload-restore": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Upload & Restore"
                         },
                         "/settings": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Settings Dashboard"
                         },
                         "/settings/company": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Company Settings"
                         },
                         "/settings/route-control": {
-                            "enabled": false,
+                            "enabled": true,
                             "category": "System Administration",
                             "description": "Route Control Center"
                         }
@@ -613,7 +613,7 @@ function initializeFreshSystem() {
 function createDefaultItems() {
     const defaultItems = [
         // Steel Products
-        { id: 'item_001', name: 'Steel Rod 6mm', categoryId: 'cat_001', price: 74.5, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'SAIL', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 8.7 kg per rod', stock: { quantity: 400, minLevel: 20 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
+        { id: 'item_001', name: 'Steel Rod 6mm', categoryId: 'cat_001', price: 74.5, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'SAIL', isServiceItem: false, priceEditableAtBilling: true, bundleInfo: 'Each bundle ≈ 8.7 kg per rod', stock: { quantity: 400, minLevel: 20 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
         { id: 'item_002', name: 'Steel Rod 8mm', categoryId: 'cat_001', price: 75.5, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'SAIL', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 12.4 kg per rod', stock: { quantity: 300, minLevel: 15 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
         { id: 'item_003', name: 'Steel Rod 10mm', categoryId: 'cat_001', price: 76.0, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'TATA Steel', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 19.3 kg per rod', stock: { quantity: 250, minLevel: 10 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },
         { id: 'item_004', name: 'Steel Rod 12mm', categoryId: 'cat_001', price: 76.2, unit: 'kg', isTaxable: true, gstRate: 18, hsnCode: '7213', brand: 'TATA Steel', isServiceItem: false, priceEditableAtBilling: false, bundleInfo: 'Each bundle ≈ 27.8 kg per rod', stock: { quantity: 200, minLevel: 15 }, isActive: true, createdAt: '2025-01-01T00:00:00.000Z' },

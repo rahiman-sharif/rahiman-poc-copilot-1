@@ -458,6 +458,21 @@
             color: #dc2626;
         }
         
+        /* Price editable styling */
+        .price-locked {
+            background-color: #f8f9fa !important;
+            color: #6c757d !important;
+            opacity: 0.7;
+            cursor: not-allowed !important;
+            border-color: #e9ecef !important;
+        }
+        
+        .price-editable {
+            background-color: white !important;
+            color: #333 !important;
+            cursor: text !important;
+        }
+        
         .charges-section {
             margin: 24px 0;
             padding: 24px;
@@ -1118,7 +1133,8 @@
                                      data-service="${item.isServiceItem}"
                                      data-bundle="${item.bundleInfo}"
                                      data-stock="${item.stock.quantity}"
-                                     data-min-level="${item.stock.minLevel}">
+                                     data-min-level="${item.stock.minLevel}"
+                                     data-price-editable="${item.priceEditableAtBilling}">
                                 ${item.name} (${item.unit}) - Stock: ${item.stock.quantity} ${item.unit}${item.stock.quantity <= item.stock.minLevel ? ' ⚠️' : ''}
                             </option>`
                         ).join('')}
@@ -1143,6 +1159,7 @@
             if (option.value) {
                 const availableStock = parseFloat(option.dataset.stock);
                 const minLevel = parseFloat(option.dataset.minLevel);
+                const priceEditable = option.dataset.priceEditable === 'true';
                 
                 // Fill HSN code
                 row.cells[2].querySelector('input').value = option.dataset.hsn;
@@ -1150,8 +1167,20 @@
                 const bundleInfo = option.dataset.bundle || '';
                 const stockInfo = `Stock: ${availableStock} ${option.dataset.unit}`;
                 row.cells[3].querySelector('input').value = bundleInfo ? `${bundleInfo} | ${stockInfo}` : stockInfo;
-                // Set default price
-                row.cells[5].querySelector('input').value = option.dataset.price;
+                
+                // Set price and handle editability
+                const rateInput = row.cells[5].querySelector('input');
+                rateInput.value = option.dataset.price;
+                
+                if (priceEditable) {
+                    rateInput.readonly = false;
+                    rateInput.className = 'price-editable';
+                    rateInput.title = 'Price is editable for this item';
+                } else {
+                    rateInput.readonly = true;
+                    rateInput.className = 'price-locked';
+                    rateInput.title = 'Price is fixed for this item';
+                }
                 
                 // Set stock validation on quantity input
                 const quantityInput = row.cells[4].querySelector('input');
@@ -1212,7 +1241,11 @@
                 // Clear fields
                 row.cells[2].querySelector('input').value = '';
                 row.cells[3].querySelector('input').value = '';
-                row.cells[5].querySelector('input').value = '';
+                const rateInput = row.cells[5].querySelector('input');
+                rateInput.value = '';
+                rateInput.readonly = false;
+                rateInput.className = 'price-editable';
+                rateInput.title = '';
                 row.cells[6].querySelector('input').value = '₹0.00';
                 
                 // Reset quantity input

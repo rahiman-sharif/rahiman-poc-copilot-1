@@ -4,14 +4,21 @@
  */
 
 // ========== CONFIGURATION SETTINGS ==========
-const COMPANY_NAME = "Vikram Steels"; // Used for folder naming and display
+const COMPANY_NAME1 = "Rahiman Industries";
+const COMPANY_NAME2 = "Vikram Steels";
+const COMPANY_NAME3 = "Ram Steels";
+
+const APP_TYPE1 = "web";
+const APP_TYPE2 = "desktop";
+
+const COMPANY_NAME = COMPANY_NAME1; // Used for folder naming and display
 const LICENSE_APP_NAME = `${COMPANY_NAME} Management System`; // Used for license validation
-const APP_TYPE = "desktop"; // Change to "desktop" for desktop mode
+const APP_TYPE = APP_TYPE2; // Change to "desktop" for desktop mode
 const LICENSE_SECRET = "25c940c9046913b04d1ed2f580d29eed3478881b9e36e722f88ee1a62595f3ca";
 const UNLIMITED_LICENSE = false; // Set to true to auto-generate 10-year license on startup
-const USE_OLD_WELCOME_SCREEN = true; // Set to true to use welcome-old.ejs instead of welcome.ejs
+const USE_OLD_WELCOME_SCREEN = false; // Set to true to use welcome-old.ejs instead of welcome.ejs
 const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
-const NEED_SUPER_USER = false;
+const NEED_SUPER_USER = true;
 
 // ========== FUNCTIONS ==========
 

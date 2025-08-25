@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Get company name for the executable
-const companyName = 'VikramSteels';
+const companyName = getCompanyNameFolder();
 const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 16);
 
 // Logo configuration
