@@ -4,21 +4,92 @@
  */
 
 // ========== CONFIGURATION SETTINGS ==========
-const COMPANY_NAME1 = "Rahiman Industries";
-const COMPANY_NAME2 = "Vikram Steels";
-const COMPANY_NAME3 = "Ram Steels";
 
-const APP_TYPE1 = "web";
-const APP_TYPE2 = "desktop";
-
-const COMPANY_NAME = COMPANY_NAME1; // Used for folder naming and display
-const LICENSE_APP_NAME = `${COMPANY_NAME} Management System`; // Used for license validation
-const APP_TYPE = APP_TYPE2; // Change to "desktop" for desktop mode
+const Types = {
+  vikramdesktop: "vikramdesktop",
+  vikramweb: "vikramweb",
+  kanakkardesktop: "kanakkardesktop",
+  kanakkarweb: "kanakkarweb",
+};
 const LICENSE_SECRET = "25c940c9046913b04d1ed2f580d29eed3478881b9e36e722f88ee1a62595f3ca";
-const UNLIMITED_LICENSE = false; // Set to true to auto-generate 10-year license on startup
-const USE_OLD_WELCOME_SCREEN = false; // Set to true to use welcome-old.ejs instead of welcome.ejs
+    let data_COMPANY_NAME;
+    let data_LICENSE_APP_NAME;
+    let data_APP_TYPE;
+    let data_UNLIMITED_LICENSE;
+    let data_USE_OLD_WELCOME_SCREEN;
+    let data_NEED_SUPER_USER;
+    let data_LIMITEDACCESS;
+
+let TypeBuild = Types.kanakkardesktop;
+
+console.log('🔧 Configuration Debug:', {
+    TypeBuild: TypeBuild,
+    Expected: Types.vikramdesktop,
+    Match: TypeBuild === Types.vikramdesktop
+});
+
+if(TypeBuild === Types.vikramdesktop){
+    data_COMPANY_NAME = 'Vikram Steels'
+    data_LICENSE_APP_NAME = `${data_COMPANY_NAME} Management System`;
+    data_APP_TYPE = 'desktop';
+    data_UNLIMITED_LICENSE = false; 
+    data_USE_OLD_WELCOME_SCREEN = true;     
+    data_NEED_SUPER_USER = false;
+    data_LIMITEDACCESS = true;
+    console.log('✅ Using Vikram Steels Desktop configuration');
+}
+else if(TypeBuild === Types.vikramweb){
+    data_COMPANY_NAME = 'Vikram Steels'
+    data_LICENSE_APP_NAME = `${data_COMPANY_NAME} Management System`;
+    data_APP_TYPE = 'web';
+    data_UNLIMITED_LICENSE = true; 
+    data_USE_OLD_WELCOME_SCREEN = true;     
+    data_NEED_SUPER_USER = true;
+    data_LIMITEDACCESS = true;
+    console.log('✅ Using Vikram Steels Web configuration');
+}
+else if(TypeBuild === Types.kanakkardesktop){
+    data_COMPANY_NAME = "Test Industries"
+    data_LICENSE_APP_NAME = `${data_COMPANY_NAME} Management System`;
+    data_APP_TYPE = 'desktop';
+    data_UNLIMITED_LICENSE = false; 
+    data_USE_OLD_WELCOME_SCREEN = false;     
+    data_NEED_SUPER_USER = false;
+    data_LIMITEDACCESS = false;
+    console.log('❌ Using Test Industries Desktop configuration - THIS SHOULD NOT HAPPEN!');
+}
+else if(TypeBuild === Types.kanakkarweb){
+    data_COMPANY_NAME = "Test Industries"
+    data_LICENSE_APP_NAME = `${data_COMPANY_NAME} Management System`;
+    data_APP_TYPE = 'web';
+    data_UNLIMITED_LICENSE = true; 
+    data_USE_OLD_WELCOME_SCREEN = false;     
+    data_NEED_SUPER_USER = true;
+    data_LIMITEDACCESS = false;
+    console.log('❌ Using Test Industries Web configuration - THIS SHOULD NOT HAPPEN!');
+}
+
+// Fallback values (should not be needed if TypeBuild is set correctly)
+if (!data_COMPANY_NAME) {
+    data_COMPANY_NAME = 'Vikram Steels'
+    data_LICENSE_APP_NAME = `${data_COMPANY_NAME} Management System`;
+    data_APP_TYPE = 'desktop';
+    data_UNLIMITED_LICENSE = false; 
+    data_USE_OLD_WELCOME_SCREEN = true;     
+    data_NEED_SUPER_USER = false;
+    data_LIMITEDACCESS = true;
+}
+
+
+const LIMITEDACCESS = data_LIMITEDACCESS;
+const COMPANY_NAME = data_COMPANY_NAME;
+const LICENSE_APP_NAME = data_LICENSE_APP_NAME;
+const APP_TYPE= data_APP_TYPE;
+const UNLIMITED_LICENSE = data_UNLIMITED_LICENSE;
+const USE_OLD_WELCOME_SCREEN = data_USE_OLD_WELCOME_SCREEN;
+const NEED_SUPER_USER = data_NEED_SUPER_USER;
 const companyNameNoSpaces = COMPANY_NAME.replace(/\s+/g, '');
-const NEED_SUPER_USER = true;
+
 
 // ========== FUNCTIONS ==========
 
@@ -82,6 +153,12 @@ function useOldWelcomeScreen() {
     return USE_OLD_WELCOME_SCREEN;
 }
 
+function limitedAccess() {
+    return LIMITEDACCESS;
+}
+
+
+
 /**
  * Check if super user is needed
  * @returns {boolean} True if super user should be created
@@ -107,5 +184,6 @@ module.exports = {
     getLicenseSecret,
     isUnlimitedLicenseEnabled,
     useOldWelcomeScreen,
-    needSuperUser
+    needSuperUser,
+    limitedAccess
 };

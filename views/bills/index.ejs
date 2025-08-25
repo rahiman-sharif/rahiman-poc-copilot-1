@@ -330,7 +330,7 @@
                                             <a href="/bills/<%= bill.id %>" class="btn btn-sm btn-secondary" title="View Bill">
                                                 👁️
                                             </a>
-                                            <a href="/bills/<%= bill.id %>/print" class="btn btn-sm btn-info" title="Print Bill" target="_blank">
+                                            <a href="/bills/<%= bill.id %>/print?from=bills" class="btn btn-sm btn-info" title="Print Bill">
                                                 🖨️
                                             </a>
                                             <% if (user.role === 'admin') { %>

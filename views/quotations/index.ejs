@@ -492,7 +492,7 @@
                                                     🔄 Convert
                                                 </button>
                                             <% } %>
-                                            <a href="/quotations/<%= quotation.id %>/print" class="btn-sm btn-print" target="_blank">
+                                            <a href="/quotations/<%= quotation.id %>/print?from=quotations" class="btn-sm btn-print">
                                                 🖨️ Print
                                             </a>
                                             <% if (user.role === 'admin' || user.role === 'manager') { %>

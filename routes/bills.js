@@ -484,12 +484,16 @@ router.get('/:id/print', requireAuth, (req, res) => {
         // Add GST amount in words
         bill.totalGstInWords = convertAmountToWords(bill.totalGst || 0);
         
+        // Capture the 'from' query parameter for back navigation
+        const fromParam = req.query.from || 'bills';
+        
         res.render('bills/print-compact', {
             title: `Bill #${bill.billNumber} - Compact Print`,
             user: req.session.user,
             bill: bill,
             company: company,
             companyName: company.name || 'Vikram Steels',
+            from: fromParam,
             layout: false // No layout for print view
         });
     } catch (error) {

@@ -708,6 +708,7 @@ router.get('/:id/print', requireAuth, (req, res) => {
             quotation: flattenedQuotation,
             company: company,
             companyName: company.name || 'Vikram Steels',
+            from: req.query.from || 'quotations',
             layout: false // No layout for print view
         });
     } catch (error) {

@@ -142,8 +142,8 @@ router.get('/company/download', requireAuth, requireAdminOrSuper, (req, res) => 
         const fs = require('fs');
         const path = require('path');
         
-        // Get the absolute path to the company.json file
-        const companyFilePath = path.join(process.cwd(), 'data', 'company.json');
+        // Get the correct path to the company.json file based on app config
+        const companyFilePath = path.join(pathManager.getDataPath(), 'company.json');
         
         if (!fs.existsSync(companyFilePath)) {
             return res.status(404).send('Company data file not found');
@@ -163,6 +163,7 @@ router.get('/company/download', requireAuth, requireAdminOrSuper, (req, res) => 
         
         console.log(`📄 Raw encrypted file downloaded by: ${req.session.user.username}`);
         console.log(`📄 File size: ${fileBuffer.length} bytes`);
+        console.log(`📄 File path: ${companyFilePath}`);
         
         // Send the raw file buffer directly
         res.send(fileBuffer);
@@ -214,8 +215,8 @@ router.get('/company/download-key', requireAuth, requireAdminOrSuper, (req, res)
         const path = require('path');
         const jsonProtection = require('../utils/json-protection');
         
-        // Get the absolute path to the company.json file
-        const companyFilePath = path.join(process.cwd(), 'data', 'company.json');
+        // Get the correct path to the company.json file based on app config
+        const companyFilePath = path.join(pathManager.getDataPath(), 'company.json');
         
         if (!fs.existsSync(companyFilePath)) {
             return res.status(404).send('Company data file not found');
@@ -334,8 +335,8 @@ router.post('/company-upload', requireAuth, requireAdminOrSuper, (req, res) => {
             }
             
             // Create backup of current file
-            const companyFilePath = path.join(process.cwd(), 'data', 'company.json');
-            const backupPath = path.join(process.cwd(), 'backups', `company-backup-${Date.now()}.json`);
+            const companyFilePath = path.join(pathManager.getDataPath(), 'company.json');
+            const backupPath = path.join(pathManager.getBackupPath(), `company-backup-${Date.now()}.json`);
             
             // Ensure backups directory exists
             const backupsDir = path.dirname(backupPath);

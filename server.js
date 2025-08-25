@@ -11,7 +11,7 @@ const { exec } = require('child_process');
 const dataManager = require('./utils/dataManager');
 const pathManager = require('./utils/path-manager');
 const licenseManager = require('./utils/licenseManager');
-const { getCompanyName,needSuperUser, isUnlimitedLicenseEnabled, getLicenseAppName, useOldWelcomeScreen } = require('./utils/app-config');
+const { getCompanyName,needSuperUser, isUnlimitedLicenseEnabled, getLicenseAppName, useOldWelcomeScreen, limitedAccess} = require('./utils/app-config');
 const { checkRoutePermission } = require('./middleware/routePermissions');
 const ConsoleManager = require('./utils/console-manager');
 
@@ -361,7 +361,7 @@ function initializeFreshSystem() {
         if (!fs.existsSync(routePermissionsPath)) {
           //  console.log('🛣️ Creating default route permissions...');
             
-            const defaultRoutePermissions = {
+            let defaultRoutePermissions = {
                 "permissions": {
                     "dashboard": {
                         "/dashboard": {
@@ -597,7 +597,250 @@ function initializeFreshSystem() {
                     }
                 },
                 "lastUpdated": new Date().toISOString()
+            };       
+
+            if(limitedAccess() == true){
+                defaultRoutePermissions = {};
+                defaultRoutePermissions = {
+                "permissions": {
+                    "dashboard": {
+                        "/dashboard": {
+                            "enabled": true,
+                            "category": "Dashboard",
+                            "description": "Main Dashboard"
+                        },
+                        "/whatsapp": {
+                            "enabled": true,
+                            "category": "Dashboard",
+                            "description": "Send Bills via WhatsApp"
+                        }
+                    },
+                    "inventory": {
+                        "/items": {
+                            "enabled": true,
+                            "category": "Inventory",
+                            "description": "Items Management"
+                        },
+                        "/items/new": {
+                            "enabled": true,
+                            "category": "Inventory",
+                            "description": "Add New Item"
+                        },
+                        "/items/:id": {
+                            "enabled": true,
+                            "category": "Inventory",
+                            "description": "View Item Details"
+                        },
+                        "/items/:id/edit": {
+                            "enabled": true,
+                            "category": "Inventory",
+                            "description": "Edit Item"
+                        },
+                        "/items/test/stock/:id": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Test Stock Data"
+                        },
+                        "/stock": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Stock Management"
+                        },
+                        "/stock/adjust/:id": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Stock Adjustments"
+                        },
+                        "/stock/movements": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Stock Movements"
+                        },
+                        "/stock/api/item/:id": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Stock API Endpoints"
+                        },
+                        "/stock/debug/items": {
+                            "enabled": false,
+                            "category": "Inventory",
+                            "description": "Debug Stock Items"
+                        }
+                    },
+                    "sales": {
+                        "/bills": {
+                            "enabled": true,
+                            "category": "Sales & Orders",
+                            "description": "Bills Management"
+                        },
+                        "/bills/new": {
+                            "enabled": true,
+                            "category": "Sales & Orders",
+                            "description": "Create New Bill"
+                        },
+                        "/bills/api/fresh-stock": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Fresh Stock API"
+                        },
+                        "/bills/:id": {
+                            "enabled": true,
+                            "category": "Sales & Orders",
+                            "description": "View Bill"
+                        },
+                        "/bills/:id/print": {
+                            "enabled": true,
+                            "category": "Sales & Orders",
+                            "description": "Print Bill"
+                        },
+                        "/quotations": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Quotations Management"
+                        },
+                        "/quotations/new": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Create New Quotation"
+                        },
+                        "/quotations/:id": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "View Quotation"
+                        },
+                        "/quotations/:id/print": {
+                            "enabled": false,
+                            "category": "Sales & Orders",
+                            "description": "Print Quotation"
+                        }
+                    },
+                    "customers": {
+                        "/customers": {
+                            "enabled": true,
+                            "category": "Customer Relations",
+                            "description": "Customers Management"
+                        },
+                        "/customers/new": {
+                            "enabled": true,
+                            "category": "Customer Relations",
+                            "description": "Add New Customer"
+                        },
+                        "/customers/:id/edit": {
+                            "enabled": true,
+                            "category": "Customer Relations",
+                            "description": "Edit Customer"
+                        }
+                    },
+                    "reports": {
+                        "/reports": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "Reports Dashboard"
+                        },
+                        "/reports/sales": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "Sales Reports"
+                        },
+                        "/reports/inventory": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "Inventory Reports"
+                        },
+                        "/reports/customers": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "Customer Reports"
+                        },
+                        "/reports/gst": {
+                            "enabled": false,
+                            "category": "Reports & Analytics",
+                            "description": "GST Reports"
+                        }
+                    },
+                    "administration": {
+                        "/users": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "User Management"
+                        },
+                        "/users/add": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Add New User"
+                        },
+                        "/users/:id/edit": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Edit User"
+                        },
+                        "/users/:id/delete": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Delete User"
+                        },
+                        "/users/:id/toggle-status": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Toggle User Status"
+                        },
+                        "/data": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Data Management"
+                        },
+                        "/data/backup": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Create Backup"
+                        },
+                        "/data/backups": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "View Backups"
+                        },
+                        "/data/restore/:backupName": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Restore Data"
+                        },
+                        "/data/export": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Export Data"
+                        },
+                        "/data/download/:backupName": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Download Backups"
+                        },
+                        "/data/upload-restore": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Upload & Restore"
+                        },
+                        "/settings": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Settings Dashboard"
+                        },
+                        "/settings/company": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Company Settings"
+                        },
+                        "/settings/route-control": {
+                            "enabled": false,
+                            "category": "System Administration",
+                            "description": "Route Control Center"
+                        }
+                    }
+                },
+                "lastUpdated": new Date().toISOString()
             };
+            }
+
+           
             
             fs.writeFileSync(routePermissionsPath, JSON.stringify(defaultRoutePermissions, null, 2));
             //console.log('✅ Default route permissions file created');
